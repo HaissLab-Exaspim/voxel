@@ -13,7 +13,7 @@ from voxel.devices.tunable_lens.base import BaseTunableLens
 # UNITLESS = 4
 # UNDEFINED = 5
 
-INPUTS = {
+LUT_MODES = {
     "current": UnitType.CURRENT,
     "of": UnitType.OF,
     "xy": UnitType.XY,
@@ -46,7 +46,7 @@ class TunableLens(BaseTunableLens):
         # start lens in analog mode
         self._mode = "external"
         self.tunable_lens.Analog.SetAsInput() # default to analog input mode
-        self.tunable_lens.Analog.SetLUTtype(INPUTS["current"]) # default to current mode
+        self.tunable_lens.Analog.SetLUTtype(LUT_MODES["current"]) # default to current mode
 
     @property
     def channel(self):
@@ -61,6 +61,7 @@ class TunableLens(BaseTunableLens):
     @mode.setter
     def mode(self, mode: str):
         """Set the tunable lens control mode."""
+        self._mode = mode
         if mode == "external":
             self.tunable_lens.Analog.SetAsInput()
         elif mode == "internal":
@@ -75,25 +76,25 @@ class TunableLens(BaseTunableLens):
         return temperature
 
     @property
-    def voltages_lut(self):
+    def lut_voltages(self):
         """Get the tunable lens lookup table voltages"""
         values_volts = self.tunable_lens.Analog.GetLUTvoltages()
         return values_volts
 
-    @voltages_lut.setter
-    def voltages_lut(self, values_volts: list):
+    @lut_voltages.setter
+    def lut_voltages(self, values_volts: list):
         """Set the tunable lens lookup table voltages"""
         self.log.info(f'setting voltages lut to {values_volts} volts')
         self.tunable_lens.Analog.SetLUTvoltages(values_volts)
 
     @property
-    def values_lut(self):
+    def lut_values(self):
         """Get the tunable lens lookup table values"""
         values_mA = self.tunable_lens.Analog.GetLUTvalues()
         return values_mA
 
-    @values_lut.setter
-    def values_lut(self, values: list):
+    @lut_values.setter
+    def lut_values(self, values: list):
         """Set the tunable lens lookup table values"""
         unit = UNITS[self.tunable_lens.Analog.GetLUTtype()]
         self.log.info(f'setting current lut to {values} {unit}')
@@ -103,14 +104,14 @@ class TunableLens(BaseTunableLens):
     def lut_mode(self):
         """Get the tunable lens lookup table type"""
         lut_mode = self.tunable_lens.Analog.GetLUTtype()
-        return next(key for key, value in INPUTS.items() if value == lut_mode)
+        return next(key for key, value in LUT_MODES.items() if value == lut_mode)
 
     @lut_mode.setter
     def lut_mode(self, lut_mode: list):
         """Set the tunable lens lookup table type"""
         self.log.info(f'setting lut mode to {lut_mode}')
-        self.tunable_lens.Analog.SetLUTtype(INPUTS[lut_mode])
+        self.tunable_lens.Analog.SetLUTtype(LUT_MODES[lut_mode])
  
-    def close(self):
-        """Close the tunable lens."""
-        self.icc4c.disconnect()
+    # def close(self):
+    #     """Close the tunable lens."""
+    #     self.icc4c.disconnect()
