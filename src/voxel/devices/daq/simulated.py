@@ -214,7 +214,7 @@ class DAQ(BaseDAQ):
             if start_time_ms > timing["period_time_ms"]:
                 raise ValueError("start time must be < period time")
             end_time_ms = channel["parameters"]["end_time_ms"]["channels"][wavelength]
-            if end_time_ms > timing["period_time_ms"] or end_time_ms < start_time_ms:
+            if end_time_ms > timing["period_time_ms"] + timing["rest_time_ms"] or end_time_ms < start_time_ms:
                 raise ValueError("end time must be < period time and > start time")
 
             if waveform == "square wave":
@@ -264,8 +264,8 @@ class DAQ(BaseDAQ):
                 )
 
             # sanity check voltages for ni card range
-            max = getattr(self, "ao_max_volts", 5)
-            min = getattr(self, "ao_min_volts", 0)
+            max = getattr(self, "max_ao_volts", 5)
+            min = getattr(self, "min_ao_volts", 0)
             if numpy.max(voltages[:]) > max or numpy.min(voltages[:]) < min:
                 raise ValueError(f"voltages are out of ni card range [{max}, {min}] volts")
 

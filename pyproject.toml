@@ -2,7 +2,7 @@
 name = "voxel"
 description = "A python package for controlling Light Sheet Microscopes"
 license = { file = "LICENSE" }
-requires-python = ">=3.10, <3.12"
+requires-python = ">=3.10, <=3.12"
 authors = [
     { name = "Micah Woodard", email = "micah.woodard@alleninstitute.org" },
     { name = "Adam Glaser", email = "adam.glaser@alleninstitute.org" },
@@ -38,7 +38,6 @@ dependencies = [
     "PyVISA-py>=0.7.2",
     "pylablib>=1.4.2",
     "nidaqmx>=0.9.0",
-    "tigerasi>=0.0.26",
     # data handling dependencies
     "h5py>=3.0.0",
     # processing and utils dependencies
