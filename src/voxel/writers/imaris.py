@@ -198,12 +198,12 @@ class ImarisWriter(BaseWriter):
         # compute the start/end extremes of the enclosed rectangular solid.
         # (x0, y0, z0) position (in [um]) of the beginning of the first voxel,
         # (xf, yf, zf) position (in [um]) of the end of the last voxel.
-        x0 = self._x_position_mm - (self._x_voxel_size_um * 0.5 * self._column_count_px)
-        y0 = self._y_position_mm - (self._y_voxel_size_um * 0.5 * self._row_count_px)
-        z0 = self._z_position_mm
-        xf = self._x_position_mm + (self._x_voxel_size_um * 0.5 * self._column_count_px)
-        yf = self._y_position_mm + (self._y_voxel_size_um * 0.5 * self._row_count_px)
-        zf = self._z_position_mm + self._frame_count_px * self._z_voxel_size_um
+        x0 = self._x_position_mm * 1000 - (self._x_voxel_size_um * 0.5 * self._column_count_px)
+        y0 = self._y_position_mm * 1000 - (self._y_voxel_size_um * 0.5 * self._row_count_px)
+        z0 = self._z_position_mm * 1000
+        xf = self._x_position_mm * 1000 + (self._x_voxel_size_um * 0.5 * self._column_count_px)
+        yf = self._y_position_mm * 1000 + (self._y_voxel_size_um * 0.5 * self._row_count_px)
+        zf = self._z_position_mm * 1000 + self._frame_count_px * self._z_voxel_size_um
         image_extents = pw.ImageExtents(-x0, -y0, -z0, -xf, -yf, -zf)
         # c = channel, t = time. These fields are unused for now.
         # Note: ImarisWriter performs MUCH faster when the dimension sequence
