@@ -76,10 +76,7 @@ class Camera(BaseCamera):
         for interfaceIndex in range(interface_count):
             device_count = discovery.device_count(interfaceIndex)
             for deviceIndex in range(device_count):
-                if (
-                    discovery.device_info(interfaceIndex, deviceIndex).deviceVendorName
-                    != ""
-                ):
+                if discovery.device_info(interfaceIndex, deviceIndex).deviceVendorName != "":
                     stream_count = discovery.stream_count(interfaceIndex, deviceIndex)
                     for streamIndex in range(stream_count):
                         info = {
@@ -94,9 +91,7 @@ class Camera(BaseCamera):
 
         # identify by serial number and return correct grabber
         if not egrabber_list["grabbers"]:
-            raise ValueError(
-                "no valid cameras found. check connections and close any software."
-            )
+            raise ValueError("no valid cameras found. check connections and close any software.")
 
         try:
             for egrabber in egrabber_list["grabbers"]:
@@ -148,10 +143,7 @@ class Camera(BaseCamera):
     def width_px(self, value: int):
         # reset offset to (0,0)
         self.grabber.remote.set("OffsetX", 0)
-        centered_offset_px = (
-            round((self.max_width_px / 2 - value / 2) / self.step_width_px)
-            * self.step_width_px
-        )
+        centered_offset_px = round((self.max_width_px / 2 - value / 2) / self.step_width_px) * self.step_width_px
         self.grabber.remote.set("OffsetX", centered_offset_px)
         self.grabber.remote.set("Width", value)
         self.log.info(f"width set to: {value} px")
@@ -170,10 +162,7 @@ class Camera(BaseCamera):
     def height_px(self, value: int):
         # reset offset to (0,0)
         self.grabber.remote.set("OffsetY", 0)
-        centered_offset_px = (
-            round((self.max_height_px / 2 - value / 2) / self.step_height_px)
-            * self.step_height_px
-        )
+        centered_offset_px = round((self.max_height_px / 2 - value / 2) / self.step_height_px) * self.step_height_px
         self.grabber.remote.set("OffsetY", centered_offset_px)
         self.grabber.remote.set("Height", value)
         self.log.info(f"height set to: {value} px")
@@ -205,9 +194,7 @@ class Camera(BaseCamera):
     def bit_packing_mode(self):
         bit_packing = self.grabber.stream.get("UnpackingMode")
         # invert the dictionary and find the abstracted key to output
-        return next(
-            key for key, value in BIT_PACKING_MODES.items() if value == bit_packing
-        )
+        return next(key for key, value in BIT_PACKING_MODES.items() if value == bit_packing)
 
     @bit_packing_mode.setter
     def bit_packing_mode(self, bit_packing: str):
@@ -234,15 +221,9 @@ class Camera(BaseCamera):
         source = self.grabber.remote.get("TriggerSource")
         polarity = self.grabber.remote.get("TriggerActivation")
         return {
-            "mode": next(
-                key for key, value in TRIGGERS["mode"].items() if value == mode
-            ),
-            "source": next(
-                key for key, value in TRIGGERS["source"].items() if value == source
-            ),
-            "polarity": next(
-                key for key, value in TRIGGERS["polarity"].items() if value == polarity
-            ),
+            "mode": next(key for key, value in TRIGGERS["mode"].items() if value == mode),
+            "source": next(key for key, value in TRIGGERS["source"].items() if value == source),
+            "polarity": next(key for key, value in TRIGGERS["polarity"].items() if value == polarity),
         }
 
     @trigger.setter
@@ -260,15 +241,11 @@ class Camera(BaseCamera):
         if polarity not in valid_polarity:
             raise ValueError("polarity must be one of %r." % valid_polarity)
         # note: Setting TriggerMode if it's already correct will throw an error
-        if (
-            self.grabber.remote.get("TriggerMode") != mode
-        ):  # set camera to external trigger mode
+        if self.grabber.remote.get("TriggerMode") != mode:  # set camera to external trigger mode
             self.grabber.remote.set("TriggerMode", TRIGGERS["mode"][mode])
         self.grabber.remote.set("TriggerSource", TRIGGERS["source"][source])
         self.grabber.remote.set("TriggerActivation", TRIGGERS["polarity"][polarity])
-        self.log.info(
-            f"trigger set to, mode: {mode}, source: {source}, polarity: {polarity}"
-        )
+        self.log.info(f"trigger set to, mode: {mode}, source: {source}, polarity: {polarity}")
         # refresh parameter values
         self._get_min_max_step_values()
 
@@ -326,9 +303,7 @@ class Camera(BaseCamera):
         frame_size_mb = self.width_px * self.height_px * bit_to_byte / 1e6
         self.buffer_size_frames = round(BUFFER_SIZE_MB / frame_size_mb)
         # realloc buffers appears to be allocating ram on the pc side, not camera side.
-        self.grabber.realloc_buffers(
-            self.buffer_size_frames
-        )  # allocate RAM buffer N frames
+        self.grabber.realloc_buffers(self.buffer_size_frames)  # allocate RAM buffer N frames
         self.log.info(f"buffer set to: {self.buffer_size_frames} frames")
 
     def start(self, frame_count: int = GENTL_INFINITE):
@@ -365,17 +340,13 @@ class Camera(BaseCamera):
         row_count = self.grabber.remote.get("Height")
         timeout_ms = 1000
         with Buffer(self.grabber, timeout=timeout_ms) as buffer:
-            ptr = buffer.get_info(
-                BUFFER_INFO_BASE, INFO_DATATYPE_PTR
-            )  # grab pointer to new frame
+            ptr = buffer.get_info(BUFFER_INFO_BASE, INFO_DATATYPE_PTR)  # grab pointer to new frame
             # grab frame data
-            data = ct.cast(
-                ptr, ct.POINTER(ct.c_ubyte * column_count * row_count * 2)
-            ).contents
+            data = ct.cast(ptr, ct.POINTER(ct.c_ubyte * column_count * row_count * 2)).contents
             # cast data to numpy array of correct size/datatype:
-            image = numpy.frombuffer(
-                data, count=int(column_count * row_count), dtype=numpy.uint16
-            ).reshape((row_count, column_count))
+            image = numpy.frombuffer(data, count=int(column_count * row_count), dtype=numpy.uint16).reshape(
+                (row_count, column_count)
+            )
         # do software binning if != 1 and not a string for setting in egrabber
         if self._binning > 1 and isinstance(self._binning, int):
             image = np.copy(self.gpu_binning.run(image))
@@ -393,23 +364,13 @@ class Camera(BaseCamera):
         # https://documentation.euresys.com/Products/Coaxlink/Coaxlink/en-us/Content/IOdoc/egrabber-reference/
         # namespace_gen_t_l.html#a6b498d9a4c08dea2c44566722699706e
         state = {}
-        state["Frame Index"] = self.grabber.stream.get_info(
-            STREAM_INFO_NUM_DELIVERED, INFO_DATATYPE_SIZET
-        )
-        state["Input Buffer Size"] = self.grabber.stream.get_info(
-            STREAM_INFO_NUM_QUEUED, INFO_DATATYPE_SIZET
-        )
-        state["Output Buffer Size"] = self.grabber.stream.get_info(
-            STREAM_INFO_NUM_AWAIT_DELIVERY, INFO_DATATYPE_SIZET
-        )
+        state["Frame Index"] = self.grabber.stream.get_info(STREAM_INFO_NUM_DELIVERED, INFO_DATATYPE_SIZET)
+        state["Input Buffer Size"] = self.grabber.stream.get_info(STREAM_INFO_NUM_QUEUED, INFO_DATATYPE_SIZET)
+        state["Output Buffer Size"] = self.grabber.stream.get_info(STREAM_INFO_NUM_AWAIT_DELIVERY, INFO_DATATYPE_SIZET)
         # number of underrun, i.e. dropped frames
-        state["Dropped Frames"] = self.grabber.stream.get_info(
-            STREAM_INFO_NUM_UNDERRUN, INFO_DATATYPE_SIZET
-        )
+        state["Dropped Frames"] = self.grabber.stream.get_info(STREAM_INFO_NUM_UNDERRUN, INFO_DATATYPE_SIZET)
         # adjust data rate based on internal software binning
-        state["Data Rate [MB/s]"] = (
-            self.grabber.stream.get("StatisticsDataRate") / self._binning**2
-        )
+        state["Data Rate [MB/s]"] = self.grabber.stream.get("StatisticsDataRate") / self._binning**2
         state["Frame Rate [fps]"] = self.grabber.stream.get("StatisticsFrameRate")
         self.log.info(
             f"id: {self.id}, "
@@ -433,9 +394,7 @@ class Camera(BaseCamera):
                 if self.grabber.device.get(query.available(feature)):
                     if self.grabber.device.get(query.readable(feature)):
                         if not self.grabber.device.get(query.command(feature)):
-                            self.log.info(
-                                f"device, {feature}, {self.grabber.device.get(feature)}"
-                            )
+                            self.log.info(f"device, {feature}, {self.grabber.device.get(feature)}")
 
         categories = self.grabber.remote.get(query.categories())
         for category in categories:
@@ -444,13 +403,8 @@ class Camera(BaseCamera):
                 if self.grabber.remote.get(query.available(feature)):
                     if self.grabber.remote.get(query.readable(feature)):
                         if not self.grabber.remote.get(query.command(feature)):
-                            if (
-                                feature != "BalanceRatioSelector"
-                                and feature != "BalanceWhiteAuto"
-                            ):
-                                self.log.info(
-                                    f"remote, {feature}, {self.grabber.remote.get(feature)}"
-                                )
+                            if feature != "BalanceRatioSelector" and feature != "BalanceWhiteAuto":
+                                self.log.info(f"remote, {feature}, {self.grabber.remote.get(feature)}")
 
         categories = self.grabber.stream.get(query.categories())
         for category in categories:
@@ -459,9 +413,7 @@ class Camera(BaseCamera):
                 if self.grabber.stream.get(query.available(feature)):
                     if self.grabber.stream.get(query.readable(feature)):
                         if not self.grabber.stream.get(query.command(feature)):
-                            self.log.info(
-                                f"stream, {feature}, {self.grabber.stream.get(feature)}"
-                            )
+                            self.log.info(f"stream, {feature}, {self.grabber.stream.get(feature)}")
 
         categories = self.grabber.interface.get(query.categories())
         for category in categories:
@@ -470,9 +422,7 @@ class Camera(BaseCamera):
                 if self.grabber.interface.get(query.available(feature)):
                     if self.grabber.interface.get(query.readable(feature)):
                         if not self.grabber.interface.get(query.command(feature)):
-                            self.log.info(
-                                f"interface, {feature}, {self.grabber.interface.get(feature)}"
-                            )
+                            self.log.info(f"interface, {feature}, {self.grabber.interface.get(feature)}")
 
         categories = self.grabber.system.get(query.categories())
         for category in categories:
@@ -481,9 +431,7 @@ class Camera(BaseCamera):
                 if self.grabber.system.get(query.available(feature)):
                     if self.grabber.system.get(query.readable(feature)):
                         if not self.grabber.system.get(query.command(feature)):
-                            self.log.info(
-                                f"system, {feature}, {self.grabber.system.get(feature)}"
-                            )
+                            self.log.info(f"system, {feature}, {self.grabber.system.get(feature)}")
 
     def _update_parameters(self):
         # grab min/max parameter values
@@ -506,9 +454,7 @@ class Camera(BaseCamera):
         # minimum exposure time
         # convert from us to ms
         try:
-            self.min_exposure_time_ms = (
-                self.grabber.remote.get("ExposureTime.Min") / 1e3
-            )
+            self.min_exposure_time_ms = self.grabber.remote.get("ExposureTime.Min") / 1e3
             type(self).exposure_time_ms.minimum = self.min_exposure_time_ms
             self.log.debug(f"min exposure time is: {self.min_exposure_time_ms} ms")
         except:
@@ -516,9 +462,7 @@ class Camera(BaseCamera):
         # maximum exposure time
         # convert from us to ms
         try:
-            self.max_exposure_time_ms = (
-                self.grabber.remote.get("ExposureTime.Max") / 1e3
-            )
+            self.max_exposure_time_ms = self.grabber.remote.get("ExposureTime.Max") / 1e3
             type(self).exposure_time_ms.maximum = self.max_exposure_time_ms
             self.log.debug(f"max exposure time is: {self.max_exposure_time_ms} ms")
         except:
@@ -578,9 +522,7 @@ class Camera(BaseCamera):
         # step exposure time
         # convert from us to ms
         try:
-            self.step_exposure_time_ms = (
-                self.grabber.remote.get("ExposureTime.Inc") / 1e3
-            )
+            self.step_exposure_time_ms = self.grabber.remote.get("ExposureTime.Inc") / 1e3
             type(self).exposure_time_ms.step = self.step_exposure_time_ms
             self.log.debug(f"step exposure time is: {self.step_exposure_time_ms} ms")
         except:
@@ -688,9 +630,7 @@ class Camera(BaseCamera):
         for trigger_mode in trigger_mode_options:
             # note: setting TriggerMode to the already set value throws an error
             # so check the current value and only set if new value
-            if (
-                self.grabber.remote.get("TriggerMode") != trigger_mode
-            ):  # set camera to external trigger mode
+            if self.grabber.remote.get("TriggerMode") != trigger_mode:  # set camera to external trigger mode
                 try:
                     self.grabber.remote.set("TriggerMode", trigger_mode)
                     # generate lowercase string key
@@ -706,9 +646,7 @@ class Camera(BaseCamera):
         self.grabber.remote.set("TriggerMode", init_trigger_mode)
 
     def _query_trigger_sources(self):
-        trigger_source_options = self.grabber.remote.get(
-            "@ee TriggerSource", dtype=list
-        )
+        trigger_source_options = self.grabber.remote.get("@ee TriggerSource", dtype=list)
         init_trigger_source = self.grabber.remote.get("TriggerSource")
         for trigger_source in trigger_source_options:
             try:
@@ -722,9 +660,7 @@ class Camera(BaseCamera):
         self.grabber.remote.set("TriggerSource", init_trigger_source)
 
     def _query_trigger_polarities(self):
-        trigger_polarity_options = self.grabber.remote.get(
-            "@ee TriggerActivation", dtype=list
-        )
+        trigger_polarity_options = self.grabber.remote.get("@ee TriggerActivation", dtype=list)
         init_trigger_polarity = self.grabber.remote.get("TriggerActivation")
         for trigger_polarity in trigger_polarity_options:
             try:

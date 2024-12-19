@@ -49,15 +49,9 @@ class Instrument:
                     raise ValueError(f"laser {laser_name} not in {self.lasers.keys()}")
             for filter in channel.get("filters", []):
                 if filter not in self.filters.keys():
-                    raise ValueError(
-                        f"filter wheel {filter} not in {self.filters.keys()}"
-                    )
-                if filter not in sum(
-                    [list(v.filters.keys()) for v in self.filter_wheels.values()], []
-                ):
-                    raise ValueError(
-                        f"filter {filter} not associated with any filter wheel: {self.filter_wheels}"
-                    )
+                    raise ValueError(f"filter wheel {filter} not in {self.filters.keys()}")
+                if filter not in sum([list(v.filters.keys()) for v in self.filter_wheels.values()], []):
+                    raise ValueError(f"filter {filter} not associated with any filter wheel: {self.filter_wheels}")
         self.channels = self.config["instrument"]["channels"]
 
     def _construct_device(self, device_name, device_specs, lock: Lock = None):
@@ -93,17 +87,11 @@ class Instrument:
                 self.stage_axes.append(instrument_axis)
 
         # Add subdevices under device and fill in any needed keywords to init
-        for subdevice_name, subdevice_specs in device_specs.get(
-            "subdevices", {}
-        ).items():
+        for subdevice_name, subdevice_specs in device_specs.get("subdevices", {}).items():
             # copy so config is not altered by adding in parent devices
-            self._construct_subdevice(
-                device_object, subdevice_name, copy.deepcopy(subdevice_specs), lock
-            )
+            self._construct_subdevice(device_object, subdevice_name, copy.deepcopy(subdevice_specs), lock)
 
-    def _construct_subdevice(
-        self, device_object, subdevice_name, subdevice_specs, lock
-    ):
+    def _construct_subdevice(self, device_object, subdevice_name, subdevice_specs, lock):
         """Handle the case where devices share serial ports or device objects
         :param device_object: parent device setup before sub-device
         :param subdevice_name: name of sub-device
@@ -119,13 +107,9 @@ class Instrument:
         kwds = {}
         for name, parameter in subdevice_needs.items():
             # If subdevice init needs a serial port, add device's serial port to init arguments
-            if parameter.annotation == Serial and Serial in [
-                type(v) for v in device_object.__dict__.values()
-            ]:
+            if parameter.annotation == Serial and Serial in [type(v) for v in device_object.__dict__.values()]:
                 # assuming only one relevant serial port in parent
-                subdevice_specs["init"][name] = [
-                    v for v in device_object.__dict__.values() if type(v) == Serial
-                ][0]
+                subdevice_specs["init"][name] = [v for v in device_object.__dict__.values() if type(v) == Serial][0]
             # If subdevice init needs parent object type, add device object to init arguments
             elif parameter.annotation == type(device_object):
                 subdevice_specs["init"][name] = device_object
@@ -162,15 +146,12 @@ class Instrument:
         """Capture current state of instrument in config form"""
 
         for device_name, device_specs in self.config["instrument"]["devices"].items():
-            device = getattr(self, inflection.pluralize(device_specs["type"]))[
-                device_name
-            ]
+            device = getattr(self, inflection.pluralize(device_specs["type"]))[device_name]
             properties = {}
             for attr_name in dir(device):
                 attr = getattr(type(device), attr_name, None)
                 if (
-                    isinstance(attr, property)
-                    or isinstance(inspect.unwrap(attr), property)
+                    isinstance(attr, property) or isinstance(inspect.unwrap(attr), property)
                 ) and attr_name != "latest_frame":
                     properties[attr_name] = getattr(device, attr_name)
             device_specs["properties"] = properties
@@ -198,15 +179,9 @@ def for_all_methods(lock, cls):
         elif isinstance(attr, property):
             wrapped_getter = lock_methods(getattr(attr, "fget"), lock)
             # don't wrap setters if none
-            wrapped_setter = (
-                lock_methods(getattr(attr, "fset"), lock)
-                if getattr(attr, "fset") is not None
-                else None
-            )
+            wrapped_setter = lock_methods(getattr(attr, "fset"), lock) if getattr(attr, "fset") is not None else None
             setattr(cls, attr_name, property(wrapped_getter, wrapped_setter))
-        elif callable(attr) and not isinstance(
-            inspect.getattr_static(cls, attr_name), staticmethod
-        ):
+        elif callable(attr) and not isinstance(inspect.getattr_static(cls, attr_name), staticmethod):
             setattr(cls, attr_name, lock_methods(attr, lock))
     return cls
 

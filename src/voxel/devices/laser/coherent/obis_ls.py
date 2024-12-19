@@ -6,7 +6,12 @@ from voxel.descriptors.deliminated_property import DeliminatedProperty
 from ..base import BaseLaser
 from .obis_lx import obis_modulation_getter, obis_modulation_setter
 
-MODULATION_MODES = {"off": "CWP", "analog": "ANALOG", "digital": "DIGITAL", "mixed": "MIXED"}
+MODULATION_MODES = {
+    "off": "CWP",
+    "analog": "ANALOG",
+    "digital": "DIGITAL",
+    "mixed": "MIXED",
+}
 
 
 class ObisLSLaser(BaseLaser):

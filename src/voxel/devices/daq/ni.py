@@ -50,10 +50,7 @@ class DAQ(BaseDAQ):
         self.ao_physical_chans = self.dev.ao_physical_chans.channel_names
         self.co_physical_chans = self.dev.co_physical_chans.channel_names
         self.do_physical_chans = self.dev.do_ports.channel_names
-        self.dio_ports = [
-            channel.replace(f"port", "PFI")
-            for channel in self.dev.do_ports.channel_names
-        ]
+        self.dio_ports = [channel.replace(f"port", "PFI") for channel in self.dev.do_ports.channel_names]
         self.dio_lines = self.dev.di_lines.channel_names
         self.max_ao_rate = self.dev.ao_max_rate
         self.min_ao_rate = self.dev.ao_min_rate
@@ -116,16 +113,12 @@ class DAQ(BaseDAQ):
                 # add channel to task
                 channel_port = specs["port"]
                 if f"{self.id}/{channel_port}" not in channel_options[task_type]:
-                    raise ValueError(
-                        f"{task_type} number must be one of {channel_options[task_type]}"
-                    )
+                    raise ValueError(f"{task_type} number must be one of {channel_options[task_type]}")
                 physical_name = f"/{self.id}/{channel_port}"
                 add_task_options[task_type](physical_name)
 
             total_time_ms = timing["period_time_ms"] + timing["rest_time_ms"]
-            daq_samples = int(
-                ((total_time_ms) / 1000) * timing["sampling_frequency_hz"]
-            )
+            daq_samples = int(((total_time_ms) / 1000) * timing["sampling_frequency_hz"])
 
             if timing["trigger_mode"] == "on":
                 daq_task.timing.cfg_samp_clk_timing(
@@ -138,17 +131,12 @@ class DAQ(BaseDAQ):
                     trigger_source=f"/{self.id}/{trigger_port}",
                     trigger_edge=TRIGGER_EDGE[timing["trigger_polarity"]],
                 )
-                daq_task.triggers.start_trigger.retriggerable = RETRIGGERABLE[
-                    timing["retriggerable"]
-                ]
+                daq_task.triggers.start_trigger.retriggerable = RETRIGGERABLE[timing["retriggerable"]]
             else:
                 daq_task.timing.cfg_samp_clk_timing(
                     rate=timing["sampling_frequency_hz"],
                     sample_mode=SAMPLE_MODE[timing["sample_mode"]],
-                    samps_per_chan=int(
-                        (timing["period_time_ms"] / 1000)
-                        / timing["sampling_frequency_hz"]
-                    ),
+                    samps_per_chan=int((timing["period_time_ms"] / 1000) / timing["sampling_frequency_hz"]),
                 )
 
             setattr(daq_task, f"{task_type}_line_states_done_state", Level.LOW)
@@ -166,9 +154,7 @@ class DAQ(BaseDAQ):
 
             for channel_number in task["counters"]:
                 if f"{self.id}/{channel_number}" not in self.co_physical_chans:
-                    raise ValueError(
-                        "co number must be one of %r." % self.co_physical_chans
-                    )
+                    raise ValueError("co number must be one of %r." % self.co_physical_chans)
                 physical_name = f"/{self.id}/{channel_number}"
                 co_chan = daq_task.co_channels.add_co_pulse_chan_freq(
                     counter=physical_name,
@@ -207,9 +193,9 @@ class DAQ(BaseDAQ):
             raise ValueError("Period time must be >0 ms")
 
         sampling_frequency_hz = timing["sampling_frequency_hz"]
-        if sampling_frequency_hz < getattr(
-            self, f"min_{task_type}_rate", 0
-        ) or sampling_frequency_hz > getattr(self, f"max_{task_type}_rate"):
+        if sampling_frequency_hz < getattr(self, f"min_{task_type}_rate", 0) or sampling_frequency_hz > getattr(
+            self, f"max_{task_type}_rate"
+        ):
             raise ValueError(f"Sampling frequency must be > {getattr(self, f'{task_type}_min_rate', 0)} Hz and \
                                          <{getattr(self, f'{task_type}_max_rate')} Hz!")
 
@@ -234,38 +220,21 @@ class DAQ(BaseDAQ):
             if waveform not in valid:
                 raise ValueError("waveform must be one of %r." % valid)
 
-            start_time_ms = channel["parameters"]["start_time_ms"]["channels"][
-                wavelength
-            ]
+            start_time_ms = channel["parameters"]["start_time_ms"]["channels"][wavelength]
             if start_time_ms > timing["period_time_ms"]:
                 raise ValueError("start time must be < period time")
             end_time_ms = channel["parameters"]["end_time_ms"]["channels"][wavelength]
-            if (
-                end_time_ms > timing["period_time_ms"] + timing["rest_time_ms"]
-                or end_time_ms < start_time_ms
-            ):
+            if end_time_ms > timing["period_time_ms"] + timing["rest_time_ms"] or end_time_ms < start_time_ms:
                 raise ValueError("end time must be < period time and > start time")
 
             if waveform == "square wave":
                 try:
-                    max_volts = (
-                        channel["parameters"]["max_volts"]["channels"][wavelength]
-                        if task_type == "ao"
-                        else 5
-                    )
+                    max_volts = channel["parameters"]["max_volts"]["channels"][wavelength] if task_type == "ao" else 5
                     if max_volts > self.max_ao_volts:
-                        raise ValueError(
-                            f"max volts must be < {self.max_ao_volts} volts"
-                        )
-                    min_volts = (
-                        channel["parameters"]["min_volts"]["channels"][wavelength]
-                        if task_type == "ao"
-                        else 0
-                    )
+                        raise ValueError(f"max volts must be < {self.max_ao_volts} volts")
+                    min_volts = channel["parameters"]["min_volts"]["channels"][wavelength] if task_type == "ao" else 0
                     if min_volts < self.min_ao_volts:
-                        raise ValueError(
-                            f"min volts must be > {self.min_ao_volts} volts"
-                        )
+                        raise ValueError(f"min volts must be > {self.min_ao_volts} volts")
                 except AttributeError:
                     raise ValueError("missing input parameter for square wave")
                 voltages = self.square_wave(
@@ -278,26 +247,15 @@ class DAQ(BaseDAQ):
                     min_volts,
                 )
 
-            if (
-                waveform == "sawtooth" or waveform == "triangle wave"
-            ):  # setup is same for both waves, only be ao task
+            if waveform == "sawtooth" or waveform == "triangle wave":  # setup is same for both waves, only be ao task
                 try:
-                    amplitude_volts = channel["parameters"]["amplitude_volts"][
-                        "channels"
-                    ][wavelength]
-                    offset_volts = channel["parameters"]["offset_volts"]["channels"][
-                        wavelength
-                    ]
-                    if (
-                        offset_volts < self.min_ao_volts
-                        or offset_volts > self.max_ao_volts
-                    ):
+                    amplitude_volts = channel["parameters"]["amplitude_volts"]["channels"][wavelength]
+                    offset_volts = channel["parameters"]["offset_volts"]["channels"][wavelength]
+                    if offset_volts < self.min_ao_volts or offset_volts > self.max_ao_volts:
                         raise ValueError(
                             f"min volts must be > {self.min_ao_volts} volts and < {self.max_ao_volts} volts"
                         )
-                    cutoff_frequency_hz = channel["parameters"]["cutoff_frequency_hz"][
-                        "channels"
-                    ][wavelength]
+                    cutoff_frequency_hz = channel["parameters"]["cutoff_frequency_hz"]["channels"][wavelength]
                     if cutoff_frequency_hz < 0:
                         raise ValueError(f"cutoff frequnecy must be > 0 Hz")
                 except AttributeError:
@@ -319,27 +277,18 @@ class DAQ(BaseDAQ):
             max = getattr(self, "max_ao_volts", 5)
             min = getattr(self, "min_ao_volts", 0)
             if numpy.max(voltages[:]) > max or numpy.min(voltages[:]) < min:
-                raise ValueError(
-                    f"voltages are out of ni card range [{max}, {min}] volts"
-                )
+                raise ValueError(f"voltages are out of ni card range [{max}, {min}] volts")
 
             # sanity check voltages for device range
-            if (
-                numpy.max(voltages[:]) > device_max_volts
-                or numpy.min(voltages[:]) < device_min_volts
-            ):
-                raise ValueError(
-                    f"voltages are out of device range [{device_min_volts}, {device_max_volts}] volts"
-                )
+            if numpy.max(voltages[:]) > device_max_volts or numpy.min(voltages[:]) < device_min_volts:
+                raise ValueError(f"voltages are out of device range [{device_min_volts}, {device_max_volts}] volts")
 
             # store 1d voltage array into 2d waveform array
 
             waveform_attribute[f"{port}: {name}"] = voltages
 
         # store these values as properties for plotting purposes
-        setattr(
-            self, f"{task_type}_sampling_frequency_hz", timing["sampling_frequency_hz"]
-        )
+        setattr(self, f"{task_type}_sampling_frequency_hz", timing["sampling_frequency_hz"])
         setattr(
             self,
             f"{task_type}_total_time_ms",
@@ -349,9 +298,7 @@ class DAQ(BaseDAQ):
     def write_ao_waveforms(self, rereserve_buffer=True):
         ao_voltages = numpy.array(list(self.ao_waveforms.values()))
 
-        if (
-            rereserve_buffer
-        ):  # don't need to rereseve when rewriting already running tasks
+        if rereserve_buffer:  # don't need to rereseve when rewriting already running tasks
             # unreserve buffer
             self.ao_task.control(TaskMode.TASK_UNRESERVE)
             # sets buffer to length of voltages
@@ -361,19 +308,13 @@ class DAQ(BaseDAQ):
 
     def write_do_waveforms(self, rereserve_buffer=True):
         do_voltages = numpy.array(list(self.do_waveforms.values()))
-        if (
-            rereserve_buffer
-        ):  # don't need to rereseve when rewriting already running tasks
+        if rereserve_buffer:  # don't need to rereseve when rewriting already running tasks
             # unreserve buffer
             self.do_task.control(TaskMode.TASK_UNRESERVE)
             # sets buffer to length of voltages
             self.do_task.out_stream.output_buf_size = len(do_voltages[0])
             # FIXME: Really weird quirk on Micah's computer. Check if actually real
-        do_voltages = (
-            do_voltages.astype("uint32")[0]
-            if len(do_voltages) == 1
-            else do_voltages.astype("uint32")
-        )
+        do_voltages = do_voltages.astype("uint32")[0] if len(do_voltages) == 1 else do_voltages.astype("uint32")
         self.do_task.write(do_voltages)
 
     def sawtooth(
@@ -415,9 +356,7 @@ class DAQ(BaseDAQ):
         )
 
         # bessel filter order 6, cutoff frequency is normalied from 0-1 by nyquist frequency
-        b, a = signal.bessel(
-            6, cutoff_frequency_hz / (sampling_frequency_hz / 2), btype="low"
-        )
+        b, a = signal.bessel(6, cutoff_frequency_hz / (sampling_frequency_hz / 2), btype="low")
 
         # pad before filtering with last value
         padding = int(2 / (cutoff_frequency_hz / (sampling_frequency_hz)))
@@ -448,9 +387,7 @@ class DAQ(BaseDAQ):
         max_volts: float,
         min_volts: float,
     ):
-        time_samples = int(
-            ((period_time_ms + rest_time_ms) / 1000) * sampling_frequency_hz
-        )
+        time_samples = int(((period_time_ms + rest_time_ms) / 1000) * sampling_frequency_hz)
         start_sample = int((start_time_ms / 1000) * sampling_frequency_hz)
         end_sample = int((end_time_ms / 1000) * sampling_frequency_hz)
         waveform = numpy.zeros(time_samples) + min_volts
@@ -509,9 +446,7 @@ class DAQ(BaseDAQ):
             for waveform in self.do_waveforms:
                 plt.plot(time_ms, self.do_waveforms[waveform], label=waveform)
 
-        plt.axis(
-            [0, numpy.max([self.ao_total_time_ms, self.do_total_time_ms]), -0.2, 5.2]
-        )
+        plt.axis([0, numpy.max([self.ao_total_time_ms, self.do_total_time_ms]), -0.2, 5.2])
         ax.xaxis.set_minor_locator(AutoMinorLocator())
         ax.yaxis.set_minor_locator(AutoMinorLocator())
         ax.spines[["right", "top"]].set_visible(False)
@@ -526,9 +461,7 @@ class DAQ(BaseDAQ):
     def _rereserve_buffer(self, buf_len):
         """If tasks are already configured, the buffer needs to be cleared and rereserved to work"""
         self.ao_task.control(TaskMode.TASK_UNRESERVE)  # Unreserve buffer
-        self.ao_task.out_stream.output_buf_size = (
-            buf_len  # Sets buffer to length of voltages
-        )
+        self.ao_task.out_stream.output_buf_size = buf_len  # Sets buffer to length of voltages
         self.ao_task.control(TaskMode.TASK_COMMIT)
 
         self.do_task.control(TaskMode.TASK_UNRESERVE)  # Unreserve buffer

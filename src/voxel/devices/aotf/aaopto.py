@@ -23,9 +23,7 @@ class MPDSSingleton(MPDS, metaclass=Singleton):
 
 
 class AOTF(BaseAOTF):
-
     def __init__(self, port: str):
-
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
         self.aotf = MPDSSingleton(com_port=port)
         self.id = self.aotf.get_product_id()

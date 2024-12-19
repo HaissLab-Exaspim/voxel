@@ -31,9 +31,7 @@ class Acquisition:
         self.acquisition_name = None  # initialize acquisition_name that will be populated at start of acquisition
 
         # initialize operations
-        for operation_type, operation_dict in self.config["acquisition"][
-            "operations"
-        ].items():
+        for operation_type, operation_dict in self.config["acquisition"]["operations"].items():
             setattr(self, operation_type, dict())
             self._construct_operations(operation_type, operation_dict)
 
@@ -68,9 +66,7 @@ class Acquisition:
                 setattr(self, operation_type, {device_name: {}})
             elif not getattr(self, operation_type).get(device_name, False):
                 getattr(self, operation_type)[device_name] = {}
-            getattr(self, operation_type)[device_name][operation_name] = (
-                operation_object
-            )
+            getattr(self, operation_type)[device_name][operation_name] = operation_object
 
     def _construct_class(self, class_specs: dict):
         """Construct a class object based on dictionary specifications
@@ -94,9 +90,7 @@ class Acquisition:
         master_device_type = self.instrument.master_device["type"]
         # if camera, calculate acquisition rate based on frame time
         if master_device_type == "camera":
-            acquisition_rate_hz = 1.0 / (
-                self.instrument.cameras[master_device_name].frame_time_ms / 1000
-            )
+            acquisition_rate_hz = 1.0 / (self.instrument.cameras[master_device_name].frame_time_ms / 1000)
         # if scanning stage, calculate acquisition rate based on speed and voxel size
         elif master_device_type == "scanning stage":
             speed_mm_s = self.instrument.scanning_stages[master_device_name].speed_mm_s
@@ -105,14 +99,10 @@ class Acquisition:
         # if daq, calculate based on task interval time
         elif master_device_type == "daq":
             master_task = self.instrument.master_device["task"]
-            acquisition_rate_hz = (
-                1.0 / self.instrument.daqs[master_device_name].task_time_s[master_task]
-            )
+            acquisition_rate_hz = 1.0 / self.instrument.daqs[master_device_name].task_time_s[master_task]
         # otherwise assertion, these are the only three supported master devices
         else:
-            raise ValueError(
-                f"master device type {master_device_type} is not supported."
-            )
+            raise ValueError(f"master device type {master_device_type} is not supported.")
         return acquisition_rate_hz
 
     def run(self):
@@ -146,9 +136,7 @@ class Acquisition:
     def _set_acquisition_name(self):
         """Iterate through operations and set acquisition name if it has attr"""
 
-        for device_name, operation_dict in self.config["acquisition"][
-            "operations"
-        ].items():
+        for device_name, operation_dict in self.config["acquisition"]["operations"].items():
             for op_name, op_specs in operation_dict.items():
                 op_type = inflection.pluralize(op_specs["type"])
                 operation = getattr(self, op_type)[device_name][op_name]
@@ -161,9 +149,7 @@ class Acquisition:
         # check that there is an associated writer for each camera
         for camera_id, camera in self.instrument.cameras.items():
             if camera_id not in self.writers.keys():
-                raise ValueError(
-                    f"no writer found for camera {camera_id}. check yaml files."
-                )
+                raise ValueError(f"no writer found for camera {camera_id}. check yaml files.")
 
         # check that files won't be overwritten if multiple writers/transfers per device
         for device_name, writers in self.writers.items():
@@ -175,9 +161,7 @@ class Acquisition:
                 )
         # check that files won't be overwritten if multiple writers/transfers per device
         for device_name, transfers in getattr(self, "transfers", {}).items():
-            external_directories = [
-                transfer.external_path for transfer in transfers.values()
-            ]
+            external_directories = [transfer.external_path for transfer in transfers.values()]
             if len(external_directories) != len(set(external_directories)):
                 raise ValueError(
                     f"More than one operation for device {device_name} is transferring to the same folder."
@@ -191,17 +175,13 @@ class Acquisition:
                 raise ValueError(f"not all stage axes are defined for tile positions")
             tile_channel = tile["channel"]
             if tile_channel not in self.instrument.channels:
-                raise ValueError(
-                    f"channel {tile_channel} is not in {self.instrument.channels}"
-                )
+                raise ValueError(f"channel {tile_channel} is not in {self.instrument.channels}")
 
     def _frame_size_mb(self, camera_id: str, writer_id: str):
         row_count_px = self.instrument.cameras[camera_id].height_px
         column_count_px = self.instrument.cameras[camera_id].width_px
         data_type = self.writers[camera_id][writer_id].data_type
-        frame_size_mb = (
-            row_count_px * column_count_px * numpy.dtype(data_type).itemsize / 1024**2
-        )
+        frame_size_mb = row_count_px * column_count_px * numpy.dtype(data_type).itemsize / 1024**2
         return frame_size_mb
 
     def _pyramid_factor(self, levels: int):
@@ -231,9 +211,7 @@ class Acquisition:
 
             chunk_size = writer.chunk_count_px
             chunk_lock = threading.Lock()
-            img_buffer = SharedDoubleBuffer(
-                (chunk_size, camera.height_px, camera.width_px), dtype=writer.data_type
-            )
+            img_buffer = SharedDoubleBuffer((chunk_size, camera.height_px, camera.width_px), dtype=writer.data_type)
 
             # set up and start writer and camera
             writer.prepare()
@@ -284,9 +262,7 @@ class Acquisition:
             writer.delete_files()
         else:
             compression_ratio = 1.0
-        self.log.info(
-            f"compression ratio for camera: {camera_id} writer: {writer_id} ~ {compression_ratio:.1f}"
-        )
+        self.log.info(f"compression ratio for camera: {camera_id} writer: {writer_id} ~ {compression_ratio:.1f}")
         return compression_ratio
 
     def check_local_acquisition_disk_space(self):
@@ -312,17 +288,13 @@ class Acquisition:
 
         for drive in drives:
             required_size_gb = sum(drives[drive])
-            self.log.info(
-                f"required disk space = {required_size_gb:.1f} [GB] on drive {drive}"
-            )
+            self.log.info(f"required disk space = {required_size_gb:.1f} [GB] on drive {drive}")
             free_size_gb = shutil.disk_usage(drive).free / 1024**3
             if data_size_gb >= free_size_gb:
                 self.log.error(f"only {free_size_gb:.1f} available on drive: {drive}")
                 raise ValueError(f"only {free_size_gb:.1f} available on drive: {drive}")
             else:
-                self.log.info(
-                    f"available disk space = {free_size_gb:.1f} [GB] on drive {drive}"
-                )
+                self.log.info(f"available disk space = {free_size_gb:.1f} [GB] on drive {drive}")
 
     def check_external_acquisition_disk_space(self):
         """Checks local and ext disk space before scan to see if disk has enough space scan"""
@@ -335,9 +307,7 @@ class Acquisition:
                         data_size_gb = 0
                         # if windows
                         if platform.system() == "Windows":
-                            external_drive = os.path.splitdrive(transfer.external_path)[
-                                0
-                            ]
+                            external_drive = os.path.splitdrive(transfer.external_path)[0]
                         # if unix
                         else:
                             abs_path = os.path.abspath(transfer.external_path)
@@ -350,21 +320,13 @@ class Acquisition:
                         drives.setdefault(external_drive, []).append(data_size_gb)
             for drive in drives:
                 required_size_gb = sum(drives[drive])
-                self.log.info(
-                    f"required disk space = {required_size_gb:.1f} [GB] on drive {drive}"
-                )
+                self.log.info(f"required disk space = {required_size_gb:.1f} [GB] on drive {drive}")
                 free_size_gb = shutil.disk_usage(drive).free / 1024**3
                 if data_size_gb >= free_size_gb:
-                    self.log.error(
-                        f"only {free_size_gb:.1f} available on drive: {drive}"
-                    )
-                    raise ValueError(
-                        f"only {free_size_gb:.1f} available on drive: {drive}"
-                    )
+                    self.log.error(f"only {free_size_gb:.1f} available on drive: {drive}")
+                    raise ValueError(f"only {free_size_gb:.1f} available on drive: {drive}")
                 else:
-                    self.log.info(
-                        f"available disk space = {free_size_gb:.1f} [GB] on drive {drive}"
-                    )
+                    self.log.info(f"available disk space = {free_size_gb:.1f} [GB] on drive {drive}")
         else:
             raise ValueError(f"no transfers configured. check yaml files.")
 
@@ -391,17 +353,13 @@ class Acquisition:
 
         for drive in drives:
             required_size_gb = sum(drives[drive])
-            self.log.info(
-                f"required disk space = {required_size_gb:.1f} [GB] on drive {drive}"
-            )
+            self.log.info(f"required disk space = {required_size_gb:.1f} [GB] on drive {drive}")
             free_size_gb = shutil.disk_usage(drive).free / 1024**3
             if data_size_gb >= free_size_gb:
                 self.log.error(f"only {free_size_gb:.1f} available on drive: {drive}")
                 return False  # not enough local disk space
             else:
-                self.log.info(
-                    f"available disk space = {free_size_gb:.1f} [GB] on drive {drive}"
-                )
+                self.log.info(f"available disk space = {free_size_gb:.1f} [GB] on drive {drive}")
                 return True  # enough local disk space
 
     def check_external_tile_disk_space(self, tile: dict):
@@ -413,9 +371,7 @@ class Acquisition:
                 data_size_gb = 0
                 # if windows
                 if platform.system() == "Windows":
-                    external_drive = os.path.splitdrive(
-                        self.transfers[camera_id].external_path
-                    )[0]
+                    external_drive = os.path.splitdrive(self.transfers[camera_id].external_path)[0]
                 # if unix
                 else:
                     abs_path = os.path.abspath(self.transfers[camera_id].external_path)
@@ -427,27 +383,17 @@ class Acquisition:
                 drives.setdefault(external_drive, []).append(data_size_gb)
             for drive in drives:
                 required_size_gb = sum(drives[drive])
-                self.log.info(
-                    f"required disk space = {required_size_gb:.1f} [GB] on drive {drive}"
-                )
+                self.log.info(f"required disk space = {required_size_gb:.1f} [GB] on drive {drive}")
                 free_size_gb = shutil.disk_usage(drive).free / 1024**3
                 if data_size_gb >= free_size_gb:
-                    self.log.error(
-                        f"only {free_size_gb:.1f} available on drive: {drive}"
-                    )
-                    raise ValueError(
-                        f"only {free_size_gb:.1f} available on drive: {drive}"
-                    )
+                    self.log.error(f"only {free_size_gb:.1f} available on drive: {drive}")
+                    raise ValueError(f"only {free_size_gb:.1f} available on drive: {drive}")
                 else:
-                    self.log.info(
-                        f"available disk space = {free_size_gb:.1f} [GB] on drive {drive}"
-                    )
+                    self.log.info(f"available disk space = {free_size_gb:.1f} [GB] on drive {drive}")
         else:
             raise ValueError(f"no transfers configured. check yaml files.")
 
-    def check_write_speed(
-        self, size="16Gb", bs="1M", direct=1, numjobs=1, iodepth=1, runtime=0
-    ):
+    def check_write_speed(self, size="16Gb", bs="1M", direct=1, numjobs=1, iodepth=1, runtime=0):
         """Check local read/write speeds to make sure it can keep up with acquisition
 
         :param size: Size of test file
@@ -506,9 +452,7 @@ class Acquisition:
                             external_abs_path = os.path.abspath(local_path)
                             external_drive_letter = "/"
                         # add into drives dictionary append to list if same drive letter
-                        drives.setdefault(external_drive_letter, []).append(
-                            external_path
-                        )
+                        drives.setdefault(external_drive_letter, []).append(external_path)
                         camera_speed_mb_s.setdefault(external_drive_letter, []).append(
                             acquisition_rate_hz * frame_size_mb
                         )
@@ -517,9 +461,7 @@ class Acquisition:
             # if more than one stream on this drive, just test the first directory location
             local_path = drives[drive][0]
             test_filename = Path(f"{local_path}/iotest")
-            f = open(
-                test_filename, "a"
-            )  # Create empty file to check reading/writing speed
+            f = open(test_filename, "a")  # Create empty file to check reading/writing speed
             f.close()
             try:
                 output = subprocess.check_output(
@@ -530,10 +472,7 @@ class Acquisition:
                 )
                 out = str(output)
                 # Converting MiB to MB = (10**6/2**20)
-                write_speed_mb_s = round(
-                    float(out[out.find("BW=") + len("BW=") : out.find("MiB/s")])
-                    / (10**6 / 2**20)
-                )
+                write_speed_mb_s = round(float(out[out.find("BW=") + len("BW=") : out.find("MiB/s")]) / (10**6 / 2**20))
 
                 total_speed_mb_s = sum(camera_speed_mb_s[drive])
                 # check if drive write speed exceeds the sum of all cameras streaming to this drive
@@ -541,17 +480,11 @@ class Acquisition:
                     self.log.warning(f"write speed too slow on drive {drive}")
                     raise ValueError(f"write speed too slow on drive {drive}")
 
-                self.log.info(
-                    f"available write speed = {write_speed_mb_s:.1f} [MB/sec] to directory {drive}"
-                )
-                self.log.info(
-                    f"required write speed = {total_speed_mb_s:.1f} [MB/sec] to directory {drive}"
-                )
+                self.log.info(f"available write speed = {write_speed_mb_s:.1f} [MB/sec] to directory {drive}")
+                self.log.info(f"required write speed = {total_speed_mb_s:.1f} [MB/sec] to directory {drive}")
 
             except subprocess.CalledProcessError:
-                self.log.warning(
-                    "fios not installed on computer. Cannot verify read/write speed"
-                )
+                self.log.warning("fios not installed on computer. Cannot verify read/write speed")
             finally:
                 # Delete test file
                 os.remove(test_filename)

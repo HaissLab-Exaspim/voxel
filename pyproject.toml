@@ -3,31 +3,12 @@ name = "voxel"
 description = "A python package for controlling Light Sheet Microscopes"
 license = { file = "LICENSE" }
 requires-python = ">=3.10, <=3.12"
-description = "A python package for controlling Light Sheet Microscopes"
-license = { file = "LICENSE" }
-requires-python = ">=3.10, <3.12"
+
 authors = [
     { name = "Micah Woodard", email = "micah.woodard@alleninstitute.org" },
     { name = "Adam Glaser", email = "adam.glaser@alleninstitute.org" },
     { name = "Walter Mwaniki", email = "walter.mwaniki@alleninstitute.org" },
 ]
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
-readme = "README.md"
-keywords = [
-    "microscopy",
-    "light-sheet",
-    "lightsheet",
-    "microscope",
-    "imaging",
-]
-dynamic = ["version"]
-
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -110,6 +91,47 @@ packages = ["voxel"]
 
 [tool.setuptools.dynamic]
 version = { attr = "voxel.__version__" }
+
+[tool.ruff]
+line-length = 120
+show-fixes = true
+
+target-version = "py311"
+
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".gitignore",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "sdk",
+]
+
+[tool.ruff.lint]
+extend-select = ["C4", "SIM", "TCH"]
+fixable = ["ALL"]
 
 [tool.black]
 line-length = 120

@@ -52,9 +52,7 @@ class TunableLens(BaseTunableLens):
     def signal_temperature_c(self):
         """Get the temperature in deg C."""
         state = {}
-        state["Temperature [C]"] = (
-            self.tunable_lens.TemperatureManager.GetDeviceTemperature()
-        )
+        state["Temperature [C]"] = self.tunable_lens.TemperatureManager.GetDeviceTemperature()
         return state
 
     def close(self):

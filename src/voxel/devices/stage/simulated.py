@@ -42,9 +42,7 @@ class Stage(BaseStage):
 
     def move_relative_mm(self, position: float, wait: bool = False):
         w_text = "" if wait else "NOT "
-        self.log.info(
-            f"relative move by: {self.hardware_axis}={position} mm and {w_text}waiting."
-        )
+        self.log.info(f"relative move by: {self.hardware_axis}={position} mm and {w_text}waiting.")
         move_time_s = position / self._speed
         self.move_end_time_s = time.time() + move_time_s
         self._position_mm += position
@@ -54,9 +52,7 @@ class Stage(BaseStage):
 
     def move_absolute_mm(self, position: float, wait: bool = False):
         w_text = "" if wait else "NOT "
-        self.log.info(
-            f"absolute move to: {self.hardware_axis}={position} mm and {w_text}waiting."
-        )
+        self.log.info(f"absolute move to: {self.hardware_axis}={position} mm and {w_text}waiting.")
         move_time_s = abs(self._position_mm - position) / self._speed
         self.move_end_time_s = time.time() + move_time_s
         self._position_mm = position

@@ -7,7 +7,6 @@ SWITCH_TIME_S = 0.1  # estimated timing
 
 
 class FilterWheel(BaseFilterWheel):
-
     def __init__(self, id: str, filters: dict):
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
         self.id = id

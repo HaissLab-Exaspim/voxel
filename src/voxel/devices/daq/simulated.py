@@ -62,9 +62,7 @@ AO_WAVEFORMS = ["square wave", "sawtooth", "triangle wave"]
 
 
 class DAQ(BaseDAQ):
-
     def __init__(self, dev: str):
-
         self.do_task = None
         self.ao_task = None
         self.co_task = None
@@ -103,7 +101,6 @@ class DAQ(BaseDAQ):
         self._tasks = tasks_dict
 
     def add_task(self, task_type: str, pulse_count=None):
-
         # check task type
         if task_type not in ["ao", "co", "do"]:
             raise ValueError(f"{task_type} must be one of {['ao', 'co', 'do']}")
@@ -121,7 +118,11 @@ class DAQ(BaseDAQ):
             if v not in valid and valid != []:
                 raise ValueError(f"{k} must be one of {valid}")
 
-        channel_options = {"ao": self.ao_physical_chans, "do": self.do_physical_chans, "co": self.co_physical_chans}
+        channel_options = {
+            "ao": self.ao_physical_chans,
+            "do": self.do_physical_chans,
+            "co": self.co_physical_chans,
+        }
 
         if task_type in ["ao", "do"]:
             self._timing_checks(task_type)
@@ -149,7 +150,6 @@ class DAQ(BaseDAQ):
             self.task_time_s[task["name"]] = total_time_ms / 1000
 
         else:  # co channel
-
             if timing["frequency_hz"] < 0:
                 raise ValueError(f"frequency must be >0 Hz")
 
@@ -189,7 +189,6 @@ class DAQ(BaseDAQ):
             )
 
     def generate_waveforms(self, task_type: str, wavelength: str):
-
         # check task type
         if task_type not in ["ao", "do"]:
             raise ValueError(f"{task_type} must be one of {['ao', 'do']}")
@@ -279,17 +278,19 @@ class DAQ(BaseDAQ):
 
         # store these values as properties for plotting purposes
         setattr(self, f"{task_type}_sampling_frequency_hz", timing["sampling_frequency_hz"])
-        setattr(self, f"{task_type}_total_time_ms", timing["period_time_ms"] + timing["rest_time_ms"])
+        setattr(
+            self,
+            f"{task_type}_total_time_ms",
+            timing["period_time_ms"] + timing["rest_time_ms"],
+        )
 
     def write_ao_waveforms(self, rereserve_buffer=True):
-
         ao_voltages = numpy.array(list(self.ao_waveforms.values()))
 
         if rereserve_buffer:  # don't need to rereseve when rewriting already running tasks
             pass
 
     def write_do_waveforms(self, rereserve_buffer=True):
-
         do_voltages = numpy.array(list(self.do_waveforms.values()))
         if rereserve_buffer:  # don't need to rereseve when rewriting already running tasks
             pass
@@ -305,9 +306,10 @@ class DAQ(BaseDAQ):
         offset_volts: float,
         cutoff_frequency_hz: float,
     ):
-
         time_samples_ms = numpy.linspace(
-            0, 2 * numpy.pi, int(((period_time_ms - start_time_ms) / 1000) * sampling_frequency_hz)
+            0,
+            2 * numpy.pi,
+            int(((period_time_ms - start_time_ms) / 1000) * sampling_frequency_hz),
         )
         waveform = offset_volts + amplitude_volts * signal.sawtooth(
             t=time_samples_ms, width=end_time_ms / period_time_ms
@@ -363,7 +365,6 @@ class DAQ(BaseDAQ):
         max_volts: float,
         min_volts: float,
     ):
-
         time_samples = int(((period_time_ms + rest_time_ms) / 1000) * sampling_frequency_hz)
         start_sample = int((start_time_ms / 1000) * sampling_frequency_hz)
         end_sample = int((end_time_ms / 1000) * sampling_frequency_hz)
@@ -383,7 +384,6 @@ class DAQ(BaseDAQ):
         offset_volts: float,
         cutoff_frequency_hz: float,
     ):
-
         # sawtooth with end time in center of waveform
         waveform = self.sawtooth(
             sampling_frequency_hz,
@@ -399,7 +399,6 @@ class DAQ(BaseDAQ):
         return waveform
 
     def plot_waveforms_to_pdf(self, save=False):
-
         plt.rcParams["font.size"] = 10
         plt.rcParams["font.family"] = "Arial"
         plt.rcParams["font.weight"] = "light"
@@ -410,13 +409,17 @@ class DAQ(BaseDAQ):
 
         if self.ao_waveforms:
             time_ms = numpy.linspace(
-                0, self.ao_total_time_ms, int(self.ao_total_time_ms / 1000 * self.ao_sampling_frequency_hz)
+                0,
+                self.ao_total_time_ms,
+                int(self.ao_total_time_ms / 1000 * self.ao_sampling_frequency_hz),
             )
             for waveform in self.ao_waveforms:
                 plt.plot(time_ms, self.ao_waveforms[waveform], label=waveform)
         if self.do_waveforms:
             time_ms = numpy.linspace(
-                0, self.do_total_time_ms, int(self.do_total_time_ms / 1000 * self.do_sampling_frequency_hz)
+                0,
+                self.do_total_time_ms,
+                int(self.do_total_time_ms / 1000 * self.do_sampling_frequency_hz),
             )
             for waveform in self.do_waveforms:
                 plt.plot(time_ms, self.do_waveforms[waveform], label=waveform)
@@ -457,13 +460,11 @@ class DAQ(BaseDAQ):
         self.start()
 
     def wait_until_done_all(self, timeout=1.0):
-
         for task in [self.ao_task, self.do_task, self.co_task]:
             if task is not None:
                 task.wait_until_done(timeout)
 
     def is_finished_all(self):
-
         for task in [self.ao_task, self.do_task, self.co_task]:
             if task is not None:
                 if not task.is_task_done():

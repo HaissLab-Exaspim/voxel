@@ -2,7 +2,6 @@ import inspect
 
 
 class BaseTunableLens:
-
     @property
     def mode(self):
         self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")

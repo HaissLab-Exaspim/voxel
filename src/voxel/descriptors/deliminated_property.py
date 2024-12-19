@@ -2,11 +2,16 @@
 
 
 class _DeliminatedProperty(property):
-
     def __init__(
-        self, fget, fset=None, fdel=None, minimum=float("-inf"), maximum=float("inf"), step=None, unit: str = None
+        self,
+        fget,
+        fset=None,
+        fdel=None,
+        minimum=float("-inf"),
+        maximum=float("inf"),
+        step=None,
+        unit: str = None,
     ):
-
         super().__init__()
 
         self.minimum = minimum
@@ -46,10 +51,26 @@ class _DeliminatedProperty(property):
         return self
 
     def setter(self, fset):
-        return type(self)(self._fget, fset, self._fdel, self.minimum, self.maximum, self.step, self.unit)
+        return type(self)(
+            self._fget,
+            fset,
+            self._fdel,
+            self.minimum,
+            self.maximum,
+            self.step,
+            self.unit,
+        )
 
     def deleter(self, fdel):
-        return type(self)(self._fget, self._fset, fdel, self.minimum, self.maximum, self.step, self.unit)
+        return type(self)(
+            self._fget,
+            self._fset,
+            fdel,
+            self.minimum,
+            self.maximum,
+            self.step,
+            self.unit,
+        )
 
     @property
     def fset(self):

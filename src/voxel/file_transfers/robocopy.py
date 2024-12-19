@@ -51,9 +51,7 @@ class RobocopyFileTransfer(BaseFileTransfer):
                 for name in files:
                     # check and only add if filename matches tranfer's filename but not the log file
                     if self.filename in name and name != log_path:
-                        file_list[os.path.join(path, name)] = (
-                            os.path.getsize(os.path.join(path, name)) / 1024**2
-                        )
+                        file_list[os.path.join(path, name)] = os.path.getsize(os.path.join(path, name)) / 1024**2
             total_size_mb = sum(file_list.values())
             # sort the file list based on the file sizes and create a list for transfers
             sorted_file_list = dict(sorted(file_list.items(), key=lambda item: item[1]))
@@ -64,9 +62,7 @@ class RobocopyFileTransfer(BaseFileTransfer):
             # if not, try to initiate transfer again
             else:
                 num_files = len(sorted_file_list)
-                self.log.info(
-                    f"attempt {retry_num+1}/{self._max_retry}, tranferring {num_files} files."
-                )
+                self.log.info(f"attempt {retry_num+1}/{self._max_retry}, tranferring {num_files} files.")
                 for file_path, file_size_mb in sorted_file_list.items():
                     # transfer just one file and iterate
                     # split filename and path
@@ -74,9 +70,7 @@ class RobocopyFileTransfer(BaseFileTransfer):
                     self.log.info(f"transfering {filename}")
                     # specify external directory
                     # need to change directories to str because they are Path objects
-                    external_dir = local_dir.replace(
-                        str(local_directory), str(external_directory)
-                    )
+                    external_dir = local_dir.replace(str(local_directory), str(external_directory))
                     # robocopy flags
                     # /j unbuffered copy for transfer speed stability
                     # /mov deletes local files after transfer
@@ -116,12 +110,7 @@ class RobocopyFileTransfer(BaseFileTransfer):
                                 file_progress = 0
                             # sum to transferred amount to track progress
                             self._progress = (
-                                (
-                                    total_transferred_mb
-                                    + file_size_mb * file_progress / 100
-                                )
-                                / total_size_mb
-                                * 100
+                                (total_transferred_mb + file_size_mb * file_progress / 100) / total_size_mb * 100
                             )
                             end_time_s = time.time()
                             # keep track of how long stuck at same progress
@@ -129,26 +118,18 @@ class RobocopyFileTransfer(BaseFileTransfer):
                                 stuck_time_s += end_time_s - start_time_s
                                 # break if exceeds timeout
                                 if stuck_time_s >= self._timeout_s:
-                                    self.log.info(
-                                        "timeout exceeded, restarting file transfer."
-                                    )
+                                    self.log.info("timeout exceeded, restarting file transfer.")
                                     break
                             else:
                                 stuck_time_s = 0
                             previous_progress = self.progress
-                            self.log.info(
-                                f"{self.filename} transfer is {self.progress:.2f} [%] complete."
-                            )
+                            self.log.info(f"{self.filename} transfer is {self.progress:.2f} [%] complete.")
                             # pause for 10 sec
                             time.sleep(10.0)
                     else:
                         subprocess.wait()
-                        self._progress = (
-                            (total_transferred_mb + file_size_mb) / total_size_mb * 100
-                        )
-                        self.log.info(
-                            f"{self.filename} transfer is {self.progress:.2f} [%] complete."
-                        )
+                        self._progress = (total_transferred_mb + file_size_mb) / total_size_mb * 100
+                        self.log.info(f"{self.filename} transfer is {self.progress:.2f} [%] complete.")
                     self.log.info(f"{filename} transfer complete")
                     # wait for process to finish before cleaning log file
                     time.sleep(10.0)
@@ -160,9 +141,7 @@ class RobocopyFileTransfer(BaseFileTransfer):
                 for file in delete_list:
                     # f is a relative path, convert to absolute
                     local_file_path = os.path.join(local_directory.absolute(), file)
-                    external_file_path = os.path.join(
-                        external_directory.absolute(), file
-                    )
+                    external_file_path = os.path.join(external_directory.absolute(), file)
                     # .zarr is directory but os.path.isdir will return False
                     if os.path.isdir(local_file_path) or ".zarr" in local_dir:
                         # TODO how to hash check zarr -> directory instead of file?
@@ -173,38 +152,28 @@ class RobocopyFileTransfer(BaseFileTransfer):
                             # put in try except in case no external file found
                             try:
                                 # if hash is verified delete file
-                                if self._verify_file(
-                                    local_file_path, external_file_path
-                                ):
+                                if self._verify_file(local_file_path, external_file_path):
                                     # remove local file
                                     self.log.info(f"deleting {local_file_path}")
                                     os.remove(local_file_path)
                                 # if has fails, external file is corrupt
                                 else:
                                     # remove external file, try again
-                                    self.log.info(
-                                        f"hashes did not match, deleting {external_file_path}"
-                                    )
+                                    self.log.info(f"hashes did not match, deleting {external_file_path}")
                                     os.remove(external_file_path)
                                     pass
                             except:
-                                self.log.warning(
-                                    f"no external file exists at {external_file_path}"
-                                )
+                                self.log.warning(f"no external file exists at {external_file_path}")
                         else:
                             # remove local file
                             self.log.info(f"deleting {local_file_path}")
                             os.remove(local_file_path)
                     else:
-                        raise ValueError(
-                            f"{local_file_path} is not a file or directory."
-                        )
+                        raise ValueError(f"{local_file_path} is not a file or directory.")
                     # TODO REMOVE
                     os.remove(external_file_path)
                 end_time = time.time()
                 total_time = end_time - start_time
-                self.log.info(
-                    f"{self.filename} transfer complete, total time: {total_time:.2f} [s]"
-                )
+                self.log.info(f"{self.filename} transfer complete, total time: {total_time:.2f} [s]")
                 subprocess.kill()
                 retry_num += 1

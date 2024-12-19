@@ -281,9 +281,7 @@ class BaseFileTransfer:
             self.log.info(f"{local_file_path} and {external_file_path} hashes match")
             return True
         else:
-            self.log.info(
-                f"hash mismatch for {local_file_path} and {external_file_path}"
-            )
+            self.log.info(f"hash mismatch for {local_file_path} and {external_file_path}")
             self.log.info(f"{local_file_path} hash = {local_hash}")
             self.log.info(f"{external_file_path} hash = {external_hash}")
             return False

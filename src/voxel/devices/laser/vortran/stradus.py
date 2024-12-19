@@ -12,7 +12,6 @@ MODULATION_MODES = {
 
 
 class StradusLaser(BaseLaser):
-
     def __init__(self, id: str, port: str, wavelength: int):
         """
         Communicate with stradus laser.

@@ -20,9 +20,14 @@ POLARITIES = {
 
 INSTRUMENT_AXES = list()
 
-class Joystick(BaseJoystick):
 
-    def __init__(self, tigerbox: TigerController, axis_mapping: dict, joystick_mapping: dict = None):
+class Joystick(BaseJoystick):
+    def __init__(
+        self,
+        tigerbox: TigerController,
+        axis_mapping: dict,
+        joystick_mapping: dict = None,
+    ):
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
 
         self.tigerbox = tigerbox
@@ -40,7 +45,9 @@ class Joystick(BaseJoystick):
         for key, value in self.axis_mapping.items():
             INSTRUMENT_AXES.append(key)
         self._stage_axes = {
-            v: k for k, v in self.axis_mapping.items() if k.upper() in self.tigerbox.axes and v.upper() in self.tigerbox.axes
+            v: k
+            for k, v in self.axis_mapping.items()
+            if k.upper() in self.tigerbox.axes and v.upper() in self.tigerbox.axes
         }
         for axis in self.tigerbox.axes:
             if axis.lower() not in self._stage_axes.keys():
@@ -73,7 +80,6 @@ class Joystick(BaseJoystick):
 
     @joystick_mapping.setter
     def joystick_mapping(self, joystick_mapping):
-
         for joystick_id, joystick_dict in joystick_mapping.items():
             # check that the joystick ids are valid
             if joystick_id not in JOYSTICK_AXES.keys():

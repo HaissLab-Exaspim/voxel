@@ -456,9 +456,7 @@ class HistogramProjection:
         self.shm_shape = (self._row_count_px, self._column_count_px)
         # create attributes to open shared memory in run function
         self.shm = SharedMemory(shm_name, create=False)
-        self.latest_img = np.ndarray(
-            self.shm_shape, self._data_type, buffer=self.shm.buf
-        )
+        self.latest_img = np.ndarray(self.shm_shape, self._data_type, buffer=self.shm.buf)
 
     def start(self):
         """
@@ -481,15 +479,11 @@ class HistogramProjection:
         else:
             x_projection = True
             if self._x_bin_count_px < 0 or self._x_bin_count_px > self._column_count_px:
-                raise ValueError(
-                    f"x projection must be > 0 and < {self._column_count_px}"
-                )
+                raise ValueError(f"x projection must be > 0 and < {self._column_count_px}")
             x_index_list = np.arange(0, self._column_count_px, self._x_bin_count_px)
             if self._column_count_px not in x_index_list:
                 x_index_list = np.append(x_index_list, self._column_count_px)
-            self.histogram_x = np.zeros(
-                (self._x_bins, len(x_index_list) - 1), dtype="float"
-            )
+            self.histogram_x = np.zeros((self._x_bins, len(x_index_list) - 1), dtype="float")
         if self._y_bin_count_px is None:
             y_projection = False
         else:
@@ -499,26 +493,17 @@ class HistogramProjection:
             y_index_list = np.arange(0, self._row_count_px, self._y_bin_count_px)
             if self._row_count_px not in y_index_list:
                 y_index_list = np.append(y_index_list, self._row_count_px)
-            self.histogram_y = np.zeros(
-                (self._y_bins, len(y_index_list) - 1), dtype="float"
-            )
+            self.histogram_y = np.zeros((self._y_bins, len(y_index_list) - 1), dtype="float")
         if self._z_bin_count_px is None:
             z_projection = False
         else:
             z_projection = True
-            if (
-                self._z_bin_count_px < 0
-                or self._z_bin_count_px > self._frame_count_px_px
-            ):
-                raise ValueError(
-                    f"z projection must be > 0 and < {self._frame_count_px}"
-                )
+            if self._z_bin_count_px < 0 or self._z_bin_count_px > self._frame_count_px_px:
+                raise ValueError(f"z projection must be > 0 and < {self._frame_count_px}")
             z_index_list = np.arange(0, self._frame_count_px_px, self._z_bin_count_px)
             if self._frame_count_px_px not in z_index_list:
                 z_index_list = np.append(z_index_list, self._frame_count_px_px)
-            self.histogram_z = np.zeros(
-                (self._z_bins, len(z_index_list) - 1), dtype="float"
-            )
+            self.histogram_z = np.zeros((self._z_bins, len(z_index_list) - 1), dtype="float")
 
         frame_index = 0
         z_chunk_number = 0
@@ -526,16 +511,11 @@ class HistogramProjection:
         while frame_index < self._frame_count_px_px:
             # max project latest image
             if self.new_image.is_set():
-                self.latest_img = np.ndarray(
-                    self.shm_shape, self._data_type, buffer=self.shm.buf
-                )
+                self.latest_img = np.ndarray(self.shm_shape, self._data_type, buffer=self.shm.buf)
                 if z_projection:
                     # if this projection thickness is complete or end of stack
                     chunk_index = frame_index % self._z_bin_count_px
-                    if (
-                        chunk_index == self._z_bin_count_px - 1
-                        or frame_index == self._frame_count_px_px - 1
-                    ):
+                    if chunk_index == self._z_bin_count_px - 1 or frame_index == self._frame_count_px_px - 1:
                         self.histogram_z[:, z_chunk_number] = histogram1d(
                             self.latest_img,
                             bins=self._z_bins,
@@ -569,9 +549,7 @@ class HistogramProjection:
         x_projection_centers = np.zeros(shape=(1, len(x_index_list)), dtype="float")
         x_projection_centers[0, 1:] = (x_index_list[1:] + x_index_list[:-1]) / 2
         np.savetxt(
-            Path(
-                self._path, self._acquisition_name, f"{self.filename}_histogram_x.csv"
-            ),
+            Path(self._path, self._acquisition_name, f"{self.filename}_histogram_x.csv"),
             np.row_stack(
                 (
                     x_projection_centers,
@@ -591,9 +569,7 @@ class HistogramProjection:
         y_projection_centers = np.zeros(shape=(1, len(y_index_list)), dtype="float")
         y_projection_centers[0, 1:] = (y_index_list[1:] + y_index_list[:-1]) / 2
         np.savetxt(
-            Path(
-                self._path, self._acquisition_name, f"{self.filename}_histogram_y.csv"
-            ),
+            Path(self._path, self._acquisition_name, f"{self.filename}_histogram_y.csv"),
             np.row_stack(
                 (
                     y_projection_centers,
@@ -613,9 +589,7 @@ class HistogramProjection:
         z_projection_centers = np.zeros(shape=(1, len(z_index_list)), dtype="float")
         z_projection_centers[0, 1:] = (z_index_list[1:] + z_index_list[:-1]) / 2
         np.savetxt(
-            Path(
-                self._path, self._acquisition_name, f"{self.filename}_histogram_z.csv"
-            ),
+            Path(self._path, self._acquisition_name, f"{self.filename}_histogram_z.csv"),
             np.row_stack(
                 (
                     z_projection_centers,

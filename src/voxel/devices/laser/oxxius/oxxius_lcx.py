@@ -6,7 +6,6 @@ from voxel.devices.laser.base import BaseLaser
 
 
 class OxxiusLCXLaser(BaseLaser):
-
     def __init__(self, id: str, wavelength: int, port: Serial or str, prefix: str):
         """
         Communicate with specific LBX laser in L6CC Combiner box.

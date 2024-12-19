@@ -27,7 +27,13 @@ PIXEL_TYPES = {
     "mono16": SampleType.U16,
 }
 
-LINE_INTERVALS_US = {"mono8": 15.00, "mono10": 15.00, "mono12": 15.00, "mono14": 20.21, "mono16": 45.44}
+LINE_INTERVALS_US = {
+    "mono8": 15.00,
+    "mono10": 15.00,
+    "mono12": 15.00,
+    "mono14": 20.21,
+    "mono16": 45.44,
+}
 
 TRIGGERS = {
     "modes": {
@@ -46,7 +52,6 @@ TRIGGERS = {
 
 
 class Camera(BaseCamera):
-
     def __init__(self, camera_cfg, runtime: acquire.Runtime()):
         """Connect to hardware.
 
@@ -75,7 +80,6 @@ class Camera(BaseCamera):
 
     @exposure_time_ms.setter
     def exposure_time_ms(self, exposure_time_ms: float):
-
         if exposure_time_ms < MIN_EXPOSURE_TIME_MS or exposure_time_ms > MAX_EXPOSURE_TIME_MS:
             self.log.error(
                 f"exposure time must be >{MIN_EXPOSURE_TIME_MS} ms \
@@ -104,7 +108,6 @@ class Camera(BaseCamera):
 
     @roi.setter
     def roi(self, height_px: int, width_px: int):
-
         sensor_height_px = MAX_HEIGHT_PX
         sensor_width_px = MAX_WIDTH_PX
 
@@ -164,7 +167,6 @@ class Camera(BaseCamera):
 
     @pixel_type.setter
     def pixel_type(self, pixel_type_bits: str):
-
         valid = list(PIXEL_TYPES.keys())
         if pixel_type_bits not in valid:
             raise ValueError("pixel_type_bits must be one of %r." % valid)
@@ -223,7 +225,6 @@ class Camera(BaseCamera):
 
     @trigger.setter
     def trigger(self, trigger: dict):
-
         mode = trigger["mode"]
         source = trigger["source"]
         polarity = trigger["polarity"]

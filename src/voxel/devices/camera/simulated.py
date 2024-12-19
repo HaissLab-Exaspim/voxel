@@ -84,18 +84,13 @@ class Camera(BaseCamera):
         self._trigger = {"mode": "on", "source": "internal", "polarity": "rising"}
         self._latest_frame = None
 
-    @DeliminatedProperty(
-        minimum=MIN_EXPOSURE_TIME_MS, maximum=MAX_EXPOSURE_TIME_MS, step=0.001
-    )
+    @DeliminatedProperty(minimum=MIN_EXPOSURE_TIME_MS, maximum=MAX_EXPOSURE_TIME_MS, step=0.001)
     def exposure_time_ms(self):
         return self._exposure_time_ms
 
     @exposure_time_ms.setter
     def exposure_time_ms(self, exposure_time_ms: float):
-        if (
-            exposure_time_ms < MIN_EXPOSURE_TIME_MS
-            or exposure_time_ms > MAX_EXPOSURE_TIME_MS
-        ):
+        if exposure_time_ms < MIN_EXPOSURE_TIME_MS or exposure_time_ms > MAX_EXPOSURE_TIME_MS:
             self.log.warning(f"exposure time must be >{MIN_EXPOSURE_TIME_MS} ms \
                              and <{MAX_EXPOSURE_TIME_MS} ms. Setting exposure time to {MAX_EXPOSURE_TIME_MS} ms")
 
@@ -103,9 +98,7 @@ class Camera(BaseCamera):
         self._exposure_time_ms = exposure_time_ms
         self.log.info(f"exposure time set to: {exposure_time_ms} ms")
 
-    @DeliminatedProperty(
-        minimum=MIN_WIDTH_PX, maximum=MAX_WIDTH_PX, step=DIVISIBLE_WIDTH_PX
-    )
+    @DeliminatedProperty(minimum=MIN_WIDTH_PX, maximum=MAX_WIDTH_PX, step=DIVISIBLE_WIDTH_PX)
     def width_px(self):
         return self._width_px
 
@@ -114,9 +107,7 @@ class Camera(BaseCamera):
         self._width_px = value
         self.log.info(f"width set to: {value} px")
 
-    @DeliminatedProperty(
-        minimum=MIN_WIDTH_PX, maximum=MAX_WIDTH_PX, step=DIVISIBLE_WIDTH_PX
-    )
+    @DeliminatedProperty(minimum=MIN_WIDTH_PX, maximum=MAX_WIDTH_PX, step=DIVISIBLE_WIDTH_PX)
     def width_offset_px(self):
         return self._width_offset_px
 
@@ -124,16 +115,12 @@ class Camera(BaseCamera):
     def width_offset_px(self, value: int):
         if value + self._width_px > MAX_WIDTH_PX:
             value = MAX_WIDTH_PX - self._width_px
-            self.log.warning(
-                f"width offset and width must not exceed {MAX_WIDTH_PX} px. Setting offset to {value} px"
-            )
+            self.log.warning(f"width offset and width must not exceed {MAX_WIDTH_PX} px. Setting offset to {value} px")
 
         self._width_offset_px = value
         self.log.info(f"width offset set to: {value} px")
 
-    @DeliminatedProperty(
-        minimum=MIN_HEIGHT_PX, maximum=MAX_HEIGHT_PX, step=DIVISIBLE_HEIGHT_PX
-    )
+    @DeliminatedProperty(minimum=MIN_HEIGHT_PX, maximum=MAX_HEIGHT_PX, step=DIVISIBLE_HEIGHT_PX)
     def height_px(self):
         return self._height_px
 
@@ -143,9 +130,7 @@ class Camera(BaseCamera):
         self._height_px = value
         self.log.info(f"height set to: {value} px")
 
-    @DeliminatedProperty(
-        minimum=MIN_HEIGHT_PX, maximum=MAX_HEIGHT_PX, step=DIVISIBLE_HEIGHT_PX
-    )
+    @DeliminatedProperty(minimum=MIN_HEIGHT_PX, maximum=MAX_HEIGHT_PX, step=DIVISIBLE_HEIGHT_PX)
     def height_offset_px(self):
         return self._height_offset_px
 

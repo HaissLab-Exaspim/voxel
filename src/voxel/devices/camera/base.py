@@ -2,7 +2,6 @@ import inspect
 
 
 class BaseCamera:
-
     @property
     def exposure_time_ms(self):
         self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")

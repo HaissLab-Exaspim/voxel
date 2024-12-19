@@ -2,7 +2,6 @@ import inspect
 
 
 class BaseFilterWheel:
-
     def __init__(self):
         self.filter_list = list()
 

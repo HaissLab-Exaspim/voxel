@@ -2,7 +2,6 @@ import inspect
 
 
 class BaseStage:
-
     @property
     def hardware_axis(self):
         raise ValueError

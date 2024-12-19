@@ -63,7 +63,6 @@ MODULATION_MODES = {
 
 
 class SkyraLaser(BaseLaser):
-
     def __init__(
         self,
         id: str,

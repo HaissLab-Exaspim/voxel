@@ -117,9 +117,7 @@ class Flim:
         """ """
         logger.debug("")
 
-        w = self.get_index(
-            phase_number, phase_symmetry, phase_order, tap_select, asymmetry_correction
-        )
+        w = self.get_index(phase_number, phase_symmetry, phase_order, tap_select, asymmetry_correction)
 
         dict_phases = {
             "manual shifting": 2,
@@ -176,13 +174,7 @@ class Flim:
             "8 phases": 8,
             "16 phases": 16,
         }
-        w = np.exp(
-            -1j
-            * 2.0
-            * np.pi
-            * np.arange(phase_number_to_int[phase_number])
-            / phase_number_to_int[phase_number]
-        )
+        w = np.exp(-1j * 2.0 * np.pi * np.arange(phase_number_to_int[phase_number]) / phase_number_to_int[phase_number])
 
         n = phase_number
         s = phase_symmetry
@@ -208,13 +200,7 @@ class Flim:
             return [w[0], w[1]]
         elif n == "2 phases" and s == "twice" and t == "tap B":
             return [w[1], w[0]]
-        elif (
-            n == "2 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "both"
-            and c == "average"
-        ):
+        elif n == "2 phases" and s == "twice" and o == "opposite" and t == "both" and c == "average":
             return [w[0], w[1]]
         elif n == "4 phases" and s == "singular" and t == "both" and c == "off":
             return [w[0], w[2], w[1], w[3]]
@@ -222,13 +208,7 @@ class Flim:
             return [w[0], w[1]]
         elif n == "4 phases" and s == "singular" and t == "tap B" and c == "off":
             return [w[2], w[3]]
-        elif (
-            n == "4 phases"
-            and s == "twice"
-            and o == "ascending"
-            and t == "both"
-            and c == "off"
-        ):
+        elif n == "4 phases" and s == "twice" and o == "ascending" and t == "both" and c == "off":
             return [
                 0.5 * w[0],
                 0.5 * w[2],
@@ -239,29 +219,11 @@ class Flim:
                 0.5 * w[3],
                 0.5 * w[1],
             ]
-        elif (
-            n == "4 phases"
-            and s == "twice"
-            and o == "ascending"
-            and t == "tap A"
-            and c == "off"
-        ):
+        elif n == "4 phases" and s == "twice" and o == "ascending" and t == "tap A" and c == "off":
             return [w[0], w[1], w[2], w[3]]
-        elif (
-            n == "4 phases"
-            and s == "twice"
-            and o == "ascending"
-            and t == "tap B"
-            and c == "off"
-        ):
+        elif n == "4 phases" and s == "twice" and o == "ascending" and t == "tap B" and c == "off":
             return [w[2], w[3], w[0], w[0]]
-        elif (
-            n == "4 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "both"
-            and c == "off"
-        ):
+        elif n == "4 phases" and s == "twice" and o == "opposite" and t == "both" and c == "off":
             return [
                 0.5 * w[0],
                 0.5 * w[2],
@@ -272,29 +234,11 @@ class Flim:
                 0.5 * w[3],
                 0.5 * w[1],
             ]
-        elif (
-            n == "4 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "both"
-            and c == "average"
-        ):
+        elif n == "4 phases" and s == "twice" and o == "opposite" and t == "both" and c == "average":
             return [w[0], w[2], w[1], w[3]]
-        elif (
-            n == "4 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "tap A"
-            and c == "off"
-        ):
+        elif n == "4 phases" and s == "twice" and o == "opposite" and t == "tap A" and c == "off":
             return [w[0], w[2], w[1], w[3]]
-        elif (
-            n == "4 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "tap B"
-            and c == "off"
-        ):
+        elif n == "4 phases" and s == "twice" and o == "opposite" and t == "tap B" and c == "off":
             return [w[2], w[0], w[3], w[1]]
         elif n == "8 phases" and s == "singular" and t == "both" and c == "off":
             return [w[0], w[4], w[1], w[5], w[2], w[6], w[3], w[7]]
@@ -302,13 +246,7 @@ class Flim:
             return [w[0], w[1], w[2], w[3]]
         elif n == "8 phases" and s == "singular" and t == "tap B" and c == "off":
             return [w[4], w[5], w[6], w[7]]
-        elif (
-            n == "8 phases"
-            and s == "twice"
-            and o == "ascending"
-            and t == "both"
-            and c == "off"
-        ):
+        elif n == "8 phases" and s == "twice" and o == "ascending" and t == "both" and c == "off":
             return [
                 0.5 * w[0],
                 0.5 * w[4],
@@ -327,29 +265,11 @@ class Flim:
                 0.5 * w[7],
                 0.5 * w[3],
             ]
-        elif (
-            n == "8 phases"
-            and s == "twice"
-            and o == "ascending"
-            and t == "tap A"
-            and c == "off"
-        ):
+        elif n == "8 phases" and s == "twice" and o == "ascending" and t == "tap A" and c == "off":
             return [w[0], w[1], w[2], w[3], w[4], w[5], w[6], w[7]]
-        elif (
-            n == "8 phases"
-            and s == "twice"
-            and o == "ascending"
-            and t == "tap B"
-            and c == "off"
-        ):
+        elif n == "8 phases" and s == "twice" and o == "ascending" and t == "tap B" and c == "off":
             return [w[4], w[5], w[6], w[7], w[0], w[1], w[2], w[3]]
-        elif (
-            n == "8 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "both"
-            and c == "off"
-        ):
+        elif n == "8 phases" and s == "twice" and o == "opposite" and t == "both" and c == "off":
             return [
                 0.5 * w[0],
                 0.5 * w[4],
@@ -368,29 +288,11 @@ class Flim:
                 0.5 * w[7],
                 0.5 * w[3],
             ]
-        elif (
-            n == "8 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "both"
-            and c == "average"
-        ):
+        elif n == "8 phases" and s == "twice" and o == "opposite" and t == "both" and c == "average":
             return [w[0], w[4], w[1], w[5], w[2], w[6], w[3], w[7]]
-        elif (
-            n == "8 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "tap A"
-            and c == "off"
-        ):
+        elif n == "8 phases" and s == "twice" and o == "opposite" and t == "tap A" and c == "off":
             return [w[0], w[4], w[1], w[5], w[2], w[6], w[3], w[7]]
-        elif (
-            n == "8 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "tap B"
-            and c == "off"
-        ):
+        elif n == "8 phases" and s == "twice" and o == "opposite" and t == "tap B" and c == "off":
             return [w[4], w[0], w[5], w[1], w[6], w[2], w[7], w[3]]
         elif n == "16 phases" and s == "singular" and t == "both" and c == "off":
             return [
@@ -415,13 +317,7 @@ class Flim:
             return [w[0], w[1], w[2], w[3], w[4], w[5], w[6], w[7]]
         elif n == "16 phases" and s == "singular" and t == "tap B" and c == "off":
             return [w[8], w[9], w[0], w[11], w[12], w[13], w[14], w[15]]
-        elif (
-            n == "16 phases"
-            and s == "twice"
-            and o == "ascending"
-            and t == "both"
-            and c == "off"
-        ):
+        elif n == "16 phases" and s == "twice" and o == "ascending" and t == "both" and c == "off":
             return [
                 0.5 * w[0],
                 0.5 * w[8],
@@ -456,13 +352,7 @@ class Flim:
                 0.5 * w[15],
                 0.5 * w[7],
             ]
-        elif (
-            n == "16 phases"
-            and s == "twice"
-            and o == "ascending"
-            and t == "tap A"
-            and c == "off"
-        ):
+        elif n == "16 phases" and s == "twice" and o == "ascending" and t == "tap A" and c == "off":
             return [
                 w[0],
                 w[1],
@@ -481,13 +371,7 @@ class Flim:
                 w[14],
                 w[15],
             ]
-        elif (
-            n == "16 phases"
-            and s == "twice"
-            and o == "ascending"
-            and t == "tap B"
-            and c == "off"
-        ):
+        elif n == "16 phases" and s == "twice" and o == "ascending" and t == "tap B" and c == "off":
             return [
                 w[8],
                 w[9],
@@ -506,13 +390,7 @@ class Flim:
                 w[6],
                 w[7],
             ]
-        elif (
-            n == "16 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "both"
-            and c == "off"
-        ):
+        elif n == "16 phases" and s == "twice" and o == "opposite" and t == "both" and c == "off":
             return [
                 0.5 * w[0],
                 0.5 * w[8],
@@ -547,13 +425,7 @@ class Flim:
                 0.5 * w[15],
                 0.5 * w[7],
             ]
-        elif (
-            n == "16 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "both"
-            and c == "average"
-        ):
+        elif n == "16 phases" and s == "twice" and o == "opposite" and t == "both" and c == "average":
             return [
                 w[0],
                 w[8],
@@ -572,13 +444,7 @@ class Flim:
                 w[7],
                 w[15],
             ]
-        elif (
-            n == "16 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "tap A"
-            and c == "off"
-        ):
+        elif n == "16 phases" and s == "twice" and o == "opposite" and t == "tap A" and c == "off":
             return [
                 w[0],
                 w[8],
@@ -597,13 +463,7 @@ class Flim:
                 w[7],
                 w[15],
             ]
-        elif (
-            n == "16 phases"
-            and s == "twice"
-            and o == "opposite"
-            and t == "tap B"
-            and c == "off"
-        ):
+        elif n == "16 phases" and s == "twice" and o == "opposite" and t == "tap B" and c == "off":
             return [
                 w[8],
                 w[0],

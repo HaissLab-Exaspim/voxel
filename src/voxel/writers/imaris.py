@@ -76,10 +76,7 @@ class ImarisWriter(BaseWriter):
 
         self.log.info(f"setting frame count to: {frame_count_px} [px]")
         if frame_count_px % DIVISIBLE_FRAME_COUNT_PX != 0:
-            frame_count_px = (
-                ceil(frame_count_px / DIVISIBLE_FRAME_COUNT_PX)
-                * DIVISIBLE_FRAME_COUNT_PX
-            )
+            frame_count_px = ceil(frame_count_px / DIVISIBLE_FRAME_COUNT_PX) * DIVISIBLE_FRAME_COUNT_PX
             self.log.info(f"adjusting frame count to: {frame_count_px} [px]")
         self._frame_count_px = frame_count_px
 
@@ -101,9 +98,7 @@ class ImarisWriter(BaseWriter):
         :rtype: str
         """
 
-        return next(
-            key for key, value in COMPRESSIONS.items() if value == self._compression
-        )
+        return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
 
     @compression.setter
     def compression(self, compression: str):
@@ -194,34 +189,20 @@ class ImarisWriter(BaseWriter):
             "z": CHUNK_COUNT_PX,
         }
         shm_shape = [chunk_shape_map[x] for x in chunk_dim_order]
-        shm_nbytes = int(
-            np.prod(shm_shape, dtype=np.int64) * np.dtype(self._data_type).itemsize
-        )
+        shm_nbytes = int(np.prod(shm_shape, dtype=np.int64) * np.dtype(self._data_type).itemsize)
         # voxel size metadata to create the converter
         image_size_z = int(ceil(self._frame_count_px / CHUNK_COUNT_PX) * CHUNK_COUNT_PX)
-        image_size = pw.ImageSize(
-            x=self._column_count_px, y=self._row_count_px, z=image_size_z, c=1, t=1
-        )
-        block_size = pw.ImageSize(
-            x=self._column_count_px, y=self._row_count_px, z=CHUNK_COUNT_PX, c=1, t=1
-        )
+        image_size = pw.ImageSize(x=self._column_count_px, y=self._row_count_px, z=image_size_z, c=1, t=1)
+        block_size = pw.ImageSize(x=self._column_count_px, y=self._row_count_px, z=CHUNK_COUNT_PX, c=1, t=1)
         sample_size = pw.ImageSize(x=1, y=1, z=1, c=1, t=1)
         # compute the start/end extremes of the enclosed rectangular solid.
         # (x0, y0, z0) position (in [um]) of the beginning of the first voxel,
         # (xf, yf, zf) position (in [um]) of the end of the last voxel.
-        x0 = self._x_position_mm * 1000 - (
-            self._x_voxel_size_um * 0.5 * self._column_count_px
-        )
-        y0 = self._y_position_mm * 1000 - (
-            self._y_voxel_size_um * 0.5 * self._row_count_px
-        )
+        x0 = self._x_position_mm * 1000 - (self._x_voxel_size_um * 0.5 * self._column_count_px)
+        y0 = self._y_position_mm * 1000 - (self._y_voxel_size_um * 0.5 * self._row_count_px)
         z0 = self._z_position_mm * 1000
-        xf = self._x_position_mm * 1000 + (
-            self._x_voxel_size_um * 0.5 * self._column_count_px
-        )
-        yf = self._y_position_mm * 1000 + (
-            self._y_voxel_size_um * 0.5 * self._row_count_px
-        )
+        xf = self._x_position_mm * 1000 + (self._x_voxel_size_um * 0.5 * self._column_count_px)
+        yf = self._y_position_mm * 1000 + (self._y_voxel_size_um * 0.5 * self._row_count_px)
         zf = self._z_position_mm * 1000 + self._frame_count_px * self._z_voxel_size_um
         image_extents = pw.ImageExtents(-x0, -y0, -z0, -xf, -yf, -zf)
         # c = channel, t = time. These fields are unused for now.
@@ -364,26 +345,20 @@ class ImarisWriter(BaseWriter):
             shm = SharedMemory(self.shm_name, create=False, size=shm_nbytes)
             frames = np.ndarray(shm_shape, self._data_type, buffer=shm.buf)
             shared_log_queue.put(
-                f"{self._filename}: writing chunk "
-                f"{chunk_num + 1}/{chunk_total} of size {frames.shape}."
+                f"{self._filename}: writing chunk " f"{chunk_num + 1}/{chunk_total} of size {frames.shape}."
             )
             start_time = perf_counter()
             dim_order = [dim_map[x] for x in chunk_dim_order]
             # Put the frames back into x, y, z, c, t order.
             converter.CopyBlock(frames.transpose(dim_order), block_index)
             frames = None
-            shared_log_queue.put(
-                f"{self._filename}: writing chunk took "
-                f"{perf_counter() - start_time:.2f} [s]"
-            )
+            shared_log_queue.put(f"{self._filename}: writing chunk took " f"{perf_counter() - start_time:.2f} [s]")
             shm.close()
             self.done_reading.set()
             # update shared value progress range 0-1
             shared_progress.value = self.callback_class.progress
 
-            shared_log_queue.put(
-                f"{self._filename}: {self._progress.value * 100:.2f} [%] complete."
-            )
+            shared_log_queue.put(f"{self._filename}: {self._progress.value * 100:.2f} [%] complete.")
 
         # wait for file writing to finish
         while self.callback_class.progress < 1.0:

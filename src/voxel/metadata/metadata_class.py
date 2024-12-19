@@ -71,9 +71,7 @@ class MetadataClass(BaseMetadata):
     @date_format.setter
     def date_format(self, format):
         if format not in list(DATE_FORMATS.keys()):
-            raise ValueError(
-                f"{format} is not a valid datime format. Please choose from {DATE_FORMATS.keys()}"
-            )
+            raise ValueError(f"{format} is not a valid datime format. Please choose from {DATE_FORMATS.keys()}")
         self._date_format = DATE_FORMATS[format]
 
     @property
@@ -87,9 +85,7 @@ class MetadataClass(BaseMetadata):
             if not isinstance(
                 getattr(type(self), prop_name, None), property
             ):  # check if prop name is metadata property
-                raise ValueError(
-                    f"{prop_name} is not a metadata property. Please choose from {self.__dir__()}"
-                )
+                raise ValueError(f"{prop_name} is not a metadata property. Please choose from {self.__dir__()}")
         self._acquisition_name_format = form
 
     @property
@@ -120,9 +116,7 @@ class MetadataClass(BaseMetadata):
                 if not isinstance(
                     getattr(type(self), prop_name, None), property
                 ):  # check if prop name is metadata property
-                    raise ValueError(
-                        f"{prop_name} is not a metadata property. Please choose from {self.__dir__()}"
-                    )
+                    raise ValueError(f"{prop_name} is not a metadata property. Please choose from {self.__dir__()}")
                 name.append(str(getattr(self, prop_name)))
             if self._date_format is not None:
                 name.append(datetime.now().strftime(self._date_format))

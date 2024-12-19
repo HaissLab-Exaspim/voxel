@@ -188,7 +188,13 @@ class Convert:
 
         if self.convert_type == "pseudo":
             self.convert_ctrl.update(
-                {"color_temperature": 6500, "color_saturation": 0, "color_vibrance": 0, "color_tint": 0, "lut_file": ""}
+                {
+                    "color_temperature": 6500,
+                    "color_saturation": 0,
+                    "color_vibrance": 0,
+                    "color_tint": 0,
+                    "lut_file": "",
+                }
             )
 
         self.do_auto_minmax = True
@@ -362,7 +368,6 @@ class Convert:
 
     # -------------------------------------------------------------------------
     def _get_color_mode(self, color_pattern, offset_x, offset_y):
-
         color_mode = 0
         for i in range(4):
             if ((color_pattern >> (4 * i)) & 0x000F) == 1:
@@ -432,7 +437,9 @@ class Convert:
 
         time_start = time.perf_counter()
         error = self.PCO_Convert.PCO_ConvertCreate(
-            self.convert_handle, strSensorInfo, C.c_int(self.convert_types[self.convert_type])
+            self.convert_handle,
+            strSensorInfo,
+            C.c_int(self.convert_types[self.convert_type]),
         )
         duration = time.perf_counter() - time_start
         error_msg = self.get_error_text(error)
@@ -827,7 +834,10 @@ class Convert:
 
         logger.info(
             "[{:5.3f} s] [cnv:{}] {}: {}".format(
-                duration, str(self), sys._getframe().f_code.co_name, f'{iwidth.value}{"x"}{iheight.value}'
+                duration,
+                str(self),
+                sys._getframe().f_code.co_name,
+                f'{iwidth.value}{"x"}{iheight.value}',
             )
         )
         logger.info(
@@ -897,7 +907,10 @@ class Convert:
 
         logger.info(
             "[{:5.3f} s] [cnv:{}] {}: {}".format(
-                duration, str(self), sys._getframe().f_code.co_name, f'{width}{"x"}{height}{"x"}{channels}'
+                duration,
+                str(self),
+                sys._getframe().f_code.co_name,
+                f'{width}{"x"}{height}{"x"}{channels}',
             )
         )
         logger.info(
@@ -957,7 +970,10 @@ class Convert:
 
         logger.info(
             "[{:5.3f} s] [cnv:{}] {}: {}".format(
-                duration, str(self), sys._getframe().f_code.co_name, f'{width}{"x"}{height}{"x"}{channels}'
+                duration,
+                str(self),
+                sys._getframe().f_code.co_name,
+                f'{width}{"x"}{height}{"x"}{channels}',
             )
         )
         logger.info(
@@ -1010,7 +1026,10 @@ class Convert:
 
         logger.info(
             "[{:5.3f} s] [cnv:{}] {}: {}".format(
-                duration, str(self), sys._getframe().f_code.co_name, f'{width}{"x"}{height}{"x"}{3}'
+                duration,
+                str(self),
+                sys._getframe().f_code.co_name,
+                f'{width}{"x"}{height}{"x"}{3}',
             )
         )
         logger.info(
@@ -1061,7 +1080,17 @@ class Convert:
 
         time_start = time.perf_counter()
         error = self.PCO_Convert.PCO_GetWhiteBalance(
-            self.convert_handle, color_temp, tint, mode, width, height, p_image_input, x_min, y_min, x_max, y_max
+            self.convert_handle,
+            color_temp,
+            tint,
+            mode,
+            width,
+            height,
+            p_image_input,
+            x_min,
+            y_min,
+            x_max,
+            y_max,
         )
         duration = time.perf_counter() - time_start
         error_msg = self.get_error_text(error)
@@ -1220,7 +1249,16 @@ class Convert:
 
         time_start = time.perf_counter()
         error = self.PCO_Convert.PCO_WhiteBalanceToDisplayStruct(
-            self.convert_handle, pstrDisplay, mode, width, height, p_image_input, x_min, y_min, x_max, y_max
+            self.convert_handle,
+            pstrDisplay,
+            mode,
+            width,
+            height,
+            p_image_input,
+            x_min,
+            y_min,
+            x_max,
+            y_max,
         )
         duration = time.perf_counter() - time_start
         error_msg = self.get_error_text(error)
