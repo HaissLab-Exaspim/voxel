@@ -22,7 +22,6 @@ class CPUMaxProjection(BaseMaxProjection):
         super().__init__(path)
 
     def _run(self):
-
         # check if projection counts were set
         # if not, set to max possible values based on tile
         if self._x_projection_count_px is None:

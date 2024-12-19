@@ -2,8 +2,10 @@ import logging
 import threading
 from abc import abstractmethod
 from pathlib import Path
-from voxel.descriptors.deliminated_property import DeliminatedProperty
+
 from imohash import hashfile
+
+from voxel.descriptors.deliminated_property import DeliminatedProperty
 
 
 class BaseFileTransfer:
@@ -212,7 +214,7 @@ class BaseFileTransfer:
         self._timeout_s = timeout_s
         self.log.info(f"setting timeout to: {timeout_s} [s]")
 
-    @DeliminatedProperty(minimum=0, maximum=100, unit='%')
+    @DeliminatedProperty(minimum=0, maximum=100, unit="%")
     @abstractmethod
     def progress(self) -> float:
         """

@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+import os
 import sys
 from ctypes import c_wchar
 from datetime import datetime
@@ -10,7 +11,6 @@ from pathlib import Path
 from time import perf_counter, sleep
 
 import numpy as np
-import os
 from matplotlib.colors import hex2color
 from PyImarisWriter import PyImarisWriter as pw
 
@@ -20,7 +20,7 @@ from voxel.writers.base import BaseWriter
 CHUNK_COUNT_PX = 64
 DIVISIBLE_FRAME_COUNT_PX = 64
 
-COMPRESSION_TYPES = {
+COMPRESSIONS = {
     "lz4shuffle": pw.eCompressionAlgorithmShuffleLZ4,
     "none": pw.eCompressionAlgorithmNone,
 }
@@ -77,8 +77,8 @@ class ImarisWriter(BaseWriter):
         self.log.info(f"setting frame count to: {frame_count_px} [px]")
         if frame_count_px % DIVISIBLE_FRAME_COUNT_PX != 0:
             frame_count_px = (
-                    ceil(frame_count_px / DIVISIBLE_FRAME_COUNT_PX)
-                    * DIVISIBLE_FRAME_COUNT_PX
+                ceil(frame_count_px / DIVISIBLE_FRAME_COUNT_PX)
+                * DIVISIBLE_FRAME_COUNT_PX
             )
             self.log.info(f"adjusting frame count to: {frame_count_px} [px]")
         self._frame_count_px = frame_count_px
@@ -102,9 +102,7 @@ class ImarisWriter(BaseWriter):
         """
 
         return next(
-            key
-            for key, value in COMPRESSION_TYPES.items()
-            if value == self._compression
+            key for key, value in COMPRESSIONS.items() if value == self._compression
         )
 
     @compression.setter
@@ -117,11 +115,11 @@ class ImarisWriter(BaseWriter):
         :type value: str
         """
 
-        valid = list(COMPRESSION_TYPES.keys())
+        valid = list(COMPRESSIONS.keys())
         if compression not in valid:
             raise ValueError("compression type must be one of %r." % valid)
         self.log.info(f"setting compression mode to: {compression}")
-        self._compression = COMPRESSION_TYPES[compression]
+        self._compression = COMPRESSIONS[compression]
 
     @property
     def filename(self):
@@ -211,16 +209,20 @@ class ImarisWriter(BaseWriter):
         # compute the start/end extremes of the enclosed rectangular solid.
         # (x0, y0, z0) position (in [um]) of the beginning of the first voxel,
         # (xf, yf, zf) position (in [um]) of the end of the last voxel.
-        x0 = self._x_position_mm - (
-                self._x_voxel_size_um * 0.5 * self._column_count_px
+        x0 = self._x_position_mm * 1000 - (
+            self._x_voxel_size_um * 0.5 * self._column_count_px
         )
-        y0 = self._y_position_mm - (self._y_voxel_size_um * 0.5 * self._row_count_px)
-        z0 = self._z_position_mm
-        xf = self._x_position_mm + (
-                self._x_voxel_size_um * 0.5 * self._column_count_px
+        y0 = self._y_position_mm * 1000 - (
+            self._y_voxel_size_um * 0.5 * self._row_count_px
         )
-        yf = self._y_position_mm + (self._y_voxel_size_um * 0.5 * self._row_count_px)
-        zf = self._z_position_mm + self._frame_count_px * self._z_voxel_size_um
+        z0 = self._z_position_mm * 1000
+        xf = self._x_position_mm * 1000 + (
+            self._x_voxel_size_um * 0.5 * self._column_count_px
+        )
+        yf = self._y_position_mm * 1000 + (
+            self._y_voxel_size_um * 0.5 * self._row_count_px
+        )
+        zf = self._z_position_mm * 1000 + self._frame_count_px * self._z_voxel_size_um
         image_extents = pw.ImageExtents(-x0, -y0, -z0, -xf, -yf, -zf)
         # c = channel, t = time. These fields are unused for now.
         # Note: ImarisWriter performs MUCH faster when the dimension sequence
@@ -272,23 +274,23 @@ class ImarisWriter(BaseWriter):
         )
 
     def _run(
-            self,
-            chunk_dim_order: tuple,
-            shm_shape: list,
-            shm_nbytes: int,
-            image_size: pw.ImageSize,
-            block_size: pw.ImageSize,
-            sample_size: pw.ImageSize,
-            image_extents: pw.ImageExtents,
-            dimension_sequence: pw.DimensionSequence,
-            dim_map: dict,
-            parameters: pw.Parameters,
-            opts: pw.Options,
-            color_infos: pw.ColorInfo,
-            adjust_color_range: bool,
-            time_infos: datetime,
-            shared_progress: multiprocessing.Value,
-            shared_log_queue: multiprocessing.Queue,
+        self,
+        chunk_dim_order: tuple,
+        shm_shape: list,
+        shm_nbytes: int,
+        image_size: pw.ImageSize,
+        block_size: pw.ImageSize,
+        sample_size: pw.ImageSize,
+        image_extents: pw.ImageExtents,
+        dimension_sequence: pw.DimensionSequence,
+        dim_map: dict,
+        parameters: pw.Parameters,
+        opts: pw.Options,
+        color_infos: pw.ColorInfo,
+        adjust_color_range: bool,
+        time_infos: datetime,
+        shared_progress: multiprocessing.Value,
+        shared_log_queue: multiprocessing.Queue,
     ):
         """
         Main run function of the Imaris writer.
@@ -390,9 +392,9 @@ class ImarisWriter(BaseWriter):
             shared_log_queue.put(
                 f"waiting for data writing to complete for "
                 f"{self._filename}: "
-                f"{self.progress.value * 100:.2f}% [%] complete."
+                f"{self._progress.value * 100:.2f}% [%] complete."
             )
-        f"{self.progress.value * 100:.2f}% [%] complete."
+        f"{self._progress.value * 100:.2f}% [%] complete."
 
         # check and empty queue to avoid code hanging in process
         if not shared_log_queue.empty:

@@ -11,11 +11,10 @@ from voxel.devices.tunable_lens.base import BaseTunableLens
 # UNITLESS = 4
 # UNDEFINED = 5
 
-MODES = {"internal": UnitType.FP,
-         "external": UnitType.CURRENT}
+MODES = {"internal": UnitType.FP, "external": UnitType.CURRENT}
+
 
 class TunableLens(BaseTunableLens):
-
     def __init__(self, port: str, channel: int):
         """Connect to hardware.
 
@@ -53,7 +52,9 @@ class TunableLens(BaseTunableLens):
     def signal_temperature_c(self):
         """Get the temperature in deg C."""
         state = {}
-        state['Temperature [C]'] = self.tunable_lens.TemperatureManager.GetDeviceTemperature()
+        state["Temperature [C]"] = (
+            self.tunable_lens.TemperatureManager.GetDeviceTemperature()
+        )
         return state
 
     def close(self):

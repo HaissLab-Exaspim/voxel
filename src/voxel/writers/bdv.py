@@ -10,9 +10,9 @@ from time import perf_counter, sleep
 
 import numpy as np
 
+from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.writers.base import BaseWriter
 from voxel.writers.bdv_writer import npy2bdv
-from voxel.descriptors.deliminated_property import DeliminatedProperty
 
 CHUNK_COUNT_PX = 64
 DIVISIBLE_FRAME_COUNT_PX = 64
@@ -22,7 +22,7 @@ B3D_BACKGROUND_OFFSET = 0  # ADU
 B3D_GAIN = 2.1845  # ADU/e-
 B3D_READ_NOISE = 1.5  # e-
 
-COMPRESSION_TYPES = {"none": None, "gzip": "gzip", "lzf": "lzf", "b3d": "b3d"}
+COMPRESSIONS = {"none": None, "gzip": "gzip", "lzf": "lzf", "b3d": "b3d"}
 
 
 # TODO ADD DOWNSAMPLE METHOD TO GET PASSED INTO NPY2BDV
@@ -96,8 +96,8 @@ class BDVWriter(BaseWriter):
         self.log.info(f"setting frame count to: {frame_count_px} [px]")
         if frame_count_px % DIVISIBLE_FRAME_COUNT_PX != 0:
             frame_count_px = (
-                    ceil(frame_count_px / DIVISIBLE_FRAME_COUNT_PX)
-                    * DIVISIBLE_FRAME_COUNT_PX
+                ceil(frame_count_px / DIVISIBLE_FRAME_COUNT_PX)
+                * DIVISIBLE_FRAME_COUNT_PX
             )
             self.log.info(f"adjusting frame count to: {frame_count_px} [px]")
         self._frame_count_px_px = frame_count_px
@@ -144,9 +144,7 @@ class BDVWriter(BaseWriter):
         """
 
         return next(
-            key
-            for key, value in COMPRESSION_TYPES.items()
-            if value == self._compression
+            key for key, value in COMPRESSIONS.items() if value == self._compression
         )
 
     @compression.setter
@@ -165,11 +163,11 @@ class BDVWriter(BaseWriter):
         :raises ValueError: HDF5 version is >1.8.xx
         """
 
-        valid = list(COMPRESSION_TYPES.keys())
+        valid = list(COMPRESSIONS.keys())
         if compression not in valid:
             raise ValueError("compression type must be one of %r." % valid)
         self.log.info(f"setting compression mode to: {compression}")
-        self._compression = COMPRESSION_TYPES[compression]
+        self._compression = COMPRESSIONS[compression]
         # handle compresion opts for b3d
         if compression == "b3d":
             # check for windows os

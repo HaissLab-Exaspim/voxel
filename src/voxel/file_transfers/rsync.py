@@ -85,7 +85,7 @@ class RsyncFileTransfer(BaseFileTransfer):
                     # transfer just one file and iterate
                     # split filename and path
                     [local_dir, filename] = os.path.split(file_path)
-                    self.log.info(f'transfering {filename}')
+                    self.log.info(f"transfering {filename}")
                     # specify external directory
                     # need to change directories to str because they are Path objects
                     external_dir = local_dir.replace(
@@ -126,7 +126,7 @@ class RsyncFileTransfer(BaseFileTransfer):
                     time.sleep(1.0)
                     # lets monitor the progress of the individual file if size > 1 GB
                     if file_size_mb > 1024:
-                        self.log.info(f'{filename} is > 1 GB')
+                        self.log.info(f"{filename} is > 1 GB")
                         # wait for subprocess to start otherwise log file won't exist yet
                         time.sleep(10.0)
                         file_progress = 0
@@ -145,7 +145,7 @@ class RsyncFileTransfer(BaseFileTransfer):
                                 # a location with % has been found
                                 if index != -1:
                                     # grab the string of the % progress
-                                    value = line[index - 4: index]
+                                    value = line[index - 4 : index]
                                     # strip and convert to float
                                     file_progress = float(value.rstrip())
                                 # we must be at the last line of the file
@@ -157,7 +157,7 @@ class RsyncFileTransfer(BaseFileTransfer):
                                     # grab the index of the % symbol
                                     index = line.find("%")
                                     # grab the string of the % progress
-                                    value = line[index - 4: index]
+                                    value = line[index - 4 : index]
                                     # strip and convert to float
                                     file_progress = float(value.rstrip())
                             # no lines in the file yet
@@ -181,7 +181,9 @@ class RsyncFileTransfer(BaseFileTransfer):
                                     break
                             previous_progress = self.progress
                             self.log.info(
-                                self.log.info(f'{self.filename} transfer is {self.progress:.2f} [%] complete.')
+                                self.log.info(
+                                    f"{self.filename} transfer is {self.progress:.2f} [%] complete."
+                                )
                             )
                             # close temporary stdout file handle
                             f.close()
@@ -193,9 +195,11 @@ class RsyncFileTransfer(BaseFileTransfer):
                             (total_transferred_mb + file_size_mb) / total_size_mb * 100
                         )
                         self.log.info(
-                            self.log.info(f'{self.filename} transfer is {self.progress:.2f} [%] complete.')
+                            self.log.info(
+                                f"{self.filename} transfer is {self.progress:.2f} [%] complete."
+                            )
                         )
-                    self.log.info(f'{filename} transfer complete')
+                    self.log.info(f"{filename} transfer complete")
                     # wait for process to finish before cleaning log file
                     time.sleep(10.0)
                     # clean up and remove the temporary log file
@@ -247,7 +251,9 @@ class RsyncFileTransfer(BaseFileTransfer):
                         )
                 end_time = time.time()
                 total_time = end_time - start_time
-                self.log.info(f'{self.filename} transfer complete, total time: {total_time:.2f} [s]')
+                self.log.info(
+                    f"{self.filename} transfer complete, total time: {total_time:.2f} [s]"
+                )
                 subprocess.kill()
                 retry_num += 1
 

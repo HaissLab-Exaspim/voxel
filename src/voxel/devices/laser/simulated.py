@@ -15,8 +15,9 @@ MAX_POWER_MW = 100
 
 
 class SimulatedLaser(BaseLaser):
-
-    def __init__(self, id: str, wavelength: int, prefix: str = "", coefficients: dict = {}):
+    def __init__(
+        self, id: str, wavelength: int, prefix: str = "", coefficients: dict = {}
+    ):
         """
         Communicate with specific Simulated laser in Simulated Combiner box.
 

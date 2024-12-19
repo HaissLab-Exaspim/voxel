@@ -1,5 +1,6 @@
-import numpy
 import time
+
+import numpy
 from gputools import OCLArray, OCLProgram
 
 from voxel.processes.downsample.base import BaseDownSample
@@ -23,10 +24,10 @@ class GPUToolsDownSample2D(BaseDownSample):
           int j = get_global_id(1);
           int Nx = get_global_size(0);
           int Ny = get_global_size(1);
-          int res = 0; 
+          int res = 0;
 
-          for (int m = 0; m < BLOCK; ++m) 
-             for (int n = 0; n < BLOCK; ++n) 
+          for (int m = 0; m < BLOCK; ++m)
+             for (int n = 0; n < BLOCK; ++n)
                   res+=input[BLOCK*Nx*(BLOCK*j+m)+BLOCK*i+n];
           output[Nx*j+i] = (short)(res/BLOCK/BLOCK);
         }
@@ -50,9 +51,6 @@ class GPUToolsDownSample2D(BaseDownSample):
         y_g = OCLArray.empty(
             tuple(s // self._binning for s in image.shape), image.dtype
         )
-        self._prog.run_kernel(
-            "downsample2d", y_g.shape[::-1], None, x_g.data, y_g.data
-        )
+        self._prog.run_kernel("downsample2d", y_g.shape[::-1], None, x_g.data, y_g.data)
         end_time = time.time()
-        print(end_time - start_time)
         return y_g.get()

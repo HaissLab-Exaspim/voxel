@@ -4,7 +4,10 @@ from typing import Literal
 from ...descriptors.deliminated_property import DeliminatedProperty
 from . import BaseFlipMount
 
-FLIP_TIME_RANGE_MS: tuple[float, float] = (500.0, 2800.0, 100.0) # min, max, step
+VALID_POSITIONS = [0, 1]
+FLIP_TIME_RANGE_MS: tuple[float, float] = (500.0, 2800.0, 100.0)  # min, max, step
+POSITIONS = dict()
+
 
 class SimulatedFlipMount(BaseFlipMount):
     def __init__(self, id, conn, positions):
@@ -12,11 +15,18 @@ class SimulatedFlipMount(BaseFlipMount):
         self._conn = conn
         self._positions = positions
         self._inst: Literal[0, 1] = None
+        for key, value in positions.items():
+            if value not in VALID_POSITIONS:
+                raise ValueError(
+                    f"Invalid position {key} for Thorlabs flip mount.\
+                    Valid positions are {VALID_POSITIONS}"
+                )
+            POSITIONS[key] = value
         self._connect()
 
     def _connect(self):
-        self.position = next(iter(self._positions)) # set to first position
-        self.flip_time_ms: float = FLIP_TIME_RANGE_MS[0] # min flip time
+        self.position = next(iter(self._positions))  # set to first position
+        self.flip_time_ms: float = FLIP_TIME_RANGE_MS[0]  # min flip time
 
     def close(self):
         self._inst = None
@@ -32,14 +42,14 @@ class SimulatedFlipMount(BaseFlipMount):
 
     @property
     def position(self) -> str:
-        return next((key for key, value in self._positions.items() if value == self._inst), 'Unknown')
+        return next((key for key, value in self._positions.items() if value == self._inst), "Unknown")
 
     @position.setter
     def position(self, new_position):
         try:
             self._inst = self._positions[new_position]
         except KeyError:
-            raise ValueError(f'Invalid position {new_position}. Valid positions are {list(self._positions.keys())}')
+            raise ValueError(f"Invalid position {new_position}. Valid positions are {list(self._positions.keys())}")
         except Exception as e:
             raise e
 
@@ -49,6 +59,6 @@ class SimulatedFlipMount(BaseFlipMount):
 
     @flip_time_ms.setter
     def flip_time_ms(self, time_ms: float):
-        print(f"Setting flip_time_ms to {time_ms}")
-        print(f"FLIP_TIME_RANGE_MS is {FLIP_TIME_RANGE_MS}")
+        self.log.info(f"Setting flip_time_ms to {time_ms}")
+        self.log.info(f"FLIP_TIME_RANGE_MS is {FLIP_TIME_RANGE_MS}")
         self._flip_time_ms = time_ms
