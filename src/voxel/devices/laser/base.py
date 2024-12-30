@@ -8,22 +8,37 @@ class BaseLaser(VoxelDevice):
     """Base class for all voxel laser devices."""
 
     def __init__(self, id: str):
+        """
+        Initialize the BaseLaser object.
+
+        :param id: Laser ID
+        :type id: str
+        """
         super().__init__(id)
 
     @abstractmethod
     def enable(self):
-        """Turn on the laser"""
+        """
+        Turn on the laser.
+        """
         pass
 
     @abstractmethod
     def disable(self):
-        """Turn off the laser"""
+        """
+        Turn off the laser.
+        """
         pass
 
     @property
     @abstractmethod
     def wavelength(self):
-        """Wavelength of laser"""
+        """
+        Get the wavelength of the laser.
+
+        :return: Wavelength of the laser
+        :rtype: int
+        """
         pass
 
     @property
@@ -45,7 +60,6 @@ class BaseLaser(VoxelDevice):
 
         :param value: The power setpoint in mW.
         :type value: float
-        :rtype: None
         """
         pass
 

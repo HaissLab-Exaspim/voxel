@@ -16,17 +16,38 @@ MODES = {
 
 # singleton wrapper around TigerController
 class TigerControllerSingleton(TigerController, metaclass=Singleton):
+    """
+    Singleton class for TigerController.
+
+    :param TigerController: Base class for TigerController
+    :type TigerController: class
+    :param metaclass: Singleton metaclass
+    :type metaclass: type
+    """
+
     def __init__(self, com_port):
+        """
+        Initialize the TigerControllerSingleton object.
+
+        :param com_port: COM port for the controller
+        :type com_port: str
+        """
         super(TigerControllerSingleton, self).__init__(com_port)
 
 
 class TunableLens(BaseTunableLens):
+    """
+    TunableLens class for handling ASI tunable lens devices.
+    """
 
     def __init__(self, port: str, hardware_axis: str):
-        """Connect to hardware.
+        """
+        Initialize the TunableLens object.
 
-        :param tigerbox: TigerController instance.
-        :param hardware_axis: stage hardware axis.
+        :param port: COM port for the controller
+        :type port: str
+        :param hardware_axis: Hardware axis
+        :type hardware_axis: str
         """
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
         self.tigerbox = TigerControllerSingleton(com_port=port)
@@ -36,15 +57,25 @@ class TunableLens(BaseTunableLens):
 
     @property
     def mode(self):
-        """Get the tiger axis control mode."""
+        """
+        Get the mode of the tunable lens.
+
+        :return: Mode of the tunable lens
+        :rtype: str
+        """
         mode = self.tigerbox.get_axis_control_mode(self.hardware_axis)
         converted_mode = next(key for key, enum in MODES.items() if enum.value == mode)
         return converted_mode
 
     @mode.setter
     def mode(self, mode: str):
-        """Set the tiger axis control mode."""
+        """
+        Set the mode of the tunable lens.
 
+        :param mode: Mode of the tunable lens
+        :type mode: str
+        :raises ValueError: If the mode is not valid
+        """
         valid = list(MODES.keys())
         if mode not in valid:
             raise ValueError("mode must be one of %r." % valid)
@@ -52,13 +83,19 @@ class TunableLens(BaseTunableLens):
         self.tigerbox.set_axis_control_mode(**{self.hardware_axis: MODES[mode]})
 
     @property
-    def signal_temperature_c(self):
-        """Get the temperature in deg C."""
-        state = {}
-        state["Temperature [C]"] = self.tigerbox.get_etl_temp(self.hardware_axis)
-        return state
+    def temperature_c(self):
+        """
+        Get the temperature of the tunable lens in Celsius.
+
+        :return: Temperature in Celsius
+        :rtype: float
+        """
+        return self.tigerbox.get_etl_temp(self.hardware_axis)
 
     def log_metadata(self):
+        """
+        Log metadata for the tunable lens.
+        """
         self.log.info("tiger hardware axis parameters")
         build_config = self.tigerbox.get_build_config()
         self.log.debug(f"{build_config}")
@@ -68,4 +105,7 @@ class TunableLens(BaseTunableLens):
             self.log.info(f"{self.hardware_axis} axis, {setting}, {axis_settings[setting]}")
 
     def close(self):
+        """
+        Close the tunable lens device.
+        """
         self.tigerbox.ser.close()

@@ -13,18 +13,23 @@ class GPUToolsRankDownSample2D(BaseDownSample):
     """
     Voxel rank order downsampling with gputools.
 
-    :param binning: Binning factor
-    :type binning: int
-    :param rank: Rank order
-    :param data_type: Data type (uint8 or uint16)
-    :type data_type: str
-
     Rank of element to retain (if None: median)
     If rank=0 then the minimum is returned
     If rank = size[0] x size[1] x size[2] - 1 (or -1) then the maximum is returned
     """
 
     def __init__(self, binning: int, rank=None, data_type=None):
+        """
+        Module for handling 2D rank-based downsampling processes.
+
+        :param binning: The binning factor for downsampling.
+        :type binning: int
+        :param rank: The rank for the downsampling process, defaults to None.
+        :type rank: int, optional
+        :param data_type: The data type for the downsampled output, defaults to None.
+        :type data_type: type, optional
+        :raises ValueError: If the binning factor or rank is not valid.
+        """
 
         super().__init__(binning)
 
@@ -48,11 +53,9 @@ class GPUToolsRankDownSample2D(BaseDownSample):
         with open(abspath("kernels/rank_downscale.cl"), "r") as f:
             tpl = Template(f.read())
 
-        rendered = tpl.render(DTYPE = DTYPE,
-                              FSIZE_Z=0,
-                              FSIZE_X=self._binning[1],
-                              FSIZE_Y=self._binning[0],
-                              CVAL = 0)  # constant value
+        rendered = tpl.render(
+            DTYPE=DTYPE, FSIZE_Z=0, FSIZE_X=self._binning[1], FSIZE_Y=self._binning[0], CVAL=0
+        )  # constant value
 
         self._prog = OCLProgram(src_str=rendered)
 

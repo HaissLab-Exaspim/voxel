@@ -17,15 +17,19 @@ class BaseFileTransfer:
 
     From -> \\\\local_path\\\\acquisition_name\\\\filename*
     To -> \\\\external_path\\\\acquisition_name\\\\filename*
-
-    :param external_path: External path of files to be transferred
-    :param local_path: Local path of files to be transferred
-    :type external_path: str
-    :type local_path: str
-    :raise ValueError: Same external and local path
     """
 
     def __init__(self, external_path: str, local_path: str):
+        """
+        Base class for file transfer processes.
+
+        :param external_path: External path of files to be transferred.
+        :type external_path: str
+        :param local_path: Local path of files to be transferred.
+        :type local_path: str
+        :raises ValueError: If the file path is not valid.
+        """
+
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._external_path = Path(external_path)
         self._local_path = Path(local_path)

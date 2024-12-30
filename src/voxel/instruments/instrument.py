@@ -2,8 +2,6 @@ import copy
 import importlib
 import inspect
 import logging
-import re
-import sys
 from functools import wraps
 from pathlib import Path
 from threading import Lock, RLock
@@ -16,8 +14,19 @@ from voxel.descriptors.deliminated_property import _DeliminatedProperty
 
 
 class Instrument:
+    """Represents an instrument with various devices and configurations."""
 
     def __init__(self, config_path: str, yaml_handler: YAML = None, log_level="INFO"):
+        """
+        Initialize the Instrument class.
+
+        :param config_path: Path to the configuration file.
+        :type config_path: str
+        :param yaml_handler: YAML handler for loading and dumping config, defaults to None.
+        :type yaml_handler: YAML, optional
+        :param log_level: Logging level, defaults to "INFO".
+        :type log_level: str, optional
+        """
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.log.setLevel(log_level)
 
@@ -35,7 +44,11 @@ class Instrument:
         self._construct()
 
     def _construct(self):
-        """Construct device based on configuration yaml"""
+        """
+        Construct the instrument from the configuration file.
+
+        :raises ValueError: If the instrument ID or device configurations are invalid.
+        """
         self.log.info(f"constructing instrument from {self.config_path}")
         # grab instrument id
         try:
@@ -60,14 +73,17 @@ class Instrument:
         self.channels = self.config["instrument"]["channels"]
 
     def _construct_device(self, device_name, device_specs, lock: Lock = None):
-        """Load, setup, and add any sub-devices or tasks of a device. Also wrap class methods and properties with
-        thread safe locking function
-
-        :param device_name: name of device
-        :param device_specs: dictionary dictating how device should be set up
-        :param lock: lock to be used for device and sub-devices
         """
+        Construct a device based on its specifications.
 
+        :param device_name: Name of the device.
+        :type device_name: str
+        :param device_specs: Specifications of the device.
+        :type device_specs: dict
+        :param lock: Lock for thread safety, defaults to None.
+        :type lock: Lock, optional
+        :raises ValueError: If the device configuration is invalid.
+        """
         self.log.info(f"constructing {device_name}")
         lock = RLock() if lock is None else lock
         device_type = inflection.pluralize(device_specs["type"])
@@ -97,12 +113,18 @@ class Instrument:
             self._construct_subdevice(device_object, subdevice_name, copy.deepcopy(subdevice_specs), lock)
 
     def _construct_subdevice(self, device_object, subdevice_name, subdevice_specs, lock):
-        """Handle the case where devices share serial ports or device objects
-        :param device_object: parent device setup before sub-device
-        :param subdevice_name: name of sub-device
-        :param subdevice_specs: dictionary dictating how sub-device should be set up
-        :param lock: lock to be used for device and sub-devices"""
+        """
+        Construct a subdevice based on its specifications.
 
+        :param device_object: Parent device object.
+        :type device_object: object
+        :param subdevice_name: Name of the subdevice.
+        :type subdevice_name: str
+        :param subdevice_specs: Specifications of the subdevice.
+        :type subdevice_specs: dict
+        :param lock: Lock for thread safety.
+        :type lock: Lock
+        """
         # Import subdevice class in order to access keyword argument required in the init of the device
         subdevice_class = getattr(importlib.import_module(subdevice_specs["driver"]), subdevice_specs["module"])
         subdevice_needs = inspect.signature(subdevice_class.__init__).parameters
@@ -118,24 +140,34 @@ class Instrument:
         self._construct_device(subdevice_name, subdevice_specs, lock)
 
     def _load_device(self, driver: str, module: str, kwds, lock: Lock):
-        """Load device based on driver, module, and kwds specified. Also wrap class methods and properties with
-        thread safe locking function
+        """
+        Load a device class and make it thread-safe.
 
-        :param driver: driver of device
-        :param module: specific class of device within driver
-        :param kwds: keyword argument required in the init of the device,
-        :param lock: lock to be used for device and sub-devices"""
-
+        :param driver: Driver module of the device.
+        :type driver: str
+        :param module: Module name of the device.
+        :type module: str
+        :param kwds: Initialization keywords for the device.
+        :type kwds: dict
+        :param lock: Lock for thread safety.
+        :type lock: Lock
+        :return: Thread-safe device object.
+        :rtype: object
+        """
         self.log.info(f"loading {driver}.{module}")
         device_class = getattr(importlib.import_module(driver), module)
         thread_safe_device_class = for_all_methods(lock, device_class)
         return thread_safe_device_class(**kwds)
 
     def _setup_device(self, device: object, properties: dict):
-        """Setup device based on property dictionary
-        :param device: device to be setup
-        :param properties: dictionary of attributes, values to set according to config"""
+        """
+        Set up a device with its properties.
 
+        :param device: Device object.
+        :type device: object
+        :param properties: Properties to set on the device.
+        :type properties: dict
+        """
         self.log.info(f"setting up {device}")
         # successively iterate through properties keys and if there is setter, set
         for key, value in properties.items():
@@ -145,8 +177,9 @@ class Instrument:
                 self.log.info(f"{device} property {key} has no setter")
 
     def update_current_state_config(self):
-        """Capture current state of instrument in config form"""
-
+        """
+        Update the current state configuration of the instrument.
+        """
         for device_name, device_specs in self.config["instrument"]["devices"].items():
             device = getattr(self, inflection.pluralize(device_specs["type"]))[device_name]
             properties = {}
@@ -159,18 +192,33 @@ class Instrument:
             device_specs["properties"] = properties
 
     def save_config(self, path: Path):
-        """Save current config to path provided
-        :param path: path to save config to"""
+        """
+        Save the current configuration to a file.
+
+        :param path: Path to save the configuration file.
+        :type path: Path
+        """
         with path.open("w") as f:
             self.yaml.dump(self.config, f)
 
     def close(self):
-        """Close functionality"""
+        """
+        Close the instrument and release any resources.
+        """
         pass
 
 
 def for_all_methods(lock, cls):
-    """Function that iterates through callable methods and properties in a class and wraps with lock_methods"""
+    """
+    Apply a lock to all methods of a class to make them thread-safe.
+
+    :param lock: Lock for thread safety.
+    :type lock: Lock
+    :param cls: Class to apply the lock to.
+    :type cls: type
+    :return: Class with thread-safe methods.
+    :rtype: type
+    """
     for attr_name in cls.__dict__:
         if attr_name == "__init__":
             continue
@@ -189,10 +237,25 @@ def for_all_methods(lock, cls):
 
 
 def lock_methods(fn, lock):
-    """Wrapper that locks lock shared by all methods and properties so class is thread safe"""
+    """
+    Apply a lock to a method to make it thread-safe.
+
+    :param fn: Function to apply the lock to.
+    :type fn: function
+    :param lock: Lock for thread safety.
+    :type lock: Lock
+    :return: Thread-safe function.
+    :rtype: function
+    """
 
     @wraps(fn)
     def wrapper(*args, **kwargs):
+        """
+        Wrapper function to apply the lock.
+
+        :return: Result of the original function.
+        :rtype: Any
+        """
         with lock:
             return fn(*args, **kwargs)
 

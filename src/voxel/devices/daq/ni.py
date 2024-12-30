@@ -29,9 +29,16 @@ RETRIGGERABLE = {"on": True, "off": False}
 
 
 class DAQ(BaseDAQ):
+    """DAQ class for handling NI DAQ devices."""
 
     def __init__(self, dev: str):
+        """
+        Initialize the DAQ object.
 
+        :param dev: Device name
+        :type dev: str
+        :raises ValueError: If the device name is not found in the system
+        """
         self.do_task = None
         self.ao_task = None
         self.co_task = None
@@ -63,10 +70,22 @@ class DAQ(BaseDAQ):
 
     @property
     def tasks(self):
+        """
+        Get the tasks dictionary.
+
+        :return: Dictionary of tasks
+        :rtype: dict
+        """
         return self._tasks
 
     @tasks.setter
     def tasks(self, tasks_dict: dict):
+        """
+        Set the tasks dictionary.
+
+        :param tasks_dict: Dictionary of tasks
+        :type tasks_dict: dict
+        """
         # # Add waveforms to check if task is configured correctly
         # for task_type, task_dict in tasks_dict.items():
         #     pulse_count = task_dict['timing'].get('pulse_count', None)
@@ -74,7 +93,15 @@ class DAQ(BaseDAQ):
         self._tasks = tasks_dict
 
     def add_task(self, task_type: str, pulse_count=None):
+        """
+        Add a task to the DAQ.
 
+        :param task_type: Type of the task ('ao', 'co', 'do')
+        :type task_type: str
+        :param pulse_count: Number of pulses for the task, defaults to None
+        :type pulse_count: int, optional
+        :raises ValueError: If the task type is invalid or if any parameter is out of range
+        """
         # check task type
         if task_type not in ["ao", "co", "do"]:
             raise ValueError(f"{task_type} must be one of {['ao', 'co', 'do']}")
@@ -152,7 +179,7 @@ class DAQ(BaseDAQ):
             #     raise ValueError("output port must be one of %r." % self.dio_ports)
 
             if timing["frequency_hz"] < 0:
-                raise ValueError(f"frequency must be >0 Hz")
+                raise ValueError("frequency must be >0 Hz")
 
             for channel_number in task["counters"]:
                 if f"{self.id}/{channel_number}" not in self.co_physical_chans:
@@ -179,8 +206,13 @@ class DAQ(BaseDAQ):
         setattr(self, f"{task_type}_task", daq_task)  # set task attribute
 
     def _timing_checks(self, task_type: str):
-        """Check period time, rest time, and sample frequency"""
+        """
+        Perform timing checks for the task.
 
+        :param task_type: Type of the task ('ao', 'co', 'do')
+        :type task_type: str
+        :raises ValueError: If any timing parameter is out of range
+        """
         task = self.tasks[f"{task_type}_task"]
         timing = task["timing"]
 
@@ -202,7 +234,15 @@ class DAQ(BaseDAQ):
             )
 
     def generate_waveforms(self, task_type: str, wavelength: str):
+        """
+        Generate waveforms for the task.
 
+        :param task_type: Type of the task ('ao', 'do')
+        :type task_type: str
+        :param wavelength: Wavelength for the waveform
+        :type wavelength: str
+        :raises ValueError: If any parameter is invalid or out of range
+        """
         # check task type
         if task_type not in ["ao", "do"]:
             raise ValueError(f"{task_type} must be one of {['ao', 'do']}")
@@ -297,7 +337,12 @@ class DAQ(BaseDAQ):
         setattr(self, f"{task_type}_sample_mode", SAMPLE_MODE[timing["sample_mode"]])
 
     def write_ao_waveforms(self, rereserve_buffer=True):
+        """
+        Write analog output waveforms to the DAQ.
 
+        :param rereserve_buffer: Whether to re-reserve the buffer, defaults to True
+        :type rereserve_buffer: bool, optional
+        """
         ao_voltages = numpy.array(list(self.ao_waveforms.values()))
 
         if rereserve_buffer:  # don't need to rereseve when rewriting already running tasks
@@ -316,7 +361,12 @@ class DAQ(BaseDAQ):
         self.ao_task.write(numpy.array(ao_voltages))
 
     def write_do_waveforms(self, rereserve_buffer=True):
+        """
+        Write digital output waveforms to the DAQ.
 
+        :param rereserve_buffer: Whether to re-reserve the buffer, defaults to True
+        :type rereserve_buffer: bool, optional
+        """
         do_voltages = numpy.array(list(self.do_waveforms.values()))
         if rereserve_buffer:  # don't need to rereseve when rewriting already running tasks
             # unreserve buffer
@@ -338,7 +388,28 @@ class DAQ(BaseDAQ):
         offset_volts: float,
         cutoff_frequency_hz: float,
     ):
+        """
+        Generate a sawtooth waveform.
 
+        :param sampling_frequency_hz: Sampling frequency in Hz
+        :type sampling_frequency_hz: float
+        :param period_time_ms: Period time in milliseconds
+        :type period_time_ms: float
+        :param start_time_ms: Start time in milliseconds
+        :type start_time_ms: float
+        :param end_time_ms: End time in milliseconds
+        :type end_time_ms: float
+        :param rest_time_ms: Rest time in milliseconds
+        :type rest_time_ms: float
+        :param amplitude_volts: Amplitude in volts
+        :type amplitude_volts: float
+        :param offset_volts: Offset in volts
+        :type offset_volts: float
+        :param cutoff_frequency_hz: Cutoff frequency in Hz
+        :type cutoff_frequency_hz: float
+        :return: Generated waveform
+        :rtype: numpy.ndarray
+        """
         waveform_length_samples = int(((period_time_ms + rest_time_ms) / 1000) * sampling_frequency_hz)
 
         time_samples_ms = numpy.linspace(
@@ -399,7 +470,26 @@ class DAQ(BaseDAQ):
         max_volts: float,
         min_volts: float,
     ):
+        """
+        Generate a square waveform.
 
+        :param sampling_frequency_hz: Sampling frequency in Hz
+        :type sampling_frequency_hz: float
+        :param period_time_ms: Period time in milliseconds
+        :type period_time_ms: float
+        :param start_time_ms: Start time in milliseconds
+        :type start_time_ms: float
+        :param end_time_ms: End time in milliseconds
+        :type end_time_ms: float
+        :param rest_time_ms: Rest time in milliseconds
+        :type rest_time_ms: float
+        :param max_volts: Maximum voltage
+        :type max_volts: float
+        :param min_volts: Minimum voltage
+        :type min_volts: float
+        :return: Generated waveform
+        :rtype: numpy.ndarray
+        """
         time_samples = int(((period_time_ms + rest_time_ms) / 1000) * sampling_frequency_hz)
         start_sample = int((start_time_ms / 1000) * sampling_frequency_hz)
         end_sample = int((end_time_ms / 1000) * sampling_frequency_hz)
@@ -419,7 +509,28 @@ class DAQ(BaseDAQ):
         offset_volts: float,
         cutoff_frequency_hz: float,
     ):
+        """
+        Generate a triangle waveform.
 
+        :param sampling_frequency_hz: Sampling frequency in Hz
+        :type sampling_frequency_hz: float
+        :param period_time_ms: Period time in milliseconds
+        :type period_time_ms: float
+        :param start_time_ms: Start time in milliseconds
+        :type start_time_ms: float
+        :param end_time_ms: End time in milliseconds
+        :type end_time_ms: float
+        :param rest_time_ms: Rest time in milliseconds
+        :type rest_time_ms: float
+        :param amplitude_volts: Amplitude in volts
+        :type amplitude_volts: float
+        :param offset_volts: Offset in volts
+        :type offset_volts: float
+        :param cutoff_frequency_hz: Cutoff frequency in Hz
+        :type cutoff_frequency_hz: float
+        :return: Generated waveform
+        :rtype: numpy.ndarray
+        """
         # sawtooth with end time in center of waveform
         waveform = self.sawtooth(
             sampling_frequency_hz,
@@ -435,7 +546,12 @@ class DAQ(BaseDAQ):
         return waveform
 
     def plot_waveforms_to_pdf(self, save=False):
+        """
+        Plot waveforms and optionally save to a PDF.
 
+        :param save: Whether to save the plot to a PDF, defaults to False
+        :type save: bool, optional
+        """
         plt.rcParams["font.size"] = 10
         plt.rcParams["font.family"] = "Arial"
         plt.rcParams["font.weight"] = "light"
@@ -470,6 +586,12 @@ class DAQ(BaseDAQ):
             plt.savefig("waveforms.pdf", bbox_inches="tight")
 
     def _rereserve_buffer(self, buf_len):
+        """
+        Re-reserve the buffer for tasks.
+
+        :param buf_len: Length of the buffer
+        :type buf_len: int
+        """
         """If tasks are already configured, the buffer needs to be cleared and rereserved to work"""
         self.ao_task.control(TaskMode.TASK_UNRESERVE)  # Unreserve buffer
         # reconfigure timing
@@ -487,33 +609,55 @@ class DAQ(BaseDAQ):
         self.do_task.control(TaskMode.TASK_COMMIT)
 
     def start(self):
+        """
+        Start all tasks.
+        """
         for task in [self.ao_task, self.do_task, self.co_task]:
             if task is not None:
                 task.start()
 
     def stop(self):
+        """
+        Stop all tasks.
+        """
         for task in [self.ao_task, self.do_task, self.co_task]:
             if task is not None:
                 task.stop()
 
     def close(self):
+        """
+        Close all tasks.
+        """
         for task in [self.ao_task, self.do_task, self.co_task]:
             if task is not None:
                 task.close()
 
     def restart(self):
+        """
+        Restart all tasks.
+        """
         self.stop()
         self.start()
 
     def wait_until_done_all(self, timeout=10.0):
+        """
+        Wait until all tasks are done.
 
+        :param timeout: Timeout in seconds, defaults to 10.0
+        :type timeout: float, optional
+        """
         for task in [self.ao_task, self.do_task]:
             if task is not None:
                 print(task)
                 task.wait_until_done(timeout)
 
     def is_finished_all(self):
+        """
+        Check if all tasks are finished.
 
+        :return: True if all tasks are finished, False otherwise
+        :rtype: bool
+        """
         for task in [self.ao_task, self.do_task]:
             if task is not None:
                 if not task.is_task_done():
@@ -521,6 +665,3 @@ class DAQ(BaseDAQ):
             else:
                 pass
         return True
-
-    def close(self):
-        pass

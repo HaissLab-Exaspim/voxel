@@ -19,10 +19,20 @@ class CPUMaxProjection(BaseMaxProjection):
     """
 
     def __init__(self, path: str):
+        """
+        Initialize the CPUMaxProjection class.
+
+        :param path: Path for the data writer.
+        :type path: str
+        """
         super().__init__(path)
 
     def _run(self):
+        """
+        Run the max projection process.
 
+        :raises ValueError: If the x, y, or z projection count is not valid.
+        """
         # check if projection counts were set
         # if not, set to max possible values based on tile
         if self._x_projection_count_px is None:

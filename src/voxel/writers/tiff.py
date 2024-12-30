@@ -24,12 +24,15 @@ class TiffWriter(BaseWriter):
     Voxel driver for the Tiff writer.
 
     path\\acquisition_name\\filename.tiff
-
-    :param path: Path for the data writer
-    :type path: str
     """
 
     def __init__(self, path: str):
+        """
+        Module for handling TIFF data writing processes.
+
+        :param path: The path for the data writer.
+        :type path: str
+        """
         super().__init__(path)
 
     @property
@@ -39,7 +42,6 @@ class TiffWriter(BaseWriter):
         :return: Frame number in pixels
         :rtype: int
         """
-
         return self._frame_count_px_px
 
     @frame_count_px.setter
@@ -49,7 +51,6 @@ class TiffWriter(BaseWriter):
         :param value: Frame number in pixels
         :type value: int
         """
-
         self.log.info(f"setting frame count to: {frame_count_px} [px]")
         self._frame_count_px_px = frame_count_px
 
@@ -60,7 +61,6 @@ class TiffWriter(BaseWriter):
         :return: Chunk count in pixels
         :rtype: int
         """
-
         return CHUNK_COUNT_PX
 
     @property
@@ -70,7 +70,6 @@ class TiffWriter(BaseWriter):
         :return: Compression codec
         :rtype: str
         """
-
         return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
 
     @compression.setter
@@ -81,7 +80,6 @@ class TiffWriter(BaseWriter):
         * **none**
         :type value: str
         """
-
         valid = list(COMPRESSIONS.keys())
         if compression not in valid:
             raise ValueError("compression type must be one of %r." % valid)
@@ -96,7 +94,6 @@ class TiffWriter(BaseWriter):
         :return: The base filename
         :rtype: str
         """
-
         return self._filename
 
     @filename.setter
@@ -107,15 +104,11 @@ class TiffWriter(BaseWriter):
         :param value: The base filename
         :type value: str
         """
-
         self._filename = filename if filename.endswith(".tiff") else f"{filename}.tiff"
         self.log.info(f"setting filename to: {filename}")
 
     def prepare(self):
-        """
-        Prepare the writer.
-        """
-
+        """Prepare the writer."""
         self.log.info(f"{self._filename}: intializing writer.")
         # Specs for reconstructing the shared memory object.
         self._shm_name = Array(c_wchar, 32)  # hidden and exposed via property.
@@ -215,5 +208,6 @@ class TiffWriter(BaseWriter):
         writer.close()
 
     def delete_files(self):
+        """Delete the files."""
         filepath = Path(self._path, self._acquisition_name, self._filename).absolute()
         os.remove(filepath)

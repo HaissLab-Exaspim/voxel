@@ -32,9 +32,20 @@ class ImarisProgressChecker(pw.CallbackClass):
     """
 
     def __init__(self):
+        """
+        Initialize the ImarisProgressChecker class.
+        """
         self.progress = 0  # a float representing the progress (0 to 1.0)
 
     def RecordProgress(self, progress, total_bytes_written):
+        """
+        Record the progress of the Imaris writer.
+
+        :param progress: The current progress as a float between 0 and 1.0.
+        :type progress: float
+        :param total_bytes_written: The total bytes written so far.
+        :type total_bytes_written: int
+        """
         self.progress = progress
 
 
@@ -45,12 +56,17 @@ class ImarisWriter(BaseWriter):
     Writer will save data to the following location
 
     path\\acquisition_name\\filename.ims
-
-    :param path: Path for the data writer
-    :type path: str
     """
 
     def __init__(self, path: str):
+        """
+        Initialize the ImarisWriter class.
+
+        :param path: The path for the data writer.
+        :type path: str
+        """
+        super().__init__(path)
+
         super().__init__(path)
         self._color = "#ffffff"  # initialize as white
         # Internal flow control attributes to monitor compression progress
@@ -63,7 +79,6 @@ class ImarisWriter(BaseWriter):
         :return: Frame number in pixels
         :rtype: int
         """
-
         return self._frame_count_px
 
     @frame_count_px.setter
@@ -73,7 +88,6 @@ class ImarisWriter(BaseWriter):
         :param value: Frame number in pixels
         :type value: int
         """
-
         self.log.info(f"setting frame count to: {frame_count_px} [px]")
         if frame_count_px % DIVISIBLE_FRAME_COUNT_PX != 0:
             frame_count_px = ceil(frame_count_px / DIVISIBLE_FRAME_COUNT_PX) * DIVISIBLE_FRAME_COUNT_PX
@@ -87,7 +101,6 @@ class ImarisWriter(BaseWriter):
         :return: Chunk count in pixels
         :rtype: int
         """
-
         return CHUNK_COUNT_PX
 
     @property
@@ -97,7 +110,6 @@ class ImarisWriter(BaseWriter):
         :return: Compression codec
         :rtype: str
         """
-
         return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
 
     @compression.setter
@@ -109,7 +121,6 @@ class ImarisWriter(BaseWriter):
         * **none**
         :type value: str
         """
-
         valid = list(COMPRESSIONS.keys())
         if compression not in valid:
             raise ValueError("compression type must be one of %r." % valid)
@@ -124,7 +135,6 @@ class ImarisWriter(BaseWriter):
         :return: The base filename
         :rtype: str
         """
-
         return self._filename
 
     @filename.setter
@@ -135,7 +145,6 @@ class ImarisWriter(BaseWriter):
         :param value: The base filename
         :type value: str
         """
-
         self._filename = filename if filename.endswith(".ims") else f"{filename}.ims"
         self.log.info(f"setting filename to: {filename}")
 
@@ -147,7 +156,6 @@ class ImarisWriter(BaseWriter):
         :return: Color
         :rtype: str
         """
-
         return self._color
 
     @color.setter
@@ -158,7 +166,6 @@ class ImarisWriter(BaseWriter):
         :param value: Color
         :type value: str
         """
-
         if re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", color):
             self._color = color
         else:
@@ -173,10 +180,7 @@ class ImarisWriter(BaseWriter):
         os.remove(filepath)
 
     def prepare(self):
-        """
-        Prepare the writer.
-        """
-
+        """Prepare the writer."""
         self.log.info(f"{self._filename}: intializing writer.")
         # Specs for reconstructing the shared memory object.
         self._shm_name = Array(c_wchar, 32)  # hidden and exposed via property.
@@ -309,7 +313,6 @@ class ImarisWriter(BaseWriter):
         :param shared_log_queue: Shared queue for passing log statements
         :type shared_log_queue: multiprocessing.Queue
         """
-
         # internal logger for process
         logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         fmt = "%(asctime)s.%(msecs)03d %(levelname)s %(name)s: %(message)s"

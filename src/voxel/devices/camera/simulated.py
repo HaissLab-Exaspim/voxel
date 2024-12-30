@@ -42,38 +42,21 @@ POLARITIES = {
 
 
 class Camera(BaseCamera):
+    """Camera class for simulating camera operations.
 
-    width_px = DeliminatedProperty(
-        fget=lambda instance: getattr(instance, "_width_px"),
-        fset=lambda instance, value: setattr(instance, "_width_px", value),
-        minimum=MIN_WIDTH_PX,
-        maximum=MAX_WIDTH_PX,
-        step=DIVISIBLE_WIDTH_PX,
-    )
-    width_offset_px = DeliminatedProperty(
-        fget=lambda instance: getattr(instance, "_width_offset_px"),
-        fset=lambda instance, value: setattr(instance, "_width_offset_px", value),
-        minimum=MIN_WIDTH_PX,
-        maximum=MAX_WIDTH_PX,
-        step=DIVISIBLE_WIDTH_PX,
-    )
-    height_px = DeliminatedProperty(
-        fget=lambda instance: getattr(instance, "_height_px"),
-        fset=lambda instance, value: setattr(instance, "_height_px", value),
-        minimum=MIN_HEIGHT_PX,
-        maximum=MAX_HEIGHT_PX,
-        step=DIVISIBLE_HEIGHT_PX,
-    )
-    height_offset_px = DeliminatedProperty(
-        fget=lambda instance: getattr(instance, "_height_offset_px"),
-        fset=lambda instance, value: setattr(instance, "_height_offset_px", value),
-        minimum=MIN_HEIGHT_PX,
-        maximum=MAX_HEIGHT_PX,
-        step=DIVISIBLE_HEIGHT_PX,
-    )
+    :param BaseCamera: Base class for camera
+    :type BaseCamera: BaseCamera
+    :raises ValueError: If invalid trigger mode, source, or polarity is set
+    :return: Camera instance
+    :rtype: Camera
+    """
 
     def __init__(self, id):
+        """Initialize the Camera instance.
 
+        :param id: Identifier for the camera
+        :type id: str
+        """
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.id = id
         self.terminate_frame_grab = Event()
@@ -87,7 +70,7 @@ class Camera(BaseCamera):
         self._height_offset_px = 0
         self._binning = 1
         self._trigger = {"mode": "on", "source": "internal", "polarity": "rising"}
-        
+
         self._frame = Value("i", 0)
         self._frame_rate = Value("d", 0.0)
         self._dropped_frames = Value("d", 0.0)
@@ -95,11 +78,20 @@ class Camera(BaseCamera):
 
     @DeliminatedProperty(minimum=MIN_EXPOSURE_TIME_MS, maximum=MAX_EXPOSURE_TIME_MS, step=0.001)
     def exposure_time_ms(self):
+        """Get the exposure time in milliseconds.
+
+        :return: Exposure time in milliseconds
+        :rtype: float
+        """
         return self._exposure_time_ms
 
     @exposure_time_ms.setter
     def exposure_time_ms(self, exposure_time_ms: float):
+        """Set the exposure time in milliseconds.
 
+        :param exposure_time_ms: Exposure time in milliseconds
+        :type exposure_time_ms: float
+        """
         if exposure_time_ms < MIN_EXPOSURE_TIME_MS or exposure_time_ms > MAX_EXPOSURE_TIME_MS:
             self.log.warning(
                 f"exposure time must be >{MIN_EXPOSURE_TIME_MS} ms \
@@ -112,21 +104,39 @@ class Camera(BaseCamera):
 
     @DeliminatedProperty(minimum=MIN_WIDTH_PX, maximum=MAX_WIDTH_PX, step=DIVISIBLE_WIDTH_PX)
     def width_px(self):
+        """Get the width in pixels.
+
+        :return: Width in pixels
+        :rtype: int
+        """
         return self._width_px
 
     @width_px.setter
     def width_px(self, value: int):
+        """Set the width in pixels.
 
+        :param value: Width in pixels
+        :type value: int
+        """
         self._width_px = value
         self.log.info(f"width set to: {value} px")
 
     @DeliminatedProperty(minimum=MIN_WIDTH_PX, maximum=MAX_WIDTH_PX, step=DIVISIBLE_WIDTH_PX)
     def width_offset_px(self):
+        """Get the width offset in pixels.
+
+        :return: Width offset in pixels
+        :rtype: int
+        """
         return self._width_offset_px
 
     @width_offset_px.setter
     def width_offset_px(self, value: int):
+        """Set the width offset in pixels.
 
+        :param value: Width offset in pixels
+        :type value: int
+        """
         if value + self._width_px > MAX_WIDTH_PX:
             value = MAX_WIDTH_PX - self._width_px
             self.log.warning(f"width offset and width must not exceed {MAX_WIDTH_PX} px. Setting offset to {value} px")
@@ -136,22 +146,39 @@ class Camera(BaseCamera):
 
     @DeliminatedProperty(minimum=MIN_HEIGHT_PX, maximum=MAX_HEIGHT_PX, step=DIVISIBLE_HEIGHT_PX)
     def height_px(self):
+        """Get the height in pixels.
+
+        :return: Height in pixels
+        :rtype: int
+        """
         return self._height_px
 
     @height_px.setter
     def height_px(self, value: int):
+        """Set the height in pixels.
 
-        # Note: round ms to nearest us
+        :param value: Height in pixels
+        :type value: int
+        """
         self._height_px = value
         self.log.info(f"height set to: {value} px")
 
     @DeliminatedProperty(minimum=MIN_HEIGHT_PX, maximum=MAX_HEIGHT_PX, step=DIVISIBLE_HEIGHT_PX)
     def height_offset_px(self):
+        """Get the height offset in pixels.
+
+        :return: Height offset in pixels
+        :rtype: int
+        """
         return self._height_offset_px
 
     @height_offset_px.setter
     def height_offset_px(self, value: int):
+        """Set the height offset in pixels.
 
+        :param value: Height offset in pixels
+        :type value: int
+        """
         if value + self._height_px > MAX_HEIGHT_PX:
             value = MAX_HEIGHT_PX - self._height_px
             self.log.warning(
@@ -163,11 +190,21 @@ class Camera(BaseCamera):
 
     @property
     def trigger(self):
+        """Get the trigger settings.
+
+        :return: Trigger settings
+        :rtype: dict
+        """
         return self._trigger
 
     @trigger.setter
     def trigger(self, trigger: dict):
+        """Set the trigger settings.
 
+        :param trigger: Trigger settings
+        :type trigger: dict
+        :raises ValueError: If invalid trigger mode, source, or polarity is set
+        """
         mode = trigger["mode"]
         source = trigger["source"]
         polarity = trigger["polarity"]
@@ -185,10 +222,21 @@ class Camera(BaseCamera):
 
     @property
     def binning(self):
+        """Get the binning value.
+
+        :return: Binning value
+        :rtype: int
+        """
         return self._binning
 
     @binning.setter
     def binning(self, binning: int):
+        """Set the binning value.
+
+        :param binning: Binning value
+        :type binning: int
+        :raises ValueError: If invalid binning value is set
+        """
         valid_binning = list(BINNINGS.keys())
         if binning not in valid_binning:
             raise ValueError("binning must be one of %r." % BINNINGS)
@@ -199,12 +247,23 @@ class Camera(BaseCamera):
 
     @property
     def pixel_type(self):
+        """Get the pixel type.
+
+        :return: Pixel type
+        :rtype: str
+        """
         pixel_type = self._pixel_type
         # invert the dictionary and find the abstracted key to output
         return next(key for key, value in PIXEL_TYPES.items() if value == pixel_type)
 
     @pixel_type.setter
     def pixel_type(self, pixel_type_bits: str):
+        """Set the pixel type.
+
+        :param pixel_type_bits: Pixel type bits
+        :type pixel_type_bits: str
+        :raises ValueError: If invalid pixel type is set
+        """
         valid = list(PIXEL_TYPES.keys())
         if pixel_type_bits not in valid:
             raise ValueError("pixel_type_bits must be one of %r." % valid)
@@ -215,39 +274,67 @@ class Camera(BaseCamera):
 
     @property
     def line_interval_us(self):
+        """Get the line interval in microseconds.
+
+        :return: Line interval in microseconds
+        :rtype: float
+        """
         return self._line_interval_us
 
     @property
     def sensor_width_px(self):
+        """Get the sensor width in pixels.
+
+        :return: Sensor width in pixels
+        :rtype: int
+        """
         return MAX_WIDTH_PX
 
     @property
     def sensor_height_px(self):
+        """Get the sensor height in pixels.
+
+        :return: Sensor height in pixels
+        :rtype: int
+        """
         return MAX_HEIGHT_PX
 
     @property
     def frame_time_ms(self):
+        """Get the frame time in milliseconds.
+
+        :return: Frame time in milliseconds
+        :rtype: float
+        """
         return self._height_px * self._line_interval_us / 1000 + self._exposure_time_ms
 
     def prepare(self, frame_count: int):
+        """Prepare the camera for capturing frames.
+
+        :param frame_count: Number of frames to capture
+        :type frame_count: int
+        """
         self.log.info("simulated camera preparing...")
         self._frame_generator = FrameGenerator()
         self._frame_generator.prepare(
-            frame_count,
-            self._width_px,
-            self._height_px,
-            self._pixel_type,
-            self.frame_time_ms
+            frame_count, self._width_px, self._height_px, self._pixel_type, self.frame_time_ms
         )
 
     def start(self):
+        """Start capturing frames."""
         self._frame_generator.start()
 
     def stop(self):
+        """Stop capturing frames."""
         self.log.info("simulated camera stopping...")
         self._frame_generator.stop()
 
     def grab_frame(self):
+        """Grab the latest frame.
+
+        :return: Latest frame
+        :rtype: numpy.ndarray
+        """
         image = self._frame_generator.get_latest_frame()
         if self._binning > 1:
             return self.gpu_binning.run(image)
@@ -256,35 +343,58 @@ class Camera(BaseCamera):
 
     @property
     def latest_frame(self):
+        """Get the latest frame.
+
+        :return: Latest frame
+        :rtype: numpy.ndarray
+        """
         # return latest frame from internal queue buffer
         return self._latest_frame
 
     def signal_acquisition_state(self):
+        """Signal the acquisition state of the camera.
+
+        :return: Acquisition state
+        :rtype: dict
+        """
         # copy into new variables for async
         frame_rate_async = self._frame_generator.frame_rate
         dropped_frames_async = self._frame_generator.dropped_frames
         input_buffer_size = self._frame_generator._buffer.qsize()
 
         state = {}
-        state['Frame Index'] = self._frame_generator.frame
-        state['Input Buffer Size'] = input_buffer_size
-        state['Output Buffer Size'] = BUFFER_SIZE_FRAMES - input_buffer_size
-         # number of underrun, i.e. dropped frames
-        state['Dropped Frames'] = dropped_frames_async
-        state['Data Rate [MB/s]'] = frame_rate_async*self._width_px*self._height_px*numpy.dtype(self._pixel_type).itemsize/self._binning**2/1e6
-        state['Frame Rate [fps]'] = frame_rate_async
-        self.log.info(f"id: {self.id}, "
-                      f"frame: {state['Frame Index']}, "
-                      f"input: {state['Input Buffer Size']}, "
-                      f"output: {state['Output Buffer Size']}, "
-                      f"dropped: {state['Dropped Frames']}, "
-                      f"data rate: {state['Data Rate [MB/s]']:.2f} [MB/s], "
-                      f"frame rate: {state['Frame Rate [fps]']:.2f} [fps].")
+        state["Frame Index"] = self._frame_generator.frame
+        state["Input Buffer Size"] = input_buffer_size
+        state["Output Buffer Size"] = BUFFER_SIZE_FRAMES - input_buffer_size
+        # number of underrun, i.e. dropped frames
+        state["Dropped Frames"] = dropped_frames_async
+        state["Data Rate [MB/s]"] = (
+            frame_rate_async
+            * self._width_px
+            * self._height_px
+            * numpy.dtype(self._pixel_type).itemsize
+            / self._binning**2
+            / 1e6
+        )
+        state["Frame Rate [fps]"] = frame_rate_async
+        self.log.info(
+            f"id: {self.id}, "
+            f"frame: {state['Frame Index']}, "
+            f"input: {state['Input Buffer Size']}, "
+            f"output: {state['Output Buffer Size']}, "
+            f"dropped: {state['Dropped Frames']}, "
+            f"data rate: {state['Data Rate [MB/s]']:.2f} [MB/s], "
+            f"frame rate: {state['Frame Rate [fps]']:.2f} [fps]."
+        )
         return state
 
-class FrameGenerator():
+
+class FrameGenerator:
+    """Frame generator class for generating frames."""
+
     # frame generator into separate class due to voxel wrapping and thread locking of device classes
     def __init__(self):
+        """Initialize the FrameGenerator instance."""
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         # multiprocessing shared values
         self._frame = Value("i", 0)
@@ -294,33 +404,56 @@ class FrameGenerator():
 
     @property
     def frame(self):
-        # current frame index
+        """Get the current frame index.
+
+        :return: Current frame index
+        :rtype: int
+        """
         return self._frame.value
-    
+
     @property
     def frame_rate(self):
-        # estimated frame rate
+        """Get the estimated frame rate.
+
+        :return: Estimated frame rate
+        :rtype: float
+        """
         return self._frame_rate.value
 
     @property
     def dropped_frames(self):
-        # logged dropped frames
+        """Get the number of dropped frames.
+
+        :return: Number of dropped frames
+        :rtype: int
+        """
         return self._dropped_frames.value
-    
+
     def get_latest_frame(self):
-        # return latest frame from buffer
+        """Get the latest frame from the buffer.
+
+        :return: Latest frame
+        :rtype: numpy.ndarray
+        """
         while self._buffer.empty():
             time.sleep(0.01)
         image = self._buffer.get()
         return image
 
-    def prepare(self,
-                frame_count,
-                width_px,
-                height_px,
-                pixel_type,
-                frame_time_ms):
-        # prepare the frame generator process
+    def prepare(self, frame_count, width_px, height_px, pixel_type, frame_time_ms):
+        """Prepare the frame generator process.
+
+        :param frame_count: Number of frames to generate
+        :type frame_count: int
+        :param width_px: Width in pixels
+        :type width_px: int
+        :param height_px: Height in pixels
+        :type height_px: int
+        :param pixel_type: Pixel type
+        :type pixel_type: str
+        :param frame_time_ms: Frame time in milliseconds
+        :type frame_time_ms: float
+        """
         self._process = Process(
             target=self._run,
             args=(
@@ -337,24 +470,46 @@ class FrameGenerator():
         )
 
     def start(self):
-        # start the frame generator process
+        """Start the frame generator process."""
         self._process.start()
 
     def stop(self):
-        # stop the frame generator process
+        """Stop the frame generator process."""
         self._process.join()
 
-    def _run(self,
-            frame_count: int,
-            width_px: int,
-            height_px: int,
-            frame_time_ms: float,
-            pixel_type: str,
-            buffer: multiprocessing.Queue,
-            frame: multiprocessing.Value,
-            frame_rate: multiprocessing.Value,
-            dropped_frames: multiprocessing.Value):
-        # frame generator process
+    def _run(
+        self,
+        frame_count: int,
+        width_px: int,
+        height_px: int,
+        frame_time_ms: float,
+        pixel_type: str,
+        buffer: multiprocessing.Queue,
+        frame: multiprocessing.Value,
+        frame_rate: multiprocessing.Value,
+        dropped_frames: multiprocessing.Value,
+    ):
+        """Run the frame generator process.
+
+        :param frame_count: Number of frames to generate
+        :type frame_count: int
+        :param width_px: Width in pixels
+        :type width_px: int
+        :param height_px: Height in pixels
+        :type height_px: int
+        :param frame_time_ms: Frame time in milliseconds
+        :type frame_time_ms: float
+        :param pixel_type: Pixel type
+        :type pixel_type: str
+        :param buffer: Buffer to store frames
+        :type buffer: multiprocessing.Queue
+        :param frame: Current frame index
+        :type frame: multiprocessing.Value
+        :param frame_rate: Estimated frame rate
+        :type frame_rate: multiprocessing.Value
+        :param dropped_frames: Number of dropped frames
+        :type dropped_frames: multiprocessing.Value
+        """
         i = 1
         frame_count = frame_count if frame_count is not None else 1
         while i <= frame_count:
@@ -362,15 +517,12 @@ class FrameGenerator():
             image = numpy.random.randint(low=128, high=256, size=(height_px, width_px), dtype=pixel_type)
             while (time.time() - start_time) < frame_time_ms / 1000:
                 time.sleep(0.01)
-            # add frame to buffer or log a dropped frame if buffer is full
             if buffer.qsize() < BUFFER_SIZE_FRAMES:
                 buffer.put(image)
             else:
                 dropped_frames.value += 1
-                self.log.warning('buffer full, frame dropped.')
+                self.log.warning("buffer full, frame dropped.")
             frame.value += 1
-            # handle infinite streaming from frame generator process
-            i = i if frame_count is None else i+1
+            i = i if frame_count is None else i + 1
             end_time = time.time()
-            # estimate frame rate
-            frame_rate.value = 1/(end_time - start_time)
+            frame_rate.value = 1 / (end_time - start_time)

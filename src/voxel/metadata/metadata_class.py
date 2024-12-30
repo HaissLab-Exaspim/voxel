@@ -14,10 +14,21 @@ DATE_FORMATS = {
 
 
 class MetadataClass(BaseMetadata):
-    """Class to handle metadata"""
+    """
+    Metadata class for handling metadata properties and generating acquisition names.
+    """
 
     def __init__(self, metadata_dictionary: dict, date_format: str = "None", name_specs: dict = {}):
+        """
+        Initialize the MetadataClass.
 
+        :param metadata_dictionary: Dictionary containing metadata properties.
+        :type metadata_dictionary: dict
+        :param date_format: Date format for the acquisition name, defaults to "None".
+        :type date_format: str, optional
+        :param name_specs: Specifications for the acquisition name format, defaults to {}.
+        :type name_specs: dict, optional
+        """
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
         super().__init__()
@@ -39,8 +50,15 @@ class MetadataClass(BaseMetadata):
         self._acquisition_name = self.generate_acquisition_name()
 
     def set_class_attribute(self, value, name):
-        """Function to set attribute of class to act as setters"""
+        """
+        Set the value of a class attribute.
 
+        :param value: The value to set.
+        :type value: Any
+        :param name: The name of the attribute.
+        :type name: str
+        :raises ValueError: If the value is not valid for the attribute.
+        """
         if inflection.pluralize(name).upper() in globals().keys():
             opt_dict = globals()[inflection.pluralize(name).upper()]
             if value not in opt_dict.keys():
@@ -51,33 +69,65 @@ class MetadataClass(BaseMetadata):
             setattr(self, f"_{name}", value)
 
     def get_class_attribute(self, instance, name):
-        """Function to get attribute of class to act as getters"""
+        """
+        Get the value of a class attribute.
 
+        :param instance: The instance of the class.
+        :type instance: object
+        :param name: The name of the attribute.
+        :type name: str
+        :return: The value of the attribute.
+        :rtype: Any
+        """
         if inflection.pluralize(name).upper() in globals().keys():
             opt_dict = globals()[inflection.pluralize(name).upper()]
-            inv = {v: k for k, v in opt_dict}
+            inv = {v: k for k, v in opt_dict.items()}
             return inv[getattr(self, f"_{name}")]
         else:
             return getattr(self, f"_{name}")
 
     @property
     def date_format(self):
-        """Format of date used in acquisition_name"""
+        """
+        Get the date format.
+
+        :return: The date format.
+        :rtype: str
+        """
         return self._date_format
 
     @date_format.setter
     def date_format(self, format):
+        """
+        Set the date format.
+
+        :param format: The date format to set.
+        :type format: str
+        :raises ValueError: If the date format is not valid.
+        """
         if format not in list(DATE_FORMATS.keys()):
-            raise ValueError(f"{format} is not a valid datime format. Please choose from {DATE_FORMATS.keys()}")
+            raise ValueError(f"{format} is not a valid datetime format. Please choose from {DATE_FORMATS.keys()}")
         self._date_format = DATE_FORMATS[format]
 
     @property
     def acquisition_name_format(self):
-        """Ordered list of metadata class properties to include in acquisition_name"""
+        """
+        Get the acquisition name format.
+
+        :return: The acquisition name format.
+        :rtype: list
+        """
         return self._acquisition_name_format
 
     @acquisition_name_format.setter
     def acquisition_name_format(self, form: list):
+        """
+        Set the acquisition name format.
+
+        :param form: The acquisition name format to set.
+        :type form: list
+        :raises ValueError: If the format contains invalid properties.
+        """
         for prop_name in form:
             if not isinstance(
                 getattr(type(self), prop_name, None), property
@@ -87,22 +137,42 @@ class MetadataClass(BaseMetadata):
 
     @property
     def delimiter(self):
-        """Character to separate properties in acquisition name"""
+        """
+        Get the delimiter for the acquisition name.
+
+        :return: The delimiter.
+        :rtype: str
+        """
         return self._delimiter
 
     @delimiter.setter
-    def delimiter(self, delimiter: list):
+    def delimiter(self, delimiter: str):
+        """
+        Set the delimiter for the acquisition name.
 
+        :param delimiter: The delimiter to set.
+        :type delimiter: str
+        """
         self._delimiter = delimiter
 
     @property
     def acquisition_name(self):
-        """Unique name that descibes acquisition adhering to passed in name_specs and date of acquisition"""
+        """
+        Get the acquisition name.
+
+        :return: The acquisition name.
+        :rtype: str
+        """
         return self.generate_acquisition_name()
 
     def generate_acquisition_name(self):
-        """Function to generate name of acquisition based on format"""
+        """
+        Generate the acquisition name based on the format and delimiter.
 
+        :raises ValueError: If the format contains invalid properties.
+        :return: The generated acquisition name.
+        :rtype: str
+        """
         delimiter = self.delimiter
         form = self._acquisition_name_format
 

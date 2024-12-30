@@ -19,9 +19,20 @@ class GPUMaxProjection(BaseMaxProjection):
     """
 
     def __init__(self, path: str):
+        """
+        Initialize the GPUMaxProjection class.
+
+        :param path: Path for the data writer.
+        :type path: str
+        """
         super().__init__(path)
 
     def _run(self):
+        """
+        Run the max projection process.
+
+        :raises ValueError: If the x, y, or z projection count is not valid.
+        """
         # cannot pickle cle so import within run function()
         import pyclesperanto as cle
 

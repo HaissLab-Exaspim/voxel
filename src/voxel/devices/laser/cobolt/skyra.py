@@ -11,6 +11,10 @@ from voxel.devices.laser.base import BaseLaser
 if sys.version_info < (3, 11):
 
     class StrEnum(str, Enum):
+        """
+        String enumeration class for command and query strings.
+        """
+
         pass
 
 else:
@@ -18,6 +22,10 @@ else:
 
 
 class Cmd(StrEnum):
+    """
+    Command strings for controlling the laser.
+    """
+
     LaserEnable = "l1"  # Enable(1)/Disable(0)
     LaserDisable = "l0"  # Enable(1)/Disable(0)
     EnableModulation = "em"
@@ -31,6 +39,10 @@ class Cmd(StrEnum):
 
 
 class Query(StrEnum):
+    """
+    Query strings for retrieving laser status.
+    """
+
     ModulationMode = "gmes?"
     AnalogModulationMode = "games?"
     DigitalModulationMode = "gdmes?"
@@ -39,6 +51,10 @@ class Query(StrEnum):
 
 # Boolean command value that can also be compared like a boolean.
 class BoolVal(StrEnum):
+    """
+    Boolean command values for laser control.
+    """
+
     OFF = "0"
     ON = "1"
 
@@ -63,6 +79,9 @@ MODULATION_MODES = {
 
 
 class SkyraLaser(BaseLaser):
+    """
+    SkyraLaser class for handling Cobolt Skyra laser devices.
+    """
 
     def __init__(
         self,
@@ -76,14 +95,24 @@ class SkyraLaser(BaseLaser):
         coefficients: dict,
     ):
         """
-        Communicate with Skyra Cobolt laser.
+        Initialize the SkyraLaser object.
 
-        :param port: comm port for lasers.
-        :param wavelength: wavelength of laser
-        :param prefix: prefix specic to laser.
-        :param max_power_mw: maximum power in mW
-        :param coefficients: polynomial coefficients describing
-        the relationship between current mA and power mW
+        :param id: Laser ID
+        :type id: str
+        :param wavelength: Wavelength in nanometers
+        :type wavelength: int
+        :param port: Serial port for the laser
+        :type port: str
+        :param prefix: Command prefix for the laser
+        :type prefix: str
+        :param max_power_mw: Maximum power in milliwatts
+        :type max_power_mw: float
+        :param min_current_ma: Minimum current in milliamps
+        :type min_current_ma: float
+        :param max_current_ma: Maximum current in milliamps
+        :type max_current_ma: float
+        :param coefficients: Coefficients for the power-current curve
+        :type coefficients: dict
         """
         super().__init__(id)
 
@@ -99,9 +128,21 @@ class SkyraLaser(BaseLaser):
 
     @property
     def wavelength(self) -> int:
+        """
+        Get the wavelength of the laser.
+
+        :return: Wavelength in nanometers
+        :rtype: int
+        """
         return self._wavelength
 
     def _coefficients_curve(self) -> Expr:
+        """
+        Get the power-current curve as a symbolic expression.
+
+        :return: Power-current curve
+        :rtype: Expr
+        """
         x = symbols("x")
         func: Expr = x
         for order, co in self._coefficients.items():
@@ -109,15 +150,27 @@ class SkyraLaser(BaseLaser):
         return func
 
     def enable(self):
+        """
+        Enable the laser.
+        """
         self._inst.send_cmd(f"{self._prefix}Cmd.LaserEnable")
         self.log.info(f"laser {self._prefix} enabled")
 
     def disable(self):
+        """
+        Disable the laser.
+        """
         self._inst.send_cmd(f"{self._prefix}Cmd.LaserDisable")
-        self.log.info(f"laser {self._prefix} enabled")
+        self.log.info(f"laser {self._prefix} disabled")
 
     @DeliminatedProperty(minimum=0, maximum=lambda self: self.max_power)
     def power_setpoint_mw(self):
+        """
+        Get the power setpoint in milliwatts.
+
+        :return: Power setpoint in milliwatts
+        :rtype: float
+        """
         if self._inst.constant_current == "ON":
             return int(round(self._coefficients_curve().subs(symbols("x"), self._current_setpoint)))
         else:
@@ -125,6 +178,12 @@ class SkyraLaser(BaseLaser):
 
     @power_setpoint_mw.setter
     def power_setpoint_mw(self, value: float or int):
+        """
+        Set the power setpoint in milliwatts.
+
+        :param value: Power setpoint in milliwatts
+        :type value: float or int
+        """
         if self.modulation_mode != "off":
             # solutions for laser value
             solutions = solve(self._coefficients_curve() - value)
@@ -133,11 +192,11 @@ class SkyraLaser(BaseLaser):
                 if round(sol) in range(int(self._min_current_ma), int(self._max_current_ma)):
                     # setpoint must be integer
                     self._current_setpoint = int(round(sol))
-                    # set lasser current setpoint to ma value
-                    self._inst.send_cmd(f"{self._prefix}Cmd.CurrentSetpoint" f"{self._current_setpoint}")
+                    # set laser current setpoint to ma value
+                    self._inst.send_cmd(f"{self._prefix}Cmd.CurrentSetpoint {self._current_setpoint}")
                     return
             # if no value exists, alert user
-            self.log.error(f"Cannot set laser to {value} mW because " f"no current mA correlates to {value} mW")
+            self.log.error(f"Cannot set laser to {value} mW because no current mA correlates to {value} mW")
         else:
             # convert from mw to watts
             self._inst.send_cmd(f"{self._prefix}Cmd.PowerSetpoint {value / 1000}")
@@ -145,6 +204,12 @@ class SkyraLaser(BaseLaser):
 
     @property
     def modulation_mode(self):
+        """
+        Get the modulation mode.
+
+        :return: Modulation mode
+        :rtype: str
+        """
         # query the laser for the modulation mode
         if self._inst.send_cmd(f"{self._prefix}Query.ModulationMode") == BoolVal.OFF:
             return "off"
@@ -155,6 +220,13 @@ class SkyraLaser(BaseLaser):
 
     @modulation_mode.setter
     def modulation_mode(self, value: str):
+        """
+        Set the modulation mode.
+
+        :param value: Modulation mode
+        :type value: str
+        :raises ValueError: If the modulation mode is not valid
+        """
         if value not in MODULATION_MODES.keys():
             raise ValueError("mode must be one of %r." % MODULATION_MODES.keys())
         external_control_mode = MODULATION_MODES[value]["external_control_mode"]
@@ -166,6 +238,9 @@ class SkyraLaser(BaseLaser):
         self.log.info(f"modulation mode set to {value}")
 
     def close(self):
+        """
+        Close the laser connection.
+        """
         self.log.info("closing and calling disable")
         self.disable()
         if self._inst.is_connected():
@@ -173,14 +248,32 @@ class SkyraLaser(BaseLaser):
 
     @property
     def power_mw(self) -> float:
+        """
+        Get the current power in milliwatts.
+
+        :return: Current power in milliwatts
+        :rtype: float
+        """
         return self._inst.get_power()
 
     @property
     def temperature_c(self):
+        """
+        Get the temperature of the laser in Celsius.
+
+        :return: Temperature in Celsius
+        :rtype: float
+        """
         return None
 
     @property
     def max_power(self):
+        """
+        Get the maximum power in milliwatts.
+
+        :return: Maximum power in milliwatts
+        :rtype: float
+        """
         if self._inst.constant_current == "ON":
             return int((round(self._coefficients_curve().subs(symbols("x"), 100), 1)))
         else:

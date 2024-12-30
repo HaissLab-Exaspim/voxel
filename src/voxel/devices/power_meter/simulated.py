@@ -5,15 +5,20 @@ from voxel.devices.power_meter.base import BasePowerMeter
 
 class SimulatedPowerMeter(BasePowerMeter):
     """
-    A simulated power meter device that implements the BasePowerMeter interface.
+    SimulatedPowerMeter class for handling simulated power meter devices.
+
+    :param BasePowerMeter: Base class for power meter devices
+    :type BasePowerMeter: class
     """
 
     def __init__(self, id: str, wavelength_nm: float) -> None:
         """
-        Initialize the simulated power meter with a specific wavelength.
+        Initialize the SimulatedPowerMeter object.
 
-        Parameters:
-        wavelength_nm (float): The wavelength in nanometers.
+        :param id: Power meter ID
+        :type id: str
+        :param wavelength_nm: Wavelength in nanometers
+        :type wavelength_nm: float
         """
         super().__init__(id)
         self._wavelength_nm = wavelength_nm
@@ -22,13 +27,15 @@ class SimulatedPowerMeter(BasePowerMeter):
 
     def _connect(self):
         """
-        Connect to the power meter.
+        Connect to the simulated power meter.
         """
         self._is_connected = True
 
     def _check_connection(self):
         """
-        Check if the device is connected and raise an exception if it's not.
+        Check if the power meter is connected.
+
+        :raises Exception: If the power meter is not connected
         """
         if not self._is_connected:
             raise Exception(f"Device {self.id} is not connected")
@@ -36,8 +43,10 @@ class SimulatedPowerMeter(BasePowerMeter):
     @property
     def power_mw(self) -> float:
         """
-        Returns:
-        float: The power in milliwatts if the power meter is connected, otherwise raises an exception.
+        Get the power in milliwatts.
+
+        :return: Power in milliwatts
+        :rtype: float
         """
         self._check_connection()
         return max(min(random.gauss(500, 50), 1000), 0)
@@ -45,8 +54,10 @@ class SimulatedPowerMeter(BasePowerMeter):
     @property
     def wavelength_nm(self) -> float:
         """
-        Returns:
-        float: The wavelength in nanometers if the power meter is connected, otherwise raises an exception.
+        Get the wavelength in nanometers.
+
+        :return: Wavelength in nanometers
+        :rtype: float
         """
         self._check_connection()
         return self._wavelength_nm
@@ -54,14 +65,16 @@ class SimulatedPowerMeter(BasePowerMeter):
     @wavelength_nm.setter
     def wavelength_nm(self, wavelength: float) -> None:
         """
-        Parameters:
-        wavelength (float): The new wavelength in nanometers if the power meter is connected, otherwise raises an exception.
+        Set the wavelength in nanometers.
+
+        :param wavelength: Wavelength in nanometers
+        :type wavelength: float
         """
         self._check_connection()
         self._wavelength_nm = wavelength
 
     def close(self) -> None:
         """
-        Shutdown the power meter.
+        Close the simulated power meter connection.
         """
         self._is_connected = False

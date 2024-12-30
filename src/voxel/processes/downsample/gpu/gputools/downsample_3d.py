@@ -7,12 +7,17 @@ from voxel.processes.downsample.base import BaseDownSample
 class GPUToolsDownSample3D(BaseDownSample):
     """
     Voxel 3D downsampling with gputools.
-
-    :param binning: Binning factor
-    :type binning: int
     """
 
     def __init__(self, binning: int):
+        """
+        Module for handling 3D downsampling processes.
+
+        :param binning: The binning factor for downsampling.
+        :type binning: int
+        :raises ValueError: If the binning factor is not valid.
+        """
+
         super().__init__(binning)
         # opencl kernel
         self._kernel = """

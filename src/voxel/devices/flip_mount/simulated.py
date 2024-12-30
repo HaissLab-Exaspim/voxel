@@ -1,8 +1,8 @@
 from time import sleep
 from typing import Literal
 
-from ...descriptors.deliminated_property import DeliminatedProperty
-from . import BaseFlipMount
+from voxel.descriptors.deliminated_property import DeliminatedProperty
+from voxel.devices.flip_mount.base import BaseFlipMount
 
 VALID_POSITIONS = [0, 1]
 FLIP_TIME_RANGE_MS: tuple[float, float] = (500.0, 2800.0, 100.0)  # min, max, step
@@ -10,7 +10,22 @@ POSITIONS = dict()
 
 
 class SimulatedFlipMount(BaseFlipMount):
+    """
+    SimulatedFlipMount class for handling simulated flip mount devices.
+    """
+
     def __init__(self, id, conn, positions):
+        """
+        Initialize the SimulatedFlipMount object.
+
+        :param id: Flip mount ID
+        :type id: str
+        :param conn: Connection object
+        :type conn: object
+        :param positions: Dictionary of positions
+        :type positions: dict
+        :raises ValueError: If an invalid position is provided
+        """
         super().__init__(id)
         self._conn = conn
         self._positions = positions
@@ -25,16 +40,31 @@ class SimulatedFlipMount(BaseFlipMount):
         self._connect()
 
     def _connect(self):
+        """
+        Connect to the flip mount.
+        """
         self.position = next(iter(self._positions))  # set to first position
         self.flip_time_ms: float = FLIP_TIME_RANGE_MS[0]  # min flip time
 
     def close(self):
+        """
+        Close the flip mount connection.
+        """
         self._inst = None
 
     def wait(self):
+        """
+        Wait for the flip mount to finish flipping.
+        """
         sleep(self.flip_time_ms * 1e-3)
 
     def toggle(self, wait=False):
+        """
+        Toggle the flip mount position.
+
+        :param wait: Whether to wait for the flip mount to finish moving, defaults to False
+        :type wait: bool, optional
+        """
         new_pos = 0 if self._inst == 1 else 1
         self._inst = new_pos
         if wait:
@@ -42,10 +72,24 @@ class SimulatedFlipMount(BaseFlipMount):
 
     @property
     def position(self) -> str:
+        """
+        Get the current position of the flip mount.
+
+        :return: Current position of the flip mount
+        :rtype: str
+        """
         return next((key for key, value in self._positions.items() if value == self._inst), "Unknown")
 
     @position.setter
     def position(self, new_position):
+        """
+        Set the flip mount to a specific position.
+
+        :param new_position: New position name
+        :type new_position: str
+        :raises ValueError: If an invalid position is provided
+        :raises Exception: If any other error occurs
+        """
         try:
             self._inst = self._positions[new_position]
         except KeyError:
@@ -55,10 +99,22 @@ class SimulatedFlipMount(BaseFlipMount):
 
     @DeliminatedProperty(minimum=FLIP_TIME_RANGE_MS[0], maximum=FLIP_TIME_RANGE_MS[1], step=FLIP_TIME_RANGE_MS[2])
     def flip_time_ms(self) -> float:
+        """
+        Get the time it takes to flip the mount in milliseconds.
+
+        :return: Flip time in milliseconds
+        :rtype: float
+        """
         return self._flip_time_ms
 
     @flip_time_ms.setter
     def flip_time_ms(self, time_ms: float):
+        """
+        Set the time it takes to flip the mount in milliseconds.
+
+        :param time_ms: Flip time in milliseconds
+        :type time_ms: float
+        """
         self.log.info(f"Setting flip_time_ms to {time_ms}")
         self.log.info(f"FLIP_TIME_RANGE_MS is {FLIP_TIME_RANGE_MS}")
         self._flip_time_ms = time_ms

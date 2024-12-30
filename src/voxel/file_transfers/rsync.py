@@ -18,14 +18,17 @@ class RsyncFileTransfer(BaseFileTransfer):
 
     From -> \\\\local_path\\\\acquisition_name\\\\filename*
     To -> \\\\external_path\\\\acquisition_name\\\\filename*
-
-    :param external_path: External path of files to be transferred
-    :param local_path: Local path of files to be transferred
-    :type external_path: str
-    :type local_path: str
     """
 
     def __init__(self, external_path: str, local_path: str):
+        """
+        Initialize the RsyncFileTransfer class.
+
+        :param external_path: The external path of files to be transferred.
+        :type external_path: str
+        :param local_path: The local path of files to be transferred.
+        :type local_path: str
+        """
         super().__init__(external_path, local_path)
         self._protocol = "rsync"
         # print progress, delete files after transfer
@@ -41,9 +44,10 @@ class RsyncFileTransfer(BaseFileTransfer):
 
     def _run(self):
         """
-        Internal function that runs the transfer process.
-        """
+        Run the file transfer process.
 
+        :raises ValueError: If the local file path is not a file or directory.
+        """
         start_time = time.time()
         local_directory = Path(self._local_path, self._acquisition_name)
         external_directory = Path(self._external_path, self._acquisition_name)
@@ -223,8 +227,13 @@ class RsyncFileTransfer(BaseFileTransfer):
                 retry_num += 1
 
     def _flatten(self, lst: List[Any]) -> Iterable[Any]:
-        """Flatten a list using generators comprehensions.
-        Returns a flattened version of list lst.
+        """
+        Flatten a list using generators comprehensions.
+
+        :param lst: The list to flatten.
+        :type lst: List[Any]
+        :return: A flattened version of list lst.
+        :rtype: Iterable[Any]
         """
         for sublist in lst:
             if isinstance(sublist, list):

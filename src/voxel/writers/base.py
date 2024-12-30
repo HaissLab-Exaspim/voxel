@@ -12,12 +12,16 @@ from voxel.descriptors.deliminated_property import DeliminatedProperty
 class BaseWriter:
     """
     Base class for all voxel writers.
-
-    :param path: Path for the data writer
-    :type path: str
     """
 
     def __init__(self, path: str):
+        """
+        Base module for handling data writing processes.
+
+        :param path: The path for the data writer.
+        :type path: str
+        """
+
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._path = Path(path)
         self._channel = None

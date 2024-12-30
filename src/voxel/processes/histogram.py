@@ -25,6 +25,13 @@ class HistogramProjection:
     """
 
     def __init__(self, path: str):
+        """
+        Module for handling histogram processes.
+
+        :param path: The path to the file or directory.
+        :type path: str
+        """
+
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._path = Path(path)
         self._column_count_px = None
@@ -472,6 +479,7 @@ class HistogramProjection:
         :raises ValueError: y projection must be > 0 and < total rows
         :raises ValueError: z projection must be > 0 and < total frames
         """
+
         # check if projection counts were set
         # if not, set to max possible values based on tile
         if self._x_bin_count_px is None:

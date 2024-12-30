@@ -10,13 +10,22 @@ MODULATION_MODES = {"off": "CWP", "analog": "ANALOG", "digital": "DIGITAL", "mix
 
 
 class ObisLSLaser(BaseLaser):
+    """
+    ObisLSLaser class for handling Coherent Obis LS laser devices.
+    """
+
     def __init__(self, id: str, wavelength: int, port: Serial | str, prefix: str = None):
         """
-        Communicate with specific LS laser.
+        Initialize the ObisLSLaser object.
 
-        :param port: comm port for lasers.
-        :param wavelength: wavelength of laser
-        :param prefix: prefix specic to laser.
+        :param id: Laser ID
+        :type id: str
+        :param wavelength: Wavelength in nanometers
+        :type wavelength: int
+        :param port: Serial port for the laser
+        :type port: Serial | str
+        :param prefix: Command prefix for the laser, defaults to None
+        :type prefix: str, optional
         """
         super().__init__(id)
         self.prefix = prefix
@@ -25,54 +34,98 @@ class ObisLSLaser(BaseLaser):
 
     @property
     def wavelength(self) -> int:
+        """
+        Get the wavelength of the laser.
+
+        :return: Wavelength in nanometers
+        :rtype: int
+        """
         return self._wavelength
 
     def enable(self):
+        """
+        Enable the laser.
+        """
         self._inst.enable()
 
     def disable(self):
+        """
+        Disable the laser.
+        """
         self._inst.disable()
 
     def close(self):
+        """
+        Close the laser connection.
+        """
         self._inst.close()
 
     @DeliminatedProperty(minimum=0, maximum=lambda self: self._inst.max_power)
     def power_setpoint_mw(self):
+        """
+        Get the power setpoint in milliwatts.
+
+        :return: Power setpoint in milliwatts
+        :rtype: float
+        """
         return self._inst.power_setpoint
 
     @power_setpoint_mw.setter
     def power_setpoint_mw(self, value: float | int):
+        """
+        Set the power setpoint in milliwatts.
+
+        :param value: Power setpoint in milliwatts
+        :type value: float | int
+        """
         self._inst.power_setpoint = value
 
     @property
     def modulation_mode(self):
         """
-        The modulation mode of the laser can be one of two categories:
+        Get the modulation mode.
 
-        External Control - Analog, Digital, Mixed
-
-        Internal Control - off: CWP
+        :return: Modulation mode
+        :rtype: str
         """
         return obis_modulation_getter(self._inst, self.log, modes=MODULATION_MODES)
 
     @modulation_mode.setter
     def modulation_mode(self, mode: str) -> None:
         """
-        The modulation mode of the laser can be one of two categories:   \n
-        External Control - Analog, Digital, Mixed \n
-        Internal Control - off: CWP \n
-        :param mode: str
+        Set the modulation mode.
+
+        :param mode: Modulation mode
+        :type mode: str
         """
         obis_modulation_setter(self._inst, mode, modes=MODULATION_MODES)
 
     @property
     def power_mw(self) -> float:
+        """
+        Get the current power in milliwatts.
+
+        :return: Current power in milliwatts
+        :rtype: float
+        """
         return self._inst.power_setpoint
 
     @property
     def temperature_c(self) -> float:
+        """
+        Get the temperature of the laser in Celsius.
+
+        :return: Temperature in Celsius
+        :rtype: float
+        """
         return self._inst.temperature
 
     @property
     def status(self):
+        """
+        Get the status of the laser.
+
+        :return: Status of the laser
+        :rtype: dict
+        """
         return self._inst.get_system_status()

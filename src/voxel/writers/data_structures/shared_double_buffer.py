@@ -29,6 +29,13 @@ class SharedDoubleBuffer:
     """
 
     def __init__(self, shape: tuple, dtype: str):
+        """_summary_
+
+        :param shape: _description_
+        :type shape: tuple
+        :param dtype: _description_
+        :type dtype: str
+        """
         # overflow errors without casting for large datasets
         nbytes = int(np.prod(shape, dtype=np.int64) * np.dtype(dtype).itemsize)
         self.mem_blocks = [
@@ -68,10 +75,7 @@ class SharedDoubleBuffer:
         self.write_buf_mem_name = tmp
 
     def add_image(self, image: np.array):
-        """
-        Add an image into the buffer at the correct index.
-        """
-
+        """Add an image into the buffer at the correct index."""
         self.write_buf[self.buffer_index + 1] = image
         self.buffer_index += 1
 
@@ -82,7 +86,6 @@ class SharedDoubleBuffer:
         :return: Last image from the buffer
         :rtype: numpy.array
         """
-
         if self.buffer_index == -1:
             # buffer just switched, grab last image from read buffer
             return self.read_buf[-1]
@@ -91,17 +94,11 @@ class SharedDoubleBuffer:
             return self.write_buf[self.buffer_index]
 
     def close_and_unlink(self):
-        """
-        Shared memory cleanup; call when done using this object.
-        """
-
+        """Shared memory cleanup; call when done using this object."""
         for mem in self.mem_blocks:
             mem.close()
             mem.unlink()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """
-        Cleanup called automatically if opened using a `with` statement.
-        """
-
+        """Cleanup called automatically if opened using a `with` statement."""
         self.close_and_unlink()

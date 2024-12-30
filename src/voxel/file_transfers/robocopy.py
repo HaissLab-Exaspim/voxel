@@ -4,7 +4,6 @@ import time
 from pathlib import Path
 from subprocess import DEVNULL, Popen
 
-from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.file_transfers.base import BaseFileTransfer
 
 
@@ -17,18 +16,26 @@ class RobocopyFileTransfer(BaseFileTransfer):
 
     From -> \\\\local_path\\\\acquisition_name\\\\filename*
     To -> \\\\external_path\\\\acquisition_name\\\\filename*
-
-    :param external_path: External path of files to be transferred
-    :param local_path: Local path of files to be transferred
-    :type external_path: str
-    :type local_path: str
     """
 
     def __init__(self, external_path: str, local_path: str):
+        """
+        Initialize the RobocopyFileTransfer class.
+
+        :param external_path: The external path of files to be transferred.
+        :type external_path: str
+        :param local_path: The local path of files to be transferred.
+        :type local_path: str
+        """
         super().__init__(external_path, local_path)
         self._protocol = "robocopy"
 
     def _run(self):
+        """
+        Run the file transfer process.
+
+        :raises ValueError: If the local file path is not a file or directory.
+        """
         start_time = time.time()
         local_directory = Path(self._local_path, self._acquisition_name)
         external_directory = Path(self._external_path, self._acquisition_name)

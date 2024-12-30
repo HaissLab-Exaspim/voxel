@@ -6,7 +6,19 @@ from . import BasePowerMeter
 
 
 class ThorlabsPowerMeter(BasePowerMeter):
+    """
+    ThorlabsPowerMeter class for handling Thorlabs power meter devices.
+    """
+
     def __init__(self, id: str, conn: str) -> None:
+        """
+        Initialize the ThorlabsPowerMeter object.
+
+        :param id: Power meter ID
+        :type id: str
+        :param conn: Connection string
+        :type conn: str
+        """
         super().__init__(id)
         self._conn = conn
         self._inst: Optional[visa.resources.Resource] = None
@@ -14,7 +26,7 @@ class ThorlabsPowerMeter(BasePowerMeter):
 
     def _connect(self):
         """
-        Connect to the power meter.
+        Connect to the Thorlabs power meter.
         """
         rm = visa.ResourceManager()
         try:
@@ -28,26 +40,52 @@ class ThorlabsPowerMeter(BasePowerMeter):
             raise
 
     def _check_connection(self):
+        """
+        Check if the power meter is connected.
+
+        :raises Exception: If the power meter is not connected
+        """
         if self._inst is None:
             raise Exception(f"Device {self.id} is not connected")
 
     @property
     def power_mw(self) -> float:
+        """
+        Get the power in milliwatts.
+
+        :return: Power in milliwatts
+        :rtype: float
+        """
         self._check_connection()
         return float(self._inst.query("MEAS:POW?")) * 1e3  # type: ignore
 
     @property
     def wavelength_nm(self) -> float:
+        """
+        Get the wavelength in nanometers.
+
+        :return: Wavelength in nanometers
+        :rtype: float
+        """
         self._check_connection()
         return float(self._inst.query("SENS:CORR:WAV?"))  # type: ignore
 
     @wavelength_nm.setter
     def wavelength_nm(self, wavelength: float) -> None:
+        """
+        Set the wavelength in nanometers.
+
+        :param wavelength: Wavelength in nanometers
+        :type wavelength: float
+        """
         self._check_connection()
         self._inst.write(f"SENS:CORR:WAV {wavelength}")  # type: ignore
         self.log.info(f"{self.id} - Set wavelength to {wavelength} nm")
 
     def close(self) -> None:
+        """
+        Close the power meter connection.
+        """
         if self._inst is not None:
             self._inst.close()
             self._inst = None

@@ -14,6 +14,14 @@ MODES = {
 
 
 def crc_16(s):
+    """
+    Calculate the CRC-16 checksum.
+
+    :param s: Input string
+    :type s: bytes
+    :return: CRC-16 checksum
+    :rtype: int
+    """
     crc = 0x0000
     for c in s:
         crc = crc ^ c
@@ -24,9 +32,17 @@ def crc_16(s):
 
 
 class TunableLens(BaseTunableLens):
+    """
+    TunableLens class for handling Optotune EL-E-4i tunable lens devices.
+    """
 
     def __init__(self, port: str):
+        """
+        Initialize the TunableLens object.
 
+        :param port: COM port for the controller
+        :type port: str
+        """
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
         # (!!) hardcode debug to false
         self.debug = False
@@ -37,7 +53,12 @@ class TunableLens(BaseTunableLens):
 
     @property
     def mode(self):
-        """Get the tunable lens control mode."""
+        """
+        Get the mode of the tunable lens.
+
+        :return: Mode of the tunable lens
+        :rtype: str
+        """
         mode = self.send_command("MMA", ">xxxB")[0]
 
         if mode == 1:
@@ -47,8 +68,13 @@ class TunableLens(BaseTunableLens):
 
     @mode.setter
     def mode(self, mode: str):
-        """Set the tunable lens control mode."""
+        """
+        Set the mode of the tunable lens.
 
+        :param mode: Mode of the tunable lens
+        :type mode: str
+        :raises ValueError: If the mode is not valid
+        """
         valid = list(MODES.keys())
         if mode not in valid:
             raise ValueError("mode must be one of %r." % valid)
@@ -57,12 +83,29 @@ class TunableLens(BaseTunableLens):
 
     @property
     def signal_temperature_c(self):
-        """Get the temperature in deg C."""
+        """
+        Get the temperature of the tunable lens in Celsius.
+
+        :return: Temperature in Celsius
+        :rtype: float
+        """
         state = {}
         state["Temperature [C]"] = self.send_command(b"TCA", ">xxxh")[0] * 0.0625
         return state
 
     def send_command(self, command, reply_fmt=None):
+        """
+        Send a command to the tunable lens.
+
+        :param command: Command to send
+        :type command: str or bytes
+        :param reply_fmt: Reply format, defaults to None
+        :type reply_fmt: str, optional
+        :raises Exception: If the expected response is not received
+        :raises Exception: If the response CRC is not correct
+        :return: Response from the tunable lens
+        :rtype: tuple
+        """
         if type(command) is not bytes:
             command = bytes(command, encoding="ascii")
         command = command + struct.pack("<H", crc_16(command))
@@ -88,4 +131,7 @@ class TunableLens(BaseTunableLens):
             return struct.unpack(reply_fmt, data)
 
     def close(self):
+        """
+        Close the tunable lens device.
+        """
         self.tunable_lens.close()

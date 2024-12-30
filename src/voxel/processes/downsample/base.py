@@ -7,12 +7,16 @@ import numpy
 class BaseDownSample:
     """
     Base class for image downsampling.
-
-    :param image: Input image
-    :type image: numpy.array
     """
 
     def __init__(self, binning: int) -> None:
+        """
+        Module for handling downsampling processes.
+
+        :param binning: The binning factor for downsampling.
+        :type binning: int
+        """
+
         self._binning = binning
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 

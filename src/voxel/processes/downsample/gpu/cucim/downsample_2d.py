@@ -8,12 +8,17 @@ from voxel.processes.downsample.base import BaseDownSample
 class CucimDownSample2D(BaseDownSample):
     """
     Voxel 2D downsampling with cucim.
-
-    :param binning: Binning factor
-    :type binning: int
     """
 
     def __init__(self, binning: int):
+        """
+        Module for handling 2D downsampling processes.
+
+        :param binning: The binning factor for downsampling.
+        :type binning: int
+        :raises ValueError: If the binning factor is not valid.
+        """
+
         super().__init__(binning)
 
     def run(self, image: numpy.array):

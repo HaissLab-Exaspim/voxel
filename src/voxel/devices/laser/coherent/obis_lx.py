@@ -9,6 +9,18 @@ MODULATION_MODES: dict[str, str] = {"off": "CWP", "analog": "ANALOG", "digital":
 
 
 def obis_modulation_getter(instance, logger, modes=None):
+    """
+    Get the modulation mode of the laser.
+
+    :param instance: Laser instance
+    :type instance: ObisLX
+    :param logger: Logger instance
+    :type logger: logging.Logger
+    :param modes: Modulation modes, defaults to None
+    :type modes: dict, optional
+    :return: Modulation mode
+    :rtype: str
+    """
     if modes is None:
         modes = MODULATION_MODES
     mode = instance.get_operational_setting(OperationalQuery.OPERATING_MODE)
@@ -19,6 +31,17 @@ def obis_modulation_getter(instance, logger, modes=None):
 
 
 def obis_modulation_setter(instance, value: str, modes=None):
+    """
+    Set the modulation mode of the laser.
+
+    :param instance: Laser instance
+    :type instance: ObisLX
+    :param value: Modulation mode
+    :type value: str
+    :param modes: Modulation modes, defaults to None
+    :type modes: dict, optional
+    :raises ValueError: If the modulation mode is not valid
+    """
     if modes is None:
         modes = MODULATION_MODES
     if value not in modes.keys():
@@ -30,14 +53,22 @@ def obis_modulation_setter(instance, value: str, modes=None):
 
 
 class ObisLXLaser(BaseLaser):
+    """
+    ObisLXLaser class for handling Coherent Obis LX laser devices.
+    """
 
     def __init__(self, id: str, wavelength: int, port: Serial | str, prefix: str = None):
         """
-        Communicate with specific LBX laser in L6CC Combiner box.
+        Initialize the ObisLXLaser object.
 
-        :param port: comm port for lasers.
-        :param prefix: prefix specic to laser.
-        :param wavelength: wavelength of laser
+        :param id: Laser ID
+        :type id: str
+        :param wavelength: Wavelength in nanometers
+        :type wavelength: int
+        :param port: Serial port for the laser
+        :type port: Serial | str
+        :param prefix: Command prefix for the laser, defaults to None
+        :type prefix: str, optional
         """
         super().__init__(id)
         self.prefix = prefix
@@ -46,60 +77,97 @@ class ObisLXLaser(BaseLaser):
 
     @property
     def wavelength(self) -> int:
+        """
+        Get the wavelength of the laser.
+
+        :return: Wavelength in nanometers
+        :rtype: int
+        """
         return self._wavelength
 
     def enable(self):
+        """
+        Enable the laser.
+        """
         self._inst.enable()
 
     def disable(self):
+        """
+        Disable the laser.
+        """
         self._inst.disable()
 
     def close(self):
+        """
+        Close the laser connection.
+        """
         self._inst.close()
 
     @DeliminatedProperty(minimum=0, maximum=lambda self: self._inst.max_power)
     def power_setpoint_mw(self):
+        """
+        Get the power setpoint in milliwatts.
+
+        :return: Power setpoint in milliwatts
+        :rtype: float
+        """
         return self._inst.power_setpoint
 
     @power_setpoint_mw.setter
     def power_setpoint_mw(self, value: float | int):
+        """
+        Set the power setpoint in milliwatts.
+
+        :param value: Power setpoint in milliwatts
+        :type value: float | int
+        """
         self._inst.power_setpoint = value
 
     @property
     def modulation_mode(self):
         """
-        The modulation mode of the laser can be one of two categories:
+        Get the modulation mode.
 
-        External Control - Analog, Digital, Mixed
-
-        Internal Control - off: CWP
+        :return: Modulation mode
+        :rtype: str
         """
         return obis_modulation_getter(self._inst, self.log, modes=MODULATION_MODES)
 
     @modulation_mode.setter
     def modulation_mode(self, mode: str):
         """
-        The modulation mode of the laser can be one of two categories:   \n
-        External Control - Analog, Digital, Mixed \n
-        Internal Control - off: CWP \n
-        :param mode: str
+        Set the modulation mode.
+
+        :param mode: Modulation mode
+        :type mode: str
         """
         obis_modulation_setter(self._inst, mode, modes=MODULATION_MODES)
 
     @property
     def power_mw(self) -> float:
+        """
+        Get the current power in milliwatts.
+
+        :return: Current power in milliwatts
+        :rtype: float
+        """
         return self._inst.power_setpoint
 
     @property
     def temperature_c(self) -> float:
+        """
+        Get the temperature of the laser in Celsius.
+
+        :return: Temperature in Celsius
+        :rtype: float
+        """
         return self._inst.temperature
 
     def status(self):
+        """
+        Get the status of the laser.
+
+        :return: Status of the laser
+        :rtype: dict
+        """
         return self._inst.get_system_status()
-
-
-if __name__ == "__main__":
-    from serial import Serial
-
-    laser_port = Serial("COM1")
-    laser = ObisLXLaser("test_laser", laser_port)
