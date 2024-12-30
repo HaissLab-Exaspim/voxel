@@ -2,6 +2,7 @@ import inspect
 
 
 class BaseDAQ:
+
     def add_task(self, task_type: str, pulse_count=None):
         self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
         pass

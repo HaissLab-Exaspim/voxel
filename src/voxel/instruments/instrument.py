@@ -1,17 +1,22 @@
-import logging
-from pathlib import Path
-import inspect
-import importlib
-from serial import Serial
-from ruamel.yaml import YAML
-import inflection
-from threading import Lock, RLock
-from functools import wraps
-from voxel.descriptors.deliminated_property import _DeliminatedProperty
 import copy
+import importlib
+import inspect
+import logging
+import re
+import sys
+from functools import wraps
+from pathlib import Path
+from threading import Lock, RLock
+
+import inflection
+from ruamel.yaml import YAML
+from serial import Serial
+
+from voxel.descriptors.deliminated_property import _DeliminatedProperty
 
 
 class Instrument:
+
     def __init__(self, config_path: str, yaml_handler: YAML = None, log_level="INFO"):
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.log.setLevel(log_level)
@@ -99,10 +104,7 @@ class Instrument:
         :param lock: lock to be used for device and sub-devices"""
 
         # Import subdevice class in order to access keyword argument required in the init of the device
-        subdevice_class = getattr(
-            importlib.import_module(subdevice_specs["driver"]),
-            subdevice_specs["module"],
-        )
+        subdevice_class = getattr(importlib.import_module(subdevice_specs["driver"]), subdevice_specs["module"])
         subdevice_needs = inspect.signature(subdevice_class.__init__).parameters
         kwds = {}
         for name, parameter in subdevice_needs.items():

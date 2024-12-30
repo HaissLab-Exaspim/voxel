@@ -517,9 +517,7 @@ class HistogramProjection:
                     chunk_index = frame_index % self._z_bin_count_px
                     if chunk_index == self._z_bin_count_px - 1 or frame_index == self._frame_count_px_px - 1:
                         self.histogram_z[:, z_chunk_number] = histogram1d(
-                            self.latest_img,
-                            bins=self._z_bins,
-                            range=[self._z_min_value, self._z_max_value],
+                            self.latest_img, bins=self._z_bins, range=[self._z_min_value, self._z_max_value]
                         )
                         z_chunk_number += 1
                 if x_projection:
@@ -542,60 +540,39 @@ class HistogramProjection:
         self.log.info(f"saving {self.filename}_histogram_x.tiff")
         x_bin_step = (self._x_max_value - self._x_min_value) / self._x_bins
         x_bin_centers = np.linspace(
-            self._x_min_value + x_bin_step / 2,
-            self._x_max_value - x_bin_step / 2,
-            self._x_bins,
+            self._x_min_value + x_bin_step / 2, self._x_max_value - x_bin_step / 2, self._x_bins
         )
         x_projection_centers = np.zeros(shape=(1, len(x_index_list)), dtype="float")
         x_projection_centers[0, 1:] = (x_index_list[1:] + x_index_list[:-1]) / 2
         np.savetxt(
             Path(self._path, self._acquisition_name, f"{self.filename}_histogram_x.csv"),
-            np.row_stack(
-                (
-                    x_projection_centers,
-                    np.column_stack((x_bin_centers, self.histogram_x)),
-                )
-            ),
+            np.row_stack((x_projection_centers, np.column_stack((x_bin_centers, self.histogram_x)))),
             delimiter=",",
             fmt="%f",
         )
         self.log.info(f"saving {self.filename}_histogram_y.tiff")
         y_bin_step = (self._y_max_value - self._y_min_value) / self._y_bins
         y_bin_centers = np.linspace(
-            self._y_min_value + y_bin_step / 2,
-            self._y_max_value - y_bin_step / 2,
-            self._y_bins,
+            self._y_min_value + y_bin_step / 2, self._y_max_value - y_bin_step / 2, self._y_bins
         )
         y_projection_centers = np.zeros(shape=(1, len(y_index_list)), dtype="float")
         y_projection_centers[0, 1:] = (y_index_list[1:] + y_index_list[:-1]) / 2
         np.savetxt(
             Path(self._path, self._acquisition_name, f"{self.filename}_histogram_y.csv"),
-            np.row_stack(
-                (
-                    y_projection_centers,
-                    np.column_stack((y_bin_centers, self.histogram_y)),
-                )
-            ),
+            np.row_stack((y_projection_centers, np.column_stack((y_bin_centers, self.histogram_y)))),
             delimiter=",",
             fmt="%f",
         )
         self.log.info(f"saving {self.filename}_histogram_z.tiff")
         z_bin_step = (self._z_max_value - self._z_min_value) / self._z_bins
         z_bin_centers = np.linspace(
-            self._z_min_value + z_bin_step / 2,
-            self._z_max_value - z_bin_step / 2,
-            self._z_bins,
+            self._z_min_value + z_bin_step / 2, self._z_max_value - z_bin_step / 2, self._z_bins
         )
         z_projection_centers = np.zeros(shape=(1, len(z_index_list)), dtype="float")
         z_projection_centers[0, 1:] = (z_index_list[1:] + z_index_list[:-1]) / 2
         np.savetxt(
             Path(self._path, self._acquisition_name, f"{self.filename}_histogram_z.csv"),
-            np.row_stack(
-                (
-                    z_projection_centers,
-                    np.column_stack((z_bin_centers, self.histogram_z)),
-                )
-            ),
+            np.row_stack((z_projection_centers, np.column_stack((z_bin_centers, self.histogram_z)))),
             delimiter=",",
             fmt="%f",
         )

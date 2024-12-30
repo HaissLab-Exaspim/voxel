@@ -1,15 +1,17 @@
 # Fast writing of numpy arrays to HDF5 format compatible with Fiji/BigDataViewer and BigStitcher
 # Author: Nikita Vladimirov
 # License: GPL-3.0
-import os
-import h5py
-import numpy as np
 import logging
-from xml.etree import ElementTree as ET
-import skimage.transform
+import os
 import shutil
 from pathlib import Path
+from xml.etree import ElementTree as ET
+
+import h5py
+import numpy as np
+import skimage.transform
 from tqdm import trange
+
 from voxel.processes.downsample.gpu.gputools.downsample_3d import GPUToolsDownSample3D
 
 
@@ -273,6 +275,7 @@ class BdvBase:
 
 
 class BdvWriter(BdvBase):
+
     def __init__(
         self,
         filename,
@@ -453,16 +456,7 @@ class BdvWriter(BdvBase):
             dataset[z, :, :] = self._subsample_plane(plane, self.subsamp[ilevel]).astype("int16")
 
     def append_substack(
-        self,
-        substack,
-        z_start,
-        y_start=0,
-        x_start=0,
-        time=0,
-        illumination=0,
-        channel=0,
-        tile=0,
-        angle=0,
+        self, substack, z_start, y_start=0, x_start=0, time=0, illumination=0, channel=0, tile=0, angle=0
     ):
         """Append a substack to a virtual stack. Requires stack initialization by calling e.g.
         `append_view(stack=None, virtual_stack_dim=(1000,2048,2048))` beforehand.
@@ -631,13 +625,7 @@ class BdvWriter(BdvBase):
             plane_sub = skimage.transform.downscale_local_mean(plane, tuple(subsamp_level[1:])).astype(np.uint16)
         return plane_sub
 
-    def write_xml(
-        self,
-        camera_name="default",
-        microscope_name="default",
-        microscope_version="0.0",
-        user_name="user",
-    ):
+    def write_xml(self, camera_name="default", microscope_name="default", microscope_version="0.0", user_name="user"):
         """
         Write XML header file for the HDF5 file.
 
@@ -744,8 +732,7 @@ class BdvWriter(BdvBase):
                         vt.set("type", "affine")
                         ET.SubElement(vt, "Name").text = self.affine_names[isetup]
                         mx_string = np.array2string(
-                            self.affine_matrices[isetup].flatten(),
-                            formatter={"float": lambda x: "%.6f" % x},
+                            self.affine_matrices[isetup].flatten(), formatter={"float": lambda x: "%.6f" % x}
                         )
                         ET.SubElement(vt, "affine").text = mx_string[1:-1].strip()
 
@@ -775,6 +762,7 @@ class BdvWriter(BdvBase):
 
 
 class BdvEditor(BdvBase):
+
     def __init__(self, filename):
         """
         Class for reading and editing existing H5/XML file pairs.
@@ -838,15 +826,7 @@ class BdvEditor(BdvBase):
         else:
             raise ValueError("File object is None")
 
-    def crop_view(
-        self,
-        bbox_xyz=((1, -1), (1, -1), None),
-        illumination=0,
-        channel=0,
-        tile=0,
-        angle=0,
-        ilevel=0,
-    ):
+    def crop_view(self, bbox_xyz=((1, -1), (1, -1), None), illumination=0, channel=0, tile=0, angle=0, ilevel=0):
         """Crop a view in-place, both in H5 and XML files, for all time points.
 
         Parameters:

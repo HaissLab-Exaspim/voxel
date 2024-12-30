@@ -30,6 +30,7 @@ class TigerControllerSingleton(TigerController, metaclass=Singleton):
 
 
 class Stage(BaseStage):
+
     def __init__(
         self,
         hardware_axis: str,
@@ -229,9 +230,7 @@ class Stage(BaseStage):
                 retrace_speed_percent=retrace_speed_percent,
             )
             self.tigerbox.scanv(
-                scan_start_mm=slow_axis_start_position,
-                scan_stop_mm=slow_axis_stop_position,
-                line_count=strip_count,
+                scan_start_mm=slow_axis_start_position, scan_stop_mm=slow_axis_stop_position, line_count=strip_count
             )
         else:
             raise ValueError(f"mode must be stage scan not {self.mode}")

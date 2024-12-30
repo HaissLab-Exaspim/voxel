@@ -7,6 +7,7 @@ Copyright @ Excelitas PCO GmbH 2005-2023
 The a instance of the Recorder class is part of pco.Camera
 """
 
+
 import ctypes as C
 import logging
 import os
@@ -99,6 +100,7 @@ class Recorder:
         return ((byte_value / 0x10) * 10) + (byte_value % 0x10)
 
     def __init__(self, sdk, camera_handle, name=""):
+
         if platform.architecture()[0] != "64bit":
             print("Python Interpreter not x64")
             raise OSError
@@ -840,12 +842,7 @@ class Recorder:
                     meta_dict.update({"camera subtype": metadata.wCAMERA_SUBTYPE})
                     meta_dict.update({"event number": metadata.dwEVENT_NUMBER})
                     meta_dict.update(
-                        {
-                            "image size offset": (
-                                metadata.wIMAGE_SIZE_X_Offset,
-                                metadata.wIMAGE_SIZE_Y_Offset,
-                            )
-                        }
+                        {"image size offset": (metadata.wIMAGE_SIZE_X_Offset, metadata.wIMAGE_SIZE_Y_Offset)}
                     )
 
                 meta_dict.update(
@@ -1025,12 +1022,7 @@ class Recorder:
                     meta_dict.update({"camera subtype": metadata.wCAMERA_SUBTYPE})
                     meta_dict.update({"event number": metadata.dwEVENT_NUMBER})
                     meta_dict.update(
-                        {
-                            "image size offset": (
-                                metadata.wIMAGE_SIZE_X_Offset,
-                                metadata.wIMAGE_SIZE_Y_Offset,
-                            )
-                        }
+                        {"image size offset": (metadata.wIMAGE_SIZE_X_Offset, metadata.wIMAGE_SIZE_Y_Offset)}
                     )
 
                 meta_dict.update(

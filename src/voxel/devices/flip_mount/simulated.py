@@ -42,10 +42,7 @@ class SimulatedFlipMount(BaseFlipMount):
 
     @property
     def position(self) -> str:
-        return next(
-            (key for key, value in self._positions.items() if value == self._inst),
-            "Unknown",
-        )
+        return next((key for key, value in self._positions.items() if value == self._inst), "Unknown")
 
     @position.setter
     def position(self, new_position):
@@ -56,11 +53,7 @@ class SimulatedFlipMount(BaseFlipMount):
         except Exception as e:
             raise e
 
-    @DeliminatedProperty(
-        minimum=FLIP_TIME_RANGE_MS[0],
-        maximum=FLIP_TIME_RANGE_MS[1],
-        step=FLIP_TIME_RANGE_MS[2],
-    )
+    @DeliminatedProperty(minimum=FLIP_TIME_RANGE_MS[0], maximum=FLIP_TIME_RANGE_MS[1], step=FLIP_TIME_RANGE_MS[2])
     def flip_time_ms(self) -> float:
         return self._flip_time_ms
 

@@ -24,9 +24,15 @@ COMPRESSIONS = {
     "none": aqz.CompressionCodec.NONE,
 }
 
-DATA_TYPES = {"unit8": aqz.DataType.UINT16, "uint16": aqz.DataType.UINT16}
+DATA_TYPES = {
+    "unit8": aqz.DataType.UINT16,
+    "uint16": aqz.DataType.UINT16
+}
 
-VERSIONS = {"v2": aqz.ZarrVersion.V2, "v3": aqz.ZarrVersion.V3}
+VERSIONS = {
+    "v2": aqz.ZarrVersion.V2,
+    "v3": aqz.ZarrVersion.V3
+}
 
 
 class ZarrWriter(BaseWriter):
@@ -160,7 +166,7 @@ class ZarrWriter(BaseWriter):
         """
 
         if type(multiscale) is not bool:
-            raise ValueError("multiscale setting must be true or false")
+            raise ValueError('multiscale setting must be true or false')
         self.log.info(f"setting multiscale setting to: {multiscale}")
         self._multiscale = multiscale
 
@@ -316,34 +322,32 @@ class ZarrWriter(BaseWriter):
             store_path=str(filepath),
             data_type=DATA_TYPES[self._data_type],
             version=self._version,
-            multiscale=True,
+            multiscale=True
         )
 
-        settings.dimensions.extend(
-            [
-                aqz.Dimension(
-                    name="z",
-                    type=aqz.DimensionType.SPACE,
-                    array_size_px=self.frame_count_px,
-                    chunk_size_px=self.chunk_count_px,
-                    shard_size_chunks=1,  # hardcode shard to 1 in z
-                ),
-                aqz.Dimension(
-                    name="y",
-                    type=aqz.DimensionType.SPACE,
-                    array_size_px=y_array_size,
-                    chunk_size_px=self._chunk_size_y_px,
-                    shard_size_chunks=y_shards,
-                ),
-                aqz.Dimension(
-                    name="x",
-                    type=aqz.DimensionType.SPACE,
-                    array_size_px=x_array_size,
-                    chunk_size_px=self._chunk_size_x_px,
-                    shard_size_chunks=x_shards,
-                ),
-            ]
-        )
+        settings.dimensions.extend([
+            aqz.Dimension(
+                name="z",
+                type=aqz.DimensionType.SPACE,
+                array_size_px=self.frame_count_px,
+                chunk_size_px=self.chunk_count_px,
+                shard_size_chunks=1 # hardcode shard to 1 in z
+            ),
+            aqz.Dimension(
+                name="y",
+                type=aqz.DimensionType.SPACE,
+                array_size_px=y_array_size,
+                chunk_size_px=self._chunk_size_y_px,
+                shard_size_chunks=y_shards
+            ),
+            aqz.Dimension(
+                name="x",
+                type=aqz.DimensionType.SPACE,
+                array_size_px=x_array_size,
+                chunk_size_px=self._chunk_size_x_px,
+                shard_size_chunks=x_shards
+            )
+        ])
 
         stream = aqz.ZarrStream(settings)
 

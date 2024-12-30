@@ -24,7 +24,9 @@ def crc_16(s):
 
 
 class TunableLens(BaseTunableLens):
+
     def __init__(self, port: str):
+
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
         # (!!) hardcode debug to false
         self.debug = False

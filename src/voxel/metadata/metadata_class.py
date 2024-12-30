@@ -1,5 +1,6 @@
-from datetime import datetime
 import logging
+from datetime import datetime
+
 import inflection
 
 from voxel.metadata.base import BaseMetadata
@@ -15,12 +16,8 @@ DATE_FORMATS = {
 class MetadataClass(BaseMetadata):
     """Class to handle metadata"""
 
-    def __init__(
-        self,
-        metadata_dictionary: dict,
-        date_format: str = "None",
-        name_specs: dict = {},
-    ):
+    def __init__(self, metadata_dictionary: dict, date_format: str = "None", name_specs: dict = {}):
+
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
 
         super().__init__()
@@ -95,6 +92,7 @@ class MetadataClass(BaseMetadata):
 
     @delimiter.setter
     def delimiter(self, delimiter: list):
+
         self._delimiter = delimiter
 
     @property

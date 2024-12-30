@@ -25,6 +25,7 @@ class GPUToolsRankDownSample2D(BaseDownSample):
     """
 
     def __init__(self, binning: int, rank=None, data_type=None):
+
         super().__init__(binning)
 
         self._binning = binning
@@ -47,13 +48,11 @@ class GPUToolsRankDownSample2D(BaseDownSample):
         with open(abspath("kernels/rank_downscale.cl"), "r") as f:
             tpl = Template(f.read())
 
-        rendered = tpl.render(
-            DTYPE=DTYPE,
-            FSIZE_Z=0,
-            FSIZE_X=self._binning[1],
-            FSIZE_Y=self._binning[0],
-            CVAL=0,
-        )  # constant value
+        rendered = tpl.render(DTYPE = DTYPE,
+                              FSIZE_Z=0,
+                              FSIZE_X=self._binning[1],
+                              FSIZE_Y=self._binning[0],
+                              CVAL = 0)  # constant value
 
         self._prog = OCLProgram(src_str=rendered)
 

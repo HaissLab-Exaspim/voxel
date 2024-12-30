@@ -1,9 +1,10 @@
+import logging
 import random
 
-from voxel.devices.laser.base import BaseLaser
-import logging
 from serial import Serial
+
 from voxel.descriptors.deliminated_property import DeliminatedProperty
+from voxel.devices.laser.base import BaseLaser
 
 MODULATION_MODES = {
     "off": {"external_control_mode": "OFF", "digital_modulation": "OFF"},
@@ -15,6 +16,7 @@ MAX_POWER_MW = 100
 
 
 class SimulatedLaser(BaseLaser):
+
     def __init__(self, id: str, wavelength: int, prefix: str = "", coefficients: dict = {}):
         """
         Communicate with specific Simulated laser in Simulated Combiner box.

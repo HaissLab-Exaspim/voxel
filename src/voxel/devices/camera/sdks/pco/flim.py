@@ -4,7 +4,6 @@ This module extends the functionality of pco.Camera for support of pco.flim.
 
 Copyright @ Excelitas PCO GmbH 2005-2023
 """
-
 import logging
 
 import numpy as np
@@ -14,6 +13,7 @@ logger.addHandler(logging.NullHandler())
 
 
 class Flim:
+
     def __init__(
         self,
         phase_number,
@@ -92,12 +92,7 @@ class Flim:
         stack = self.get_stack(list_of_images)
 
         phasor, ni = self.numeric_harmonic_analysis_phasor(
-            stack,
-            self.phase_number,
-            self.phase_symmetry,
-            self.phase_order,
-            self.tap_select,
-            self.asymmetry_correction,
+            stack, self.phase_number, self.phase_symmetry, self.phase_order, self.tap_select, self.asymmetry_correction
         )
 
         phi = self.get_phase(phasor)
@@ -106,26 +101,14 @@ class Flim:
         return phi, m, ni, phasor
 
     def numeric_harmonic_analysis_phasor(
-        self,
-        stack,
-        phase_number,
-        phase_symmetry,
-        phase_order,
-        tap_select,
-        asymmetry_correction,
+        self, stack, phase_number, phase_symmetry, phase_order, tap_select, asymmetry_correction
     ):
         """ """
         logger.debug("")
 
         w = self.get_index(phase_number, phase_symmetry, phase_order, tap_select, asymmetry_correction)
 
-        dict_phases = {
-            "manual shifting": 2,
-            "2 phases": 2,
-            "4 phases": 4,
-            "8 phases": 8,
-            "16 phases": 16,
-        }
+        dict_phases = {"manual shifting": 2, "2 phases": 2, "4 phases": 4, "8 phases": 8, "16 phases": 16}
 
         z = np.einsum("ijk,k->ij", stack, w)
 
@@ -156,24 +139,11 @@ class Flim:
         return np.abs(phasor)
 
     # -------------------------------------------------------------------------
-    def get_index(
-        self,
-        phase_number,
-        phase_symmetry,
-        phase_order,
-        tap_select,
-        asymmetry_correction,
-    ):
+    def get_index(self, phase_number, phase_symmetry, phase_order, tap_select, asymmetry_correction):
         """Returns the multiplier depending of the configuration."""
         logger.debug("")
 
-        phase_number_to_int = {
-            "manual shifting": 2,
-            "2 phases": 2,
-            "4 phases": 4,
-            "8 phases": 8,
-            "16 phases": 16,
-        }
+        phase_number_to_int = {"manual shifting": 2, "2 phases": 2, "4 phases": 4, "8 phases": 8, "16 phases": 16}
         w = np.exp(-1j * 2.0 * np.pi * np.arange(phase_number_to_int[phase_number]) / phase_number_to_int[phase_number])
 
         n = phase_number
@@ -209,31 +179,13 @@ class Flim:
         elif n == "4 phases" and s == "singular" and t == "tap B" and c == "off":
             return [w[2], w[3]]
         elif n == "4 phases" and s == "twice" and o == "ascending" and t == "both" and c == "off":
-            return [
-                0.5 * w[0],
-                0.5 * w[2],
-                0.5 * w[1],
-                0.5 * w[3],
-                0.5 * w[2],
-                0.5 * w[0],
-                0.5 * w[3],
-                0.5 * w[1],
-            ]
+            return [0.5 * w[0], 0.5 * w[2], 0.5 * w[1], 0.5 * w[3], 0.5 * w[2], 0.5 * w[0], 0.5 * w[3], 0.5 * w[1]]
         elif n == "4 phases" and s == "twice" and o == "ascending" and t == "tap A" and c == "off":
             return [w[0], w[1], w[2], w[3]]
         elif n == "4 phases" and s == "twice" and o == "ascending" and t == "tap B" and c == "off":
             return [w[2], w[3], w[0], w[0]]
         elif n == "4 phases" and s == "twice" and o == "opposite" and t == "both" and c == "off":
-            return [
-                0.5 * w[0],
-                0.5 * w[2],
-                0.5 * w[2],
-                0.5 * w[0],
-                0.5 * w[1],
-                0.5 * w[3],
-                0.5 * w[3],
-                0.5 * w[1],
-            ]
+            return [0.5 * w[0], 0.5 * w[2], 0.5 * w[2], 0.5 * w[0], 0.5 * w[1], 0.5 * w[3], 0.5 * w[3], 0.5 * w[1]]
         elif n == "4 phases" and s == "twice" and o == "opposite" and t == "both" and c == "average":
             return [w[0], w[2], w[1], w[3]]
         elif n == "4 phases" and s == "twice" and o == "opposite" and t == "tap A" and c == "off":

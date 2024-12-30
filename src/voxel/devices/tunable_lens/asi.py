@@ -21,6 +21,7 @@ class TigerControllerSingleton(TigerController, metaclass=Singleton):
 
 
 class TunableLens(BaseTunableLens):
+
     def __init__(self, port: str, hardware_axis: str):
         """Connect to hardware.
 

@@ -119,6 +119,7 @@ class DcamapiSingleton(Dcamapi, metaclass=Singleton):
 
 
 class Camera(BaseCamera):
+
     def __init__(self, id: str):
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.id = str(id)  # convert to string incase serial # is entered as int
@@ -155,6 +156,7 @@ class Camera(BaseCamera):
 
     @exposure_time_ms.setter
     def exposure_time_ms(self, exposure_time_ms: float):
+
         self.dcam.prop_setvalue(PROPERTIES["exposure_time"], exposure_time_ms / 1000)
         self.log.info(f"exposure time set to: {exposure_time_ms} ms")
         # refresh parameter values
@@ -166,6 +168,7 @@ class Camera(BaseCamera):
 
     @width_px.setter
     def width_px(self, value: int):
+
         # reset offset to (0,0)
         self.dcam.prop_setvalue(PROPERTIES["subarray_hpos"], 0)
 
@@ -187,6 +190,7 @@ class Camera(BaseCamera):
 
     @height_px.setter
     def height_px(self, value: int):
+
         # reset offset to (0,0)
         self.dcam.prop_setvalue(PROPERTIES["subarray_vpos"], 0)
 
@@ -210,6 +214,7 @@ class Camera(BaseCamera):
 
     @pixel_type.setter
     def pixel_type(self, pixel_type_bits: str):
+
         valid = list(PIXEL_TYPES.keys())
         if pixel_type_bits not in valid:
             raise ValueError("pixel_type_bits must be one of %r." % valid)
@@ -227,6 +232,7 @@ class Camera(BaseCamera):
 
     @line_interval_us.setter
     def line_interval_us(self, line_interval_us: float):
+
         # convert from us to s
         self.dcam.prop_setvalue(PROPERTIES["line_interval"], line_interval_us / 1e6)
         self.log.info(f"line interval set to: {line_interval_us} us")
@@ -242,6 +248,7 @@ class Camera(BaseCamera):
 
     @property
     def trigger(self):
+
         source = self.dcam.prop_getvalue(PROPERTIES["trigger_source"])
         mode = self.dcam.prop_getvalue(PROPERTIES["trigger_mode"])
         polarity = self.dcam.prop_getvalue(PROPERTIES["trigger_polarity"])
@@ -253,6 +260,7 @@ class Camera(BaseCamera):
 
     @trigger.setter
     def trigger(self, trigger: dict):
+
         mode = trigger["mode"]
         source = trigger["source"]
         polarity = trigger["polarity"]

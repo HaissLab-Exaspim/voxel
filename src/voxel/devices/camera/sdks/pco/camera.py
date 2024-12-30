@@ -30,11 +30,7 @@ BUFFER_SIZE_MB = 2400
 BINNING = {1: 1, 2: 2, 4: 4}
 
 # generate modes by querying pco sdk
-TRIGGERS = {
-    "modes": dict(),
-    "sources": {"internal": "auto", "external": "external"},
-    "polarity": None,
-}
+TRIGGERS = {"modes": dict(), "sources": {"internal": "auto", "external": "external"}, "polarity": None}
 
 READOUT_MODES = dict()
 
@@ -45,8 +41,10 @@ class exception(Exception):
 
 
 class Camera:
+
     # -------------------------------------------------------------------------
     def __init__(self, id: str, name="", interface=None):
+
         logger.info("[-.--- s] [cam] {}".format(sys._getframe().f_code.co_name))
 
         self.flim_config = None
@@ -59,6 +57,7 @@ class Camera:
         # self.sdk.open_camera()
 
         def _scanner(sdk, interfaces, id):
+
             for interface in interfaces:
                 for camera_number in range(10):
                     ret = sdk.open_camera_ex(interface=interface, camera_number=camera_number)
@@ -83,15 +82,7 @@ class Camera:
                 if (
                     _scanner(
                         self.sdk,
-                        [
-                            "USB 3.0",
-                            "CLHS",
-                            "Camera Link Silicon Software",
-                            "GenICam",
-                            "GigE",
-                            "USB 2.0",
-                            "FireWire",
-                        ],
+                        ["USB 3.0", "CLHS", "Camera Link Silicon Software", "GenICam", "GigE", "USB 2.0", "FireWire"],
                         id,
                     )
                     != 0
@@ -120,37 +111,22 @@ class Camera:
         if self.colorflag:
             self.conv = {
                 "Mono8": Convert(
-                    self.sdk.get_camera_handle(),
-                    self.sdk,
-                    "bw",
-                    self._camera_description["bit resolution"],
+                    self.sdk.get_camera_handle(), self.sdk, "bw", self._camera_description["bit resolution"]
                 ),
                 "BGR8": Convert(
-                    self.sdk.get_camera_handle(),
-                    self.sdk,
-                    "color",
-                    self._camera_description["bit resolution"],
+                    self.sdk.get_camera_handle(), self.sdk, "color", self._camera_description["bit resolution"]
                 ),
                 "BGR16": Convert(
-                    self.sdk.get_camera_handle(),
-                    self.sdk,
-                    "color16",
-                    self._camera_description["bit resolution"],
+                    self.sdk.get_camera_handle(), self.sdk, "color16", self._camera_description["bit resolution"]
                 ),
             }
         else:
             self.conv = {
                 "Mono8": Convert(
-                    self.sdk.get_camera_handle(),
-                    self.sdk,
-                    "bw",
-                    self._camera_description["bit resolution"],
+                    self.sdk.get_camera_handle(), self.sdk, "bw", self._camera_description["bit resolution"]
                 ),
                 "BGR8": Convert(
-                    self.sdk.get_camera_handle(),
-                    self.sdk,
-                    "pseudo",
-                    self._camera_description["bit resolution"],
+                    self.sdk.get_camera_handle(), self.sdk, "pseudo", self._camera_description["bit resolution"]
                 ),
             }
 
@@ -180,6 +156,7 @@ class Camera:
 
     @exposure_time_ms.setter
     def exposure_time_ms(self, exposure_time_ms: float):
+
         if exposure_time_ms < self.min_exposure_time_ms or exposure_time_ms > self.max_exposure_time_ms:
             logger.error(
                 f"exposure time must be >{self.min_exposure_time_ms} ms \
@@ -211,6 +188,7 @@ class Camera:
 
     @roi.setter
     def roi(self, roi: dict):
+
         width_px = roi["width_px"]
         height_px = roi["height_px"]
 
@@ -246,18 +224,8 @@ class Camera:
         self.sdk.set_roi(1, 1, width_px, sensor_height_px)
         # width offset must be a multiple of the divisible width in px
         centered_width_offset_px = round((sensor_width_px / 2 - width_px / 2) / self.step_width_px) * self.step_width_px
-        self.sdk.set_roi(
-            centered_width_offset_px + 1,
-            1,
-            centered_width_offset_px + width_px,
-            sensor_height_px,
-        )
-        self.sdk.set_roi(
-            centered_width_offset_px + 1,
-            1,
-            centered_width_offset_px + width_px,
-            sensor_height_px,
-        )
+        self.sdk.set_roi(centered_width_offset_px + 1, 1, centered_width_offset_px + width_px, sensor_height_px)
+        self.sdk.set_roi(centered_width_offset_px + 1, 1, centered_width_offset_px + width_px, sensor_height_px)
         # Height offset must be a multiple of the divisible height in px
         centered_height_offset_px = (
             round((sensor_height_px / 2 - height_px / 2) / self.step_height_px) * self.step_height_px
@@ -309,6 +277,7 @@ class Camera:
 
     @trigger.setter
     def trigger(self, trigger: dict):
+
         # skip source and polarity, not used in PCO API
         mode = trigger["mode"]
         source = trigger["source"]
@@ -480,6 +449,7 @@ class Camera:
         # self.step_line_interval_us = 1.0
 
     def _query_trigger_modes(self):
+
         trigger_mode_options = {
             "off": "auto sequence",
             "software": "software trigger",
@@ -502,6 +472,7 @@ class Camera:
         self.sdk.set_trigger_mode(mode=trigger_mode_options["off"])
 
     def _query_readout_modes(self):
+
         readout_mode_options = {
             "light sheet forward": "top bottom",
             "rolling in": "top center bottom center",
@@ -801,6 +772,7 @@ class Camera:
     # -------------------------------------------------------------------------
     @flim_configuration.setter
     def flim_configuration(self, arg):
+
         logger.info("[---.- s] [cam] {}".format(sys._getframe().f_code.co_name))
 
         if type(arg) is not dict:
@@ -1620,23 +1592,14 @@ class Camera:
         if roi is None:
             if _data_format == "CompressedMono8":
                 image = self.rec.copy_image_compressed(
-                    image_index,
-                    1,
-                    1,
-                    (self._roi["x1"] - self._roi["x0"] + 1),
-                    (self._roi["y1"] - self._roi["y0"] + 1),
+                    image_index, 1, 1, (self._roi["x1"] - self._roi["x0"] + 1), (self._roi["y1"] - self._roi["y0"] + 1)
                 )
             else:
                 image = self.rec.copy_image(
-                    image_index,
-                    1,
-                    1,
-                    (self._roi["x1"] - self._roi["x0"] + 1),
-                    (self._roi["y1"] - self._roi["y0"] + 1),
+                    image_index, 1, 1, (self._roi["x1"] - self._roi["x0"] + 1), (self._roi["y1"] - self._roi["y0"] + 1)
                 )
             np_image = np.asarray(image["image"]).reshape(
-                (self._roi["y1"] - self._roi["y0"] + 1),
-                (self._roi["x1"] - self._roi["x0"] + 1),
+                (self._roi["y1"] - self._roi["y0"] + 1), (self._roi["x1"] - self._roi["x0"] + 1)
             )
         else:
             if _data_format == "CompressedMono8":
@@ -1705,14 +1668,7 @@ class Camera:
 
     # -------------------------------------------------------------------------
 
-    def images(
-        self,
-        roi=None,
-        start_idx=0,
-        blocksize=None,
-        data_format="Mono16",
-        comp_params=None,
-    ):
+    def images(self, roi=None, start_idx=0, blocksize=None, data_format="Mono16", comp_params=None):
         """
         Returns all recorded images from the recorder.
 
@@ -1816,8 +1772,7 @@ class Camera:
                 (self._roi["y1"] - self._roi["y0"] + 1),
             )
             np_image = np.asarray(image["average image"]).reshape(
-                (self._roi["y1"] - self._roi["y0"] + 1),
-                (self._roi["x1"] - self._roi["x0"] + 1),
+                (self._roi["y1"] - self._roi["y0"] + 1), (self._roi["x1"] - self._roi["x0"] + 1)
             )
         else:
             image = self.rec.copy_average_image(start_idx, stop_idx, roi[0], roi[1], roi[2], roi[3])
@@ -1977,24 +1932,11 @@ class Camera:
         return sensor_info
 
     def __get_standard_dataformat(self, data_format):
+
         df_dict = dict.fromkeys(["Mono8", "mono8"], "Mono8")
         df_dict.update(dict.fromkeys(["Mono16", "mono16", "raw16", "bw16"], "Mono16"))
         df_dict.update(
-            dict.fromkeys(
-                [
-                    "rgb",
-                    "bgr",
-                    "RGB8",
-                    "BGR8",
-                    "RGBA8",
-                    "BGRA8",
-                    "rgba8",
-                    "bgra8",
-                    "rgba",
-                    "bgra",
-                ],
-                "BGR8",
-            )
+            dict.fromkeys(["rgb", "bgr", "RGB8", "BGR8", "RGBA8", "BGRA8", "rgba8", "bgra8", "rgba", "bgra"], "BGR8")
         )
         df_dict.update(dict.fromkeys(["RGB16", "BGR16", "rgb16", "bgr16"], "BGR16"))
         df_dict.update(dict.fromkeys(["CompressedMono8", "compressed"], "CompressedMono8"))

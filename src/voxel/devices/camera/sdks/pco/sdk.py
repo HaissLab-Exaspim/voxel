@@ -7,7 +7,6 @@ Copyright @ Excelitas PCO GmbH 2005-2023
 
 The a instance of the Sdk class is part of pco.Camera
 """
-
 import ctypes as C
 import logging
 import math
@@ -546,6 +545,7 @@ class Sdk:
 
     # -------------------------------------------------------------------------
     def __init__(self, name=""):
+
         if platform.architecture()[0] != "64bit":
             logger.error("Python Interpreter not x64")
             raise OSError
@@ -1392,12 +1392,7 @@ class Sdk:
             C.c_uint16,
         ]
 
-        self.SC2_Cam.PCO_SetCompressionMode.argtypes = [
-            C.c_void_p,
-            C.c_uint16,
-            C.POINTER(C.c_uint32),
-            C.c_uint16,
-        ]
+        self.SC2_Cam.PCO_SetCompressionMode.argtypes = [C.c_void_p, C.c_uint16, C.POINTER(C.c_uint32), C.c_uint16]
 
         self.SC2_Cam.PCO_GetMaxNumberOfImagesInSegment.argtypes = [
             C.c_void_p,
@@ -2440,8 +2435,7 @@ class Sdk:
             ret.update(
                 {
                     "interface type": interface_type.get(
-                        strGeneral.strCamType.wInterfaceType,
-                        strGeneral.strCamType.wInterfaceType,
+                        strGeneral.strCamType.wInterfaceType, strGeneral.strCamType.wInterfaceType
                     )
                 }
             )
@@ -2737,6 +2731,7 @@ class Sdk:
 
         infos = []
         for i in range(blocks):
+
             error = self.SC2_Cam.PCO_GetFirmwareInfo(self.camera_handle, i, pstrFirmWareVersion)
             error_msg = self.get_error_text(error)
             if num >= ((i + 1) * 10):
@@ -3165,6 +3160,7 @@ class Sdk:
     # 2.4.10 PCO_GetFanControlParameters
     # -------------------------------------------------------------------------
     def get_fan_control_parameters(self):
+
         wMode = C.c_uint16()
         wValue = C.c_uint16()
         wReserved = C.c_uint16()
@@ -3192,6 +3188,7 @@ class Sdk:
     # 2.4.11 PCO_SetFanControlParameters
     # -------------------------------------------------------------------------
     def set_fan_control_parameters(self, mode, value=100):
+
         if value not in range(0, 101, 1):
             raise ValueError
 
@@ -3258,6 +3255,7 @@ class Sdk:
 
         ret = {}
         if error == 0:
+
             ret.update({"wXResAct": wXResAct.value})
             ret.update({"wYResAct": wYResAct.value})
             ret.update({"wXResMax": wXResMax.value})
@@ -3857,6 +3855,7 @@ class Sdk:
             cooling_setpoints_list.append(float(sCoolSetpoints[0]))
 
         for i in range(1, wNumSetPoints.value):
+
             error = self.SC2_Cam.PCO_GetCoolingSetpoints(self.camera_handle, i, wNumSetPoints, psCoolSetpoints)
             error_msg = self.get_error_text(error)
             if error == 0:
@@ -4282,12 +4281,7 @@ class Sdk:
 
         time_start = time.perf_counter()
         error = self.SC2_Cam.PCO_GetDelayExposureTimeTable(
-            self.camera_handle,
-            p_delay,
-            p_exposure,
-            wTimeBaseDelay,
-            wTimeBaseExposure,
-            wCount,
+            self.camera_handle, p_delay, p_exposure, wTimeBaseDelay, wTimeBaseExposure, wCount
         )
         duration = time.perf_counter() - time_start
         error_msg = self.get_error_text(error)
@@ -4363,12 +4357,7 @@ class Sdk:
 
         time_start = time.perf_counter()
         error = self.SC2_Cam.PCO_SetDelayExposureTimeTable(
-            self.camera_handle,
-            p_delay,
-            p_exposure,
-            wTimeBaseDelay,
-            wTimeBaseExposure,
-            wCount,
+            self.camera_handle, p_delay, p_exposure, wTimeBaseDelay, wTimeBaseExposure, wCount
         )
         duration = time.perf_counter() - time_start
         error_msg = self.get_error_text(error)
@@ -4835,12 +4824,7 @@ class Sdk:
     # 2.6.21 PCO_SetModulationMode (for the moment intentionally not implemented)
     # -------------------------------------------------------------------------
     def set_modulation_mode(
-        self,
-        modulation_mode,
-        periodical_time,
-        periodical_timebase,
-        number_of_exposures,
-        monitor_offset,
+        self, modulation_mode, periodical_time, periodical_timebase, number_of_exposures, monitor_offset
     ):
         """
         Gets the modulation mode and necessary parameters
@@ -6342,16 +6326,7 @@ class Sdk:
 
         time_start = time.perf_counter()
         error = self.SC2_Cam.PCO_GetSegmentImageSettings(
-            self.camera_handle,
-            wSegment,
-            wXRes,
-            wYRes,
-            wBinHorz,
-            wBinVert,
-            wRoiX0,
-            wRoiY0,
-            wRoiX1,
-            wRoiY1,
+            self.camera_handle, wSegment, wXRes, wYRes, wBinHorz, wBinVert, wRoiX0, wRoiY0, wRoiX1, wRoiY1
         )
         duration = time.perf_counter() - time_start
         error_msg = self.get_error_text(error)
@@ -6644,6 +6619,7 @@ class Sdk:
     # 2.13.2 PCO_GetCmosLineTiming                                   (pco.edge)
     # -------------------------------------------------------------------------
     def get_cmos_line_timing(self):
+
         wParameter = C.c_uint16()
         wTimebase = C.c_uint16()
         dwLineTime = C.c_uint32()
@@ -6757,6 +6733,7 @@ class Sdk:
     # 2.13.5 PCO_SetCmosLineExposureDelay                            (pco.edge)
     # -------------------------------------------------------------------------
     def set_cmos_line_exposure_delay(self, lines_exposure, lines_delay):
+
         dwExposureLines = C.c_uint32(lines_exposure)
         dwDelayLines = C.c_uint32(lines_delay)
         dwReserved = C.c_uint32()
@@ -6996,12 +6973,7 @@ class Sdk:
 
         time_start = time.perf_counter()
         error = self.SC2_Cam.PCO_GetBatteryStatus(
-            self.camera_handle,
-            wBatteryType,
-            wBatteryLevel,
-            wPowerStatus,
-            wReserved,
-            wNumReserved,
+            self.camera_handle, wBatteryType, wBatteryLevel, wPowerStatus, wReserved, wNumReserved
         )
         duration = time.perf_counter() - time_start
         error_msg = self.get_error_text(error)
@@ -7033,27 +7005,13 @@ class Sdk:
     # 2.15.3 PCO_PlayImagesFromSegmentHDSDI              (pco.dimax with HDSDI)
 
     def play_images_from_segment_hdsdi(
-        self,
-        segment_index,
-        interface,
-        mode,
-        speed,
-        range_low,
-        range_high,
-        start_pos=-1,
-        repeat_last_image=True,
+        self, segment_index, interface, mode, speed, range_low, range_high, start_pos=-1, repeat_last_image=True
     ):
         """
         Sets the actual play conditions for the HDSDI interface.
         """
 
-        play_modes = {
-            "stop play": 0,
-            "fast forward": 1,
-            "fast rewind": 2,
-            "slow forward": 3,
-            "slow rewind": 4,
-        }
+        play_modes = {"stop play": 0, "fast forward": 1, "fast rewind": 2, "slow forward": 3, "slow rewind": 4}
 
         wSegment = C.c_uint16(segment_index)
         wInterface = C.c_uint16(interface)
@@ -7068,14 +7026,7 @@ class Sdk:
 
         time_start = time.perf_counter()
         error = self.SC2_Cam.PCO_PlayImagesFromSegmentHDSDI(
-            self.camera_handle,
-            wSegment,
-            wInterface,
-            wMode,
-            wSpeed,
-            dwRangeLow,
-            dwRangeHigh,
-            dwStartPos,
+            self.camera_handle, wSegment, wInterface, wMode, wSpeed, dwRangeLow, dwRangeHigh, dwStartPos
         )
         duration = time.perf_counter() - time_start
         error_msg = self.get_error_text(error)
@@ -7295,12 +7246,7 @@ class Sdk:
         error_msg = self.get_error_text(error)
 
         inp = {}
-        inp.update(
-            {
-                "source select mode": source_select_mode,
-                "output waveform mode": output_waveform_mode,
-            }
-        )
+        inp.update({"source select mode": source_select_mode, "output waveform mode": output_waveform_mode})
 
         logger.info("[{:5.3f} s] [sdk] {}: {}".format(duration, sys._getframe().f_code.co_name, error_msg))
 
@@ -7923,12 +7869,7 @@ class Sdk:
 
         time_start = time.perf_counter()
         error = self.SC2_Cam.PCO_GetIntensifiedMCP(
-            self.camera_handle,
-            wIntensifiedVoltage,
-            wReserved,
-            dwIntensifiedPhosphorDecay_us,
-            dwReserved1,
-            dwReserved2,
+            self.camera_handle, wIntensifiedVoltage, wReserved, dwIntensifiedPhosphorDecay_us, dwReserved1, dwReserved2
         )
         duration = time.perf_counter() - time_start
         error_msg = self.get_error_text(error)

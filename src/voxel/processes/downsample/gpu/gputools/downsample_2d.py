@@ -24,10 +24,10 @@ class GPUToolsDownSample2D(BaseDownSample):
           int j = get_global_id(1);
           int Nx = get_global_size(0);
           int Ny = get_global_size(1);
-          int res = 0;
+          int res = 0; 
 
-          for (int m = 0; m < BLOCK; ++m)
-             for (int n = 0; n < BLOCK; ++n)
+          for (int m = 0; m < BLOCK; ++m) 
+             for (int n = 0; n < BLOCK; ++n) 
                   res+=input[BLOCK*Nx*(BLOCK*j+m)+BLOCK*i+n];
           output[Nx*j+i] = (short)(res/BLOCK/BLOCK);
         }

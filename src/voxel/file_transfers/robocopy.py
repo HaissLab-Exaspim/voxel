@@ -2,9 +2,9 @@ import os
 import shutil
 import time
 from pathlib import Path
-from voxel.descriptors.deliminated_property import DeliminatedProperty
 from subprocess import DEVNULL, Popen
 
+from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.file_transfers.base import BaseFileTransfer
 
 
@@ -170,8 +170,6 @@ class RobocopyFileTransfer(BaseFileTransfer):
                             os.remove(local_file_path)
                     else:
                         raise ValueError(f"{local_file_path} is not a file or directory.")
-                    # TODO REMOVE
-                    os.remove(external_file_path)
                 end_time = time.time()
                 total_time = end_time - start_time
                 self.log.info(f"{self.filename} transfer complete, total time: {total_time:.2f} [s]")

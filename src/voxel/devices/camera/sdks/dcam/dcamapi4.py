@@ -70,7 +70,9 @@ class DCAMERR(IntEnum):
     NOPROPERTY = -2147481560  # 0x80000828, there is no altenative or influence id, or no more property id
     INVALIDCHANNEL = -2147481559  # 0x80000829, the property id specifies channel but channel is invalid
     INVALIDVIEW = -2147481558  # 0x8000082a, the property id specifies channel but channel is invalid
-    INVALIDSUBARRAY = -2147481557  # 0x8000082b, the combination of subarray values are invalid. e.g. DCAM_IDPROP_SUBARRAYHPOS + DCAM_IDPROP_SUBARRAYHSIZE is greater than the number of horizontal pixel of sensor.
+    INVALIDSUBARRAY = (
+        -2147481557
+    )  # 0x8000082b, the combination of subarray values are invalid. e.g. DCAM_IDPROP_SUBARRAYHPOS + DCAM_IDPROP_SUBARRAYHSIZE is greater than the number of horizontal pixel of sensor.
     ACCESSDENY = -2147481556  # 0x8000082c, the property cannot access during this DCAM STATUS
     NOVALUETEXT = -2147481555  # 0x8000082d, the property does not have value text
     WRONGPROPERTYVALUE = -2147481554  # 0x8000082e, at least one property value is wrong
@@ -89,7 +91,9 @@ class DCAMERR(IntEnum):
         -2147481541
     )  # 0x8000083b, the frame count is larger than device momory size on using device memory.
     REQUIREDSNAP = -2147481540  # 0x8000083c, the capture mode is sequence on using device memory.
-    LESSSYSTEMMEMORY = -2147481537  # 0x8000083f, the sysmte memory size is too small. PC doesn't have enough memory or is limited memory by 32bit OS.
+    LESSSYSTEMMEMORY = (
+        -2147481537
+    )  # 0x8000083f, the sysmte memory size is too small. PC doesn't have enough memory or is limited memory by 32bit OS.
     NOTSUPPORT = -2147479805  # 0x80000f03, camera does not support the function or property with current settings
     # camera or bus trouble
     FAILREADCAMERA = -2097147902  # 0x83001002, failed to read data from camera
@@ -555,12 +559,7 @@ class DCAMDEV_OPEN(Structure):
 
 class DCAMDEV_STRING(Structure):
     _pack_ = 8
-    _fields_ = [
-        ("size", c_int32),
-        ("iString", c_int32),
-        ("text", c_char_p),
-        ("textbytes", c_int32),
-    ]
+    _fields_ = [("size", c_int32), ("iString", c_int32), ("text", c_char_p), ("textbytes", c_int32)]
 
     def __init__(self):
         self.size = sizeof(DCAMDEV_STRING)
@@ -653,6 +652,7 @@ class DCAMPROP_UNIT(IntEnum):
 
 
 class DCAMPROP:
+
     class SENSORMODE(IntEnum):
         AREA = 1
         LINE = 3
@@ -1160,12 +1160,7 @@ class DCAM_TIMESTAMP(Structure):
 
 class DCAMCAP_TRANSFERINFO(Structure):
     _pack_ = 8
-    _fields_ = [
-        ("size", c_int32),
-        ("iKind", c_int32),
-        ("nNewestFrameIndex", c_int32),
-        ("nFrameCount", c_int32),
-    ]
+    _fields_ = [("size", c_int32), ("iKind", c_int32), ("nNewestFrameIndex", c_int32), ("nFrameCount", c_int32)]
 
     def __init__(self):
         self.size = sizeof(DCAMCAP_TRANSFERINFO)
@@ -1212,12 +1207,7 @@ class DCAMBUF_FRAME(Structure):
 
 class DCAMWAIT_OPEN(Structure):
     _pack_ = 8
-    _fields_ = [
-        ("size", c_int32),
-        ("supportevent", c_int32),
-        ("hwait", c_void_p),
-        ("hdcam", c_void_p),
-    ]  # out  # out
+    _fields_ = [("size", c_int32), ("supportevent", c_int32), ("hwait", c_void_p), ("hdcam", c_void_p)]  # out  # out
 
     def __init__(self):
         self.size = sizeof(DCAMWAIT_OPEN)
@@ -1225,12 +1215,7 @@ class DCAMWAIT_OPEN(Structure):
 
 class DCAMWAIT_START(Structure):
     _pack_ = 8
-    _fields_ = [
-        ("size", c_int32),
-        ("eventhappened", c_int32),
-        ("eventmask", c_int32),
-        ("timeout", c_int32),
-    ]  # out
+    _fields_ = [("size", c_int32), ("eventhappened", c_int32), ("eventmask", c_int32), ("timeout", c_int32)]  # out
 
     def __init__(self):
         self.size = sizeof(DCAMWAIT_START)

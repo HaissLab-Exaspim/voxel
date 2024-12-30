@@ -2,6 +2,7 @@ import inspect
 
 
 class BaseAOTF:
+
     def enable_all(self):
         self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
         pass
