@@ -1,5 +1,6 @@
 from oxxius_laser import LCX
 from serial import Serial
+from typing import Union, Dict
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.devices.laser.base import BaseLaser
@@ -10,7 +11,7 @@ class OxxiusLCXLaser(BaseLaser):
     OxxiusLCXLaser class for handling Oxxius LCX laser devices.
     """
 
-    def __init__(self, id: str, wavelength: int, port: Serial or str, prefix: str):
+    def __init__(self, id: str, wavelength: int, port: Union[Serial, str], prefix: str) -> None:
         """
         Initialize the OxxiusLCXLaser object.
 
@@ -28,13 +29,13 @@ class OxxiusLCXLaser(BaseLaser):
         self._inst = LCX(port, self._prefix)
         self._wavelength = wavelength
 
-    def enable(self):
+    def enable(self) -> None:
         """
         Enable the laser.
         """
         self._inst.enable()
 
-    def disable(self):
+    def disable(self) -> None:
         """
         Disable the laser.
         """
@@ -51,7 +52,7 @@ class OxxiusLCXLaser(BaseLaser):
         return self._wavelength
 
     @DeliminatedProperty(minimum=0, maximum=lambda self: self._inst.max_power)
-    def power_setpoint_mw(self):
+    def power_setpoint_mw(self) -> float:
         """
         Get the power setpoint in milliwatts.
 
@@ -61,7 +62,7 @@ class OxxiusLCXLaser(BaseLaser):
         return float(self._inst.power_setpoint)
 
     @power_setpoint_mw.setter
-    def power_setpoint_mw(self, value: float | int):
+    def power_setpoint_mw(self, value: Union[float, int]) -> None:
         """
         Set the power setpoint in milliwatts.
 
@@ -90,7 +91,7 @@ class OxxiusLCXLaser(BaseLaser):
         """
         return self._inst.temperature
 
-    def status(self):
+    def status(self) -> Dict[str, Union[str, float]]:
         """
         Get the status of the laser.
 
@@ -99,7 +100,7 @@ class OxxiusLCXLaser(BaseLaser):
         """
         return self._inst.get_system_status()
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the laser connection.
         """

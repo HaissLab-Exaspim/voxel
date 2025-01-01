@@ -21,7 +21,7 @@ class TigerControllerSingleton(TigerController, metaclass=Singleton):
     :type metaclass: type
     """
 
-    def __init__(self, com_port):
+    def __init__(self, com_port: str) -> None:
         """
         Initialize the TigerControllerSingleton object.
 
@@ -36,7 +36,7 @@ class FilterWheel(BaseFilterWheel):
     FilterWheel class for handling ASI filter wheel devices.
     """
 
-    def __init__(self, tigerbox: TigerController, id, filters: dict):
+    def __init__(self, tigerbox: TigerController, id: str, filters: dict) -> None:
         """
         Initialize the FilterWheel object.
 
@@ -57,7 +57,7 @@ class FilterWheel(BaseFilterWheel):
         self._filter = 0
 
     @property
-    def filter(self):
+    def filter(self) -> str:
         """
         Get the current filter.
 
@@ -67,7 +67,7 @@ class FilterWheel(BaseFilterWheel):
         return self._filter
 
     @filter.setter
-    def filter(self, filter_name: str):
+    def filter(self, filter_name: str) -> None:
         """
         Set the current filter.
 
@@ -83,7 +83,7 @@ class FilterWheel(BaseFilterWheel):
         # TODO: add "busy" check because tigerbox.is_moving() doesn't apply to filter wheels.
         time.sleep(SWITCH_TIME_S)
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the filter wheel device.
         """

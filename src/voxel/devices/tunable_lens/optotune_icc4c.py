@@ -1,4 +1,5 @@
 import logging
+from typing import List
 
 import optoICC
 from optoKummenberg.tools.definitions import UnitType
@@ -39,7 +40,7 @@ class TunableLens(BaseTunableLens):
     TunableLens class for handling Optotune ICC-4C tunable lens devices.
     """
 
-    def __init__(self, port: str, channel: int):
+    def __init__(self, port: str, channel: int) -> None:
         """
         Initialize the TunableLens object.
 
@@ -60,7 +61,7 @@ class TunableLens(BaseTunableLens):
         self.tunable_lens.Analog.SetLUTtype(LUT_MODES["current"])  # default to current mode
 
     @property
-    def channel(self):
+    def channel(self) -> int:
         """
         Get the channel number.
 
@@ -70,7 +71,7 @@ class TunableLens(BaseTunableLens):
         return self._channel
 
     @property
-    def mode(self):
+    def mode(self) -> str:
         """
         Get the mode of the tunable lens.
 
@@ -80,7 +81,7 @@ class TunableLens(BaseTunableLens):
         return self._mode
 
     @mode.setter
-    def mode(self, mode: str):
+    def mode(self, mode: str) -> None:
         """
         Set the mode of the tunable lens.
 
@@ -97,7 +98,7 @@ class TunableLens(BaseTunableLens):
             raise ValueError(f"{mode} must be {MODES}")
 
     @property
-    def temperature_c(self):
+    def temperature_c(self) -> float:
         """
         Get the temperature of the tunable lens in Celsius.
 
@@ -108,7 +109,7 @@ class TunableLens(BaseTunableLens):
         return temperature
 
     @property
-    def lut_voltages(self):
+    def lut_voltages(self) -> List[float]:
         """
         Get the LUT voltages.
 
@@ -119,7 +120,7 @@ class TunableLens(BaseTunableLens):
         return values_volts
 
     @lut_voltages.setter
-    def lut_voltages(self, values_volts: list):
+    def lut_voltages(self, values_volts: List[float]) -> None:
         """
         Set the LUT voltages.
 
@@ -130,7 +131,7 @@ class TunableLens(BaseTunableLens):
         self.tunable_lens.Analog.SetLUTvoltages(values_volts)
 
     @property
-    def lut_values(self):
+    def lut_values(self) -> List[float]:
         """
         Get the LUT values.
 
@@ -141,7 +142,7 @@ class TunableLens(BaseTunableLens):
         return values_mA
 
     @lut_values.setter
-    def lut_values(self, values: list):
+    def lut_values(self, values: List[float]) -> None:
         """
         Set the LUT values.
 
@@ -153,7 +154,7 @@ class TunableLens(BaseTunableLens):
         self.tunable_lens.Analog.SetLUTvalues(values)
 
     @property
-    def lut_mode(self):
+    def lut_mode(self) -> str:
         """
         Get the LUT mode.
 
@@ -164,7 +165,7 @@ class TunableLens(BaseTunableLens):
         return next(key for key, value in LUT_MODES.items() if value == lut_mode)
 
     @lut_mode.setter
-    def lut_mode(self, lut_mode: str):
+    def lut_mode(self, lut_mode: str) -> None:
         """
         Set the LUT mode.
 
@@ -174,7 +175,7 @@ class TunableLens(BaseTunableLens):
         self.log.info(f"setting lut mode to {lut_mode}")
         self.tunable_lens.Analog.SetLUTtype(LUT_MODES[lut_mode])
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the tunable lens device.
         """

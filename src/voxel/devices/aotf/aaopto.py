@@ -3,6 +3,7 @@ import logging
 from aaopto_aotf import MPDS
 from aaopto_aotf.device_codes import *
 
+from voxel.devices.aotf.base import BaseAOTF
 from voxel.devices.utils.singleton import Singleton
 
 BLANKING_MODES = {
@@ -22,7 +23,7 @@ class MPDSSingleton(MPDS, metaclass=Singleton):
     Singleton wrapper around the MPDS class.
     """
 
-    def __init__(self, com_port):
+    def __init__(self, com_port: str) -> None:
         """
         Initialize the MPDSSingleton class.
 
@@ -37,7 +38,7 @@ class AOTF(BaseAOTF):
     Class for controlling an Acousto-Optic Tunable Filter (AOTF).
     """
 
-    def __init__(self, port: str):
+    def __init__(self, port: str) -> None:
         """
         Initialize the AOTF class.
 
@@ -48,14 +49,14 @@ class AOTF(BaseAOTF):
         self.aotf = MPDSSingleton(com_port=port)
         self.id = self.aotf.get_product_id()
 
-    def enable_all(self):
+    def enable_all(self) -> None:
         """
         Enable all channels of the AOTF.
         """
         for channel in range(self.aotf.num_channels):
             self.enable_channel(channel)
 
-    def disable_all(self):
+    def disable_all(self) -> None:
         """
         Disable all channels of the AOTF.
         """
@@ -63,7 +64,7 @@ class AOTF(BaseAOTF):
             self.disable_channel(channel)
 
     @property
-    def frequency_hz(self):
+    def frequency_hz(self) -> dict:
         """
         Get the frequency in Hz for each channel.
 
@@ -76,21 +77,19 @@ class AOTF(BaseAOTF):
         return frequency_hz
 
     @frequency_hz.setter
-    def frequency_hz(self, channel: int, frequency_hz: dict):
+    def frequency_hz(self, frequency_hz: dict) -> None:
         """
         Set the frequency in Hz for a specific channel.
 
-        :param channel: The channel number.
-        :type channel: int
         :param frequency_hz: A dictionary with channel numbers as keys and frequencies as values.
         :type frequency_hz: dict
         """
-        for key in frequency_hz:
-            self.aotf.set_frequency(channel=channel, frequency=frequency_hz[key])
+        for channel, freq in frequency_hz.items():
+            self.aotf.set_frequency(channel=channel, frequency=freq)
         self.aotf.save_profile()
 
     @property
-    def power_dbm(self):
+    def power_dbm(self) -> dict:
         """
         Get the power in dBm for each channel.
 
@@ -103,21 +102,19 @@ class AOTF(BaseAOTF):
         return power_dbm
 
     @power_dbm.setter
-    def power_dbm(self, channel: int, power_dbm: dict):
+    def power_dbm(self, power_dbm: dict) -> None:
         """
         Set the power in dBm for a specific channel.
 
-        :param channel: The channel number.
-        :type channel: int
         :param power_dbm: A dictionary with channel numbers as keys and power levels as values.
         :type power_dbm: dict
         """
-        for key in power_dbm:
-            self.aotf.set_frequency(channel=channel, frequency=power_dbm[key])
+        for channel, power in power_dbm.items():
+            self.aotf.set_power_dbm(channel=channel, power=power)
         self.aotf.save_profile()
 
     @property
-    def blanking_mode(self):
+    def blanking_mode(self) -> str:
         """
         Get the current blanking mode.
 
@@ -129,7 +126,7 @@ class AOTF(BaseAOTF):
         return converted_mode
 
     @blanking_mode.setter
-    def blanking_mode(self, mode: str):
+    def blanking_mode(self, mode: str) -> None:
         """
         Set the blanking mode.
 
@@ -143,7 +140,7 @@ class AOTF(BaseAOTF):
         self.aotf.set_blanking_mode(BLANKING_MODES[mode])
 
     @property
-    def input_mode(self):
+    def input_mode(self) -> dict:
         """
         Get the current input mode for each channel.
 
@@ -153,11 +150,10 @@ class AOTF(BaseAOTF):
         modes = dict()
         for channel in range(self.aotf.num_channels):
             modes[channel] = self.aotf.get_channel_input_mode(channel)
-        converted_mode = next(key for key, enum in INPUT_MODES.items() if enum.value == mode)
-        return converted_mode
+        return modes
 
     @input_mode.setter
-    def input_mode(self, modes: dict):
+    def input_mode(self, modes: dict) -> None:
         """
         Set the input mode for each channel.
 
@@ -170,5 +166,5 @@ class AOTF(BaseAOTF):
             if modes[key] not in valid:
                 raise ValueError("input mode must be one of %r." % valid)
 
-        for key in modes:
+        for key, mode in modes.items():
             self.aotf.set_channel_input_mode(channel=key, mode=INPUT_MODES[mode])

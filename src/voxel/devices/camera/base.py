@@ -1,6 +1,6 @@
 from abc import abstractmethod
-
-from ..base import VoxelDevice
+import numpy as np
+from voxel.devices.base import VoxelDevice
 
 
 class BaseCamera(VoxelDevice):
@@ -10,7 +10,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def exposure_time_ms(self):
+    def exposure_time_ms(self) -> int:
         """
         Get the exposure time in milliseconds.
 
@@ -21,7 +21,7 @@ class BaseCamera(VoxelDevice):
 
     @exposure_time_ms.setter
     @abstractmethod
-    def exposure_time_ms(self, value):
+    def exposure_time_ms(self, value: int) -> None:
         """
         Set the exposure time in milliseconds.
 
@@ -32,7 +32,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def width_px(self):
+    def width_px(self) -> int:
         """
         Get the width in pixels.
 
@@ -43,7 +43,7 @@ class BaseCamera(VoxelDevice):
 
     @width_px.setter
     @abstractmethod
-    def width_px(self, value):
+    def width_px(self, value: int) -> None:
         """
         Set the width in pixels.
 
@@ -54,7 +54,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def width_offset_px(self):
+    def width_offset_px(self) -> int:
         """
         Get the width offset in pixels.
 
@@ -65,7 +65,7 @@ class BaseCamera(VoxelDevice):
 
     @width_offset_px.setter
     @abstractmethod
-    def width_offset_px(self, value):
+    def width_offset_px(self, value: int) -> None:
         """
         Set the width offset in pixels.
 
@@ -76,7 +76,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def height_px(self):
+    def height_px(self) -> int:
         """
         Get the height in pixels.
 
@@ -87,7 +87,7 @@ class BaseCamera(VoxelDevice):
 
     @height_px.setter
     @abstractmethod
-    def height_px(self, value):
+    def height_px(self, value: int) -> None:
         """
         Set the height in pixels.
 
@@ -98,7 +98,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def height_offset_px(self):
+    def height_offset_px(self) -> int:
         """
         Get the height offset in pixels.
 
@@ -109,7 +109,7 @@ class BaseCamera(VoxelDevice):
 
     @height_offset_px.setter
     @abstractmethod
-    def height_offset_px(self, value):
+    def height_offset_px(self, value: int) -> None:
         """
         Set the height offset in pixels.
 
@@ -120,7 +120,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def pixel_type(self):
+    def pixel_type(self) -> str:
         """
         Get the pixel type.
 
@@ -131,7 +131,7 @@ class BaseCamera(VoxelDevice):
 
     @pixel_type.setter
     @abstractmethod
-    def pixel_type(self, value):
+    def pixel_type(self, value: str) -> None:
         """
         Set the pixel type.
 
@@ -142,7 +142,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def bit_packing_mode(self):
+    def bit_packing_mode(self) -> str:
         """
         Get the bit packing mode.
 
@@ -153,7 +153,7 @@ class BaseCamera(VoxelDevice):
 
     @bit_packing_mode.setter
     @abstractmethod
-    def bit_packing_mode(self, value):
+    def bit_packing_mode(self, value: str) -> None:
         """
         Set the bit packing mode.
 
@@ -164,7 +164,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def line_interval_us(self):
+    def line_interval_us(self) -> int:
         """
         Get the line interval in microseconds.
 
@@ -175,7 +175,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def trigger(self):
+    def trigger(self) -> str:
         """
         Get the trigger mode.
 
@@ -186,7 +186,7 @@ class BaseCamera(VoxelDevice):
 
     @trigger.setter
     @abstractmethod
-    def trigger(self, value):
+    def trigger(self, value: str) -> None:
         """
         Set the trigger mode.
 
@@ -197,7 +197,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def binning(self):
+    def binning(self) -> str:
         """
         Get the binning mode.
 
@@ -208,7 +208,7 @@ class BaseCamera(VoxelDevice):
 
     @binning.setter
     @abstractmethod
-    def binning(self, value):
+    def binning(self, value: str) -> None:
         """
         Set the binning mode.
 
@@ -219,7 +219,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def sensor_width_px(self):
+    def sensor_width_px(self) -> int:
         """
         Get the sensor width in pixels.
 
@@ -230,7 +230,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def sensor_height_px(self):
+    def sensor_height_px(self) -> int:
         """
         Get the sensor height in pixels.
 
@@ -241,7 +241,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def frame_time_ms(self):
+    def frame_time_ms(self) -> int:
         """
         Get the frame time in milliseconds.
 
@@ -252,7 +252,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def mainboard_temperature_c(self):
+    def mainboard_temperature_c(self) -> float:
         """
         Get the mainboard temperature in Celsius.
 
@@ -263,7 +263,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def sensor_temperature_c(self):
+    def sensor_temperature_c(self) -> float:
         """
         Get the sensor temperature in Celsius.
 
@@ -274,7 +274,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def readout_mode(self):
+    def readout_mode(self) -> str:
         """
         Get the readout mode.
 
@@ -285,7 +285,7 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def latest_frame(self):
+    def latest_frame(self) -> np.ndarray:
         """
         Get the latest frame.
 
@@ -294,43 +294,98 @@ class BaseCamera(VoxelDevice):
         """
         pass
 
+    @property
     @abstractmethod
-    def reset(self):
+    def image_width_px(self) -> int:
+        """
+        Get the image width in pixels.
+
+        :return: The image width in pixels.
+        :rtype: int
+        """
+        return self.width_px // self.binning
+
+    @property
+    @abstractmethod
+    def image_height_px(self) -> int:
+        """
+        Get the image height in pixels.
+
+        :return: The image height in pixels.
+        :rtype: int
+        """
+        return self.height_px // self.binning
+
+    @property
+    @abstractmethod
+    def um_px(self) -> float:
+        """
+        Get the sampling in micrometers per pixel.
+
+        :return: The sampling in micrometers per pixel.
+        :rtype: float
+        """
+        return self._um_px
+
+    @abstractmethod
+    @ um_px.setter
+    def um_px(self, value: float) -> None:
+        """
+        Set the sampling in micrometers per pixel.
+
+        :param value: The sampling in micrometers per pixel.
+        :type value: float
+        """
+        self._um_px = value
+
+    @property
+    @abstractmethod
+    def sampling_um_px(self) -> float:
+        """
+        Get the sampling in micrometers per pixel.
+
+        :return: The sampling in micrometers per pixel.
+        :rtype: float
+        """
+        return self._um_px * self.binning
+
+    @abstractmethod
+    def reset(self) -> None:
         """
         Reset the camera.
         """
         pass
 
     @abstractmethod
-    def prepare(self):
+    def prepare(self) -> None:
         """
         Prepare the camera for acquisition.
         """
         pass
 
     @abstractmethod
-    def start(self):
+    def start(self) -> None:
         """
         Start the camera acquisition.
         """
         pass
 
     @abstractmethod
-    def stop(self):
+    def stop(self) -> None:
         """
         Stop the camera acquisition.
         """
         pass
 
     @abstractmethod
-    def close(self):
+    def close(self) -> None:
         """
         Close the camera and release resources.
         """
         pass
 
     @abstractmethod
-    def grab_frame(self):
+    def grab_frame(self) -> np.ndarray:
         """
         Grab a frame from the camera.
 
@@ -340,21 +395,21 @@ class BaseCamera(VoxelDevice):
         pass
 
     @abstractmethod
-    def signal_acquisition_state(self):
+    def signal_acquisition_state(self) -> None:
         """
         Signal the acquisition state of the camera.
         """
         pass
 
     @abstractmethod
-    def log_metadata(self):
+    def log_metadata(self) -> None:
         """
         Log the metadata of the camera.
         """
         pass
 
     @abstractmethod
-    def abort(self):
+    def abort(self) -> None:
         """
         Abort the camera acquisition.
         """

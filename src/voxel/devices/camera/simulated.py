@@ -2,6 +2,7 @@ import logging
 import time
 import multiprocessing
 from multiprocessing import Event, Process, Queue, Value
+from typing import Dict, Any
 
 import numpy
 
@@ -51,7 +52,7 @@ class Camera(BaseCamera):
     :rtype: Camera
     """
 
-    def __init__(self, id):
+    def __init__(self, id: str) -> None:
         """Initialize the Camera instance.
 
         :param id: Identifier for the camera
@@ -77,7 +78,7 @@ class Camera(BaseCamera):
         self._buffer = Queue()
 
     @DeliminatedProperty(minimum=MIN_EXPOSURE_TIME_MS, maximum=MAX_EXPOSURE_TIME_MS, step=0.001)
-    def exposure_time_ms(self):
+    def exposure_time_ms(self) -> float:
         """Get the exposure time in milliseconds.
 
         :return: Exposure time in milliseconds
@@ -86,7 +87,7 @@ class Camera(BaseCamera):
         return self._exposure_time_ms
 
     @exposure_time_ms.setter
-    def exposure_time_ms(self, exposure_time_ms: float):
+    def exposure_time_ms(self, exposure_time_ms: float) -> None:
         """Set the exposure time in milliseconds.
 
         :param exposure_time_ms: Exposure time in milliseconds
@@ -103,7 +104,7 @@ class Camera(BaseCamera):
         self.log.info(f"exposure time set to: {exposure_time_ms} ms")
 
     @DeliminatedProperty(minimum=MIN_WIDTH_PX, maximum=MAX_WIDTH_PX, step=DIVISIBLE_WIDTH_PX)
-    def width_px(self):
+    def width_px(self) -> int:
         """Get the width in pixels.
 
         :return: Width in pixels
@@ -112,7 +113,7 @@ class Camera(BaseCamera):
         return self._width_px
 
     @width_px.setter
-    def width_px(self, value: int):
+    def width_px(self, value: int) -> None:
         """Set the width in pixels.
 
         :param value: Width in pixels
@@ -122,7 +123,7 @@ class Camera(BaseCamera):
         self.log.info(f"width set to: {value} px")
 
     @DeliminatedProperty(minimum=MIN_WIDTH_PX, maximum=MAX_WIDTH_PX, step=DIVISIBLE_WIDTH_PX)
-    def width_offset_px(self):
+    def width_offset_px(self) -> int:
         """Get the width offset in pixels.
 
         :return: Width offset in pixels
@@ -131,7 +132,7 @@ class Camera(BaseCamera):
         return self._width_offset_px
 
     @width_offset_px.setter
-    def width_offset_px(self, value: int):
+    def width_offset_px(self, value: int) -> None:
         """Set the width offset in pixels.
 
         :param value: Width offset in pixels
@@ -145,7 +146,7 @@ class Camera(BaseCamera):
         self.log.info(f"width offset set to: {value} px")
 
     @DeliminatedProperty(minimum=MIN_HEIGHT_PX, maximum=MAX_HEIGHT_PX, step=DIVISIBLE_HEIGHT_PX)
-    def height_px(self):
+    def height_px(self) -> int:
         """Get the height in pixels.
 
         :return: Height in pixels
@@ -154,7 +155,7 @@ class Camera(BaseCamera):
         return self._height_px
 
     @height_px.setter
-    def height_px(self, value: int):
+    def height_px(self, value: int) -> None:
         """Set the height in pixels.
 
         :param value: Height in pixels
@@ -164,7 +165,7 @@ class Camera(BaseCamera):
         self.log.info(f"height set to: {value} px")
 
     @DeliminatedProperty(minimum=MIN_HEIGHT_PX, maximum=MAX_HEIGHT_PX, step=DIVISIBLE_HEIGHT_PX)
-    def height_offset_px(self):
+    def height_offset_px(self) -> int:
         """Get the height offset in pixels.
 
         :return: Height offset in pixels
@@ -173,7 +174,7 @@ class Camera(BaseCamera):
         return self._height_offset_px
 
     @height_offset_px.setter
-    def height_offset_px(self, value: int):
+    def height_offset_px(self, value: int) -> None:
         """Set the height offset in pixels.
 
         :param value: Height offset in pixels
@@ -189,7 +190,7 @@ class Camera(BaseCamera):
         self.log.info(f"height offset set to: {value} px")
 
     @property
-    def trigger(self):
+    def trigger(self) -> Dict[str, str]:
         """Get the trigger settings.
 
         :return: Trigger settings
@@ -198,7 +199,7 @@ class Camera(BaseCamera):
         return self._trigger
 
     @trigger.setter
-    def trigger(self, trigger: dict):
+    def trigger(self, trigger: Dict[str, str]) -> None:
         """Set the trigger settings.
 
         :param trigger: Trigger settings
@@ -221,7 +222,7 @@ class Camera(BaseCamera):
         self._trigger = dict(trigger)
 
     @property
-    def binning(self):
+    def binning(self) -> int:
         """Get the binning value.
 
         :return: Binning value
@@ -230,7 +231,7 @@ class Camera(BaseCamera):
         return self._binning
 
     @binning.setter
-    def binning(self, binning: int):
+    def binning(self, binning: int) -> None:
         """Set the binning value.
 
         :param binning: Binning value
@@ -246,7 +247,7 @@ class Camera(BaseCamera):
             self.gpu_binning = GPUToolsDownSample2D(binning=self._binning)
 
     @property
-    def pixel_type(self):
+    def pixel_type(self) -> str:
         """Get the pixel type.
 
         :return: Pixel type
@@ -257,7 +258,7 @@ class Camera(BaseCamera):
         return next(key for key, value in PIXEL_TYPES.items() if value == pixel_type)
 
     @pixel_type.setter
-    def pixel_type(self, pixel_type_bits: str):
+    def pixel_type(self, pixel_type_bits: str) -> None:
         """Set the pixel type.
 
         :param pixel_type_bits: Pixel type bits
@@ -273,7 +274,7 @@ class Camera(BaseCamera):
         self.log.info(f"pixel type set_to: {pixel_type_bits}")
 
     @property
-    def line_interval_us(self):
+    def line_interval_us(self) -> float:
         """Get the line interval in microseconds.
 
         :return: Line interval in microseconds
@@ -282,7 +283,7 @@ class Camera(BaseCamera):
         return self._line_interval_us
 
     @property
-    def sensor_width_px(self):
+    def sensor_width_px(self) -> int:
         """Get the sensor width in pixels.
 
         :return: Sensor width in pixels
@@ -291,7 +292,7 @@ class Camera(BaseCamera):
         return MAX_WIDTH_PX
 
     @property
-    def sensor_height_px(self):
+    def sensor_height_px(self) -> int:
         """Get the sensor height in pixels.
 
         :return: Sensor height in pixels
@@ -300,7 +301,7 @@ class Camera(BaseCamera):
         return MAX_HEIGHT_PX
 
     @property
-    def frame_time_ms(self):
+    def frame_time_ms(self) -> float:
         """Get the frame time in milliseconds.
 
         :return: Frame time in milliseconds
@@ -308,7 +309,7 @@ class Camera(BaseCamera):
         """
         return self._height_px * self._line_interval_us / 1000 + self._exposure_time_ms
 
-    def prepare(self, frame_count: int):
+    def prepare(self, frame_count: int) -> None:
         """Prepare the camera for capturing frames.
 
         :param frame_count: Number of frames to capture
@@ -320,16 +321,16 @@ class Camera(BaseCamera):
             frame_count, self._width_px, self._height_px, self._pixel_type, self.frame_time_ms
         )
 
-    def start(self):
+    def start(self) -> None:
         """Start capturing frames."""
         self._frame_generator.start()
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop capturing frames."""
         self.log.info("simulated camera stopping...")
         self._frame_generator.stop()
 
-    def grab_frame(self):
+    def grab_frame(self) -> numpy.ndarray:
         """Grab the latest frame.
 
         :return: Latest frame
@@ -342,7 +343,7 @@ class Camera(BaseCamera):
             return image
 
     @property
-    def latest_frame(self):
+    def latest_frame(self) -> numpy.ndarray:
         """Get the latest frame.
 
         :return: Latest frame
@@ -351,7 +352,7 @@ class Camera(BaseCamera):
         # return latest frame from internal queue buffer
         return self._latest_frame
 
-    def signal_acquisition_state(self):
+    def signal_acquisition_state(self) -> Dict[str, Any]:
         """Signal the acquisition state of the camera.
 
         :return: Acquisition state
@@ -374,7 +375,7 @@ class Camera(BaseCamera):
             * self._height_px
             * numpy.dtype(self._pixel_type).itemsize
             / self._binning**2
-            / 1e6
+            / 1024**2
         )
         state["Frame Rate [fps]"] = frame_rate_async
         self.log.info(
@@ -393,7 +394,7 @@ class FrameGenerator:
     """Frame generator class for generating frames."""
 
     # frame generator into separate class due to voxel wrapping and thread locking of device classes
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the FrameGenerator instance."""
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         # multiprocessing shared values
@@ -403,7 +404,7 @@ class FrameGenerator:
         self._buffer = Queue()
 
     @property
-    def frame(self):
+    def frame(self) -> int:
         """Get the current frame index.
 
         :return: Current frame index
@@ -412,7 +413,7 @@ class FrameGenerator:
         return self._frame.value
 
     @property
-    def frame_rate(self):
+    def frame_rate(self) -> float:
         """Get the estimated frame rate.
 
         :return: Estimated frame rate
@@ -421,7 +422,7 @@ class FrameGenerator:
         return self._frame_rate.value
 
     @property
-    def dropped_frames(self):
+    def dropped_frames(self) -> int:
         """Get the number of dropped frames.
 
         :return: Number of dropped frames
@@ -429,7 +430,7 @@ class FrameGenerator:
         """
         return self._dropped_frames.value
 
-    def get_latest_frame(self):
+    def get_latest_frame(self) -> numpy.ndarray:
         """Get the latest frame from the buffer.
 
         :return: Latest frame
@@ -440,7 +441,7 @@ class FrameGenerator:
         image = self._buffer.get()
         return image
 
-    def prepare(self, frame_count, width_px, height_px, pixel_type, frame_time_ms):
+    def prepare(self, frame_count: int, width_px: int, height_px: int, pixel_type: str, frame_time_ms: float) -> None:
         """Prepare the frame generator process.
 
         :param frame_count: Number of frames to generate
@@ -469,11 +470,11 @@ class FrameGenerator:
             ),
         )
 
-    def start(self):
+    def start(self) -> None:
         """Start the frame generator process."""
         self._process.start()
 
-    def stop(self):
+    def stop(self) -> None:
         """Stop the frame generator process."""
         self._process.join()
 
@@ -488,7 +489,7 @@ class FrameGenerator:
         frame: multiprocessing.Value,
         frame_rate: multiprocessing.Value,
         dropped_frames: multiprocessing.Value,
-    ):
+    ) -> None:
         """Run the frame generator process.
 
         :param frame_count: Number of frames to generate

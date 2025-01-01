@@ -1,6 +1,7 @@
 from abc import abstractmethod
+from typing import Tuple
 
-from ..base import VoxelDevice
+from voxel.devices.base import VoxelDevice
 
 
 class BaseStage(VoxelDevice):
@@ -10,7 +11,7 @@ class BaseStage(VoxelDevice):
 
     @property
     @abstractmethod
-    def hardware_axis(self):
+    def hardware_axis(self) -> str:
         """
         Get the hardware axis.
 
@@ -22,7 +23,7 @@ class BaseStage(VoxelDevice):
 
     @property
     @abstractmethod
-    def instrument_axis(self):
+    def instrument_axis(self) -> str:
         """
         Get the instrument axis.
 
@@ -33,7 +34,7 @@ class BaseStage(VoxelDevice):
         pass
 
     @abstractmethod
-    def move_relative_mm(self, position: float, wait: bool = True):
+    def move_relative_mm(self, position: float, wait: bool = True) -> None:
         """
         Move the stage relative to its current position.
 
@@ -45,7 +46,7 @@ class BaseStage(VoxelDevice):
         pass
 
     @abstractmethod
-    def move_absolute_mm(self, position: float, wait: bool = True):
+    def move_absolute_mm(self, position: float, wait: bool = True) -> None:
         """
         Move the stage to an absolute position.
 
@@ -57,7 +58,7 @@ class BaseStage(VoxelDevice):
         pass
 
     @abstractmethod
-    def setup_step_shoot_scan(self, step_size_um: float):
+    def setup_step_shoot_scan(self, step_size_um: float) -> None:
         """
         Setup a step shoot scan.
 
@@ -77,7 +78,7 @@ class BaseStage(VoxelDevice):
         strip_count: int,
         pattern: str,
         retrace_speed_percent: int,
-    ):
+    ) -> None:
         """
         Setup a stage scan.
 
@@ -101,7 +102,7 @@ class BaseStage(VoxelDevice):
         pass
 
     @abstractmethod
-    def start(self):
+    def start(self) -> None:
         """
         Start the stage.
         """
@@ -120,7 +121,7 @@ class BaseStage(VoxelDevice):
 
     @property
     @abstractmethod
-    def limits_mm(self):
+    def limits_mm(self) -> Tuple[float, float]:
         """
         Get the limits of the stage in millimeters.
 
@@ -131,7 +132,7 @@ class BaseStage(VoxelDevice):
 
     @property
     @abstractmethod
-    def backlash_mm(self):
+    def backlash_mm(self) -> float:
         """
         Get the backlash of the stage in millimeters.
 
@@ -142,7 +143,7 @@ class BaseStage(VoxelDevice):
 
     @abstractmethod
     @backlash_mm.setter
-    def backlash_mm(self, backlash: float):
+    def backlash_mm(self, backlash: float) -> None:
         """
         Set the backlash of the stage in millimeters.
 
@@ -153,7 +154,7 @@ class BaseStage(VoxelDevice):
 
     @property
     @abstractmethod
-    def speed_mm_s(self):
+    def speed_mm_s(self) -> float:
         """
         Get the speed of the stage in millimeters per second.
 
@@ -164,7 +165,7 @@ class BaseStage(VoxelDevice):
 
     @abstractmethod
     @speed_mm_s.setter
-    def speed_mm_s(self, speed: float):
+    def speed_mm_s(self, speed: float) -> None:
         """
         Set the speed of the stage in millimeters per second.
 
@@ -175,7 +176,7 @@ class BaseStage(VoxelDevice):
 
     @abstractmethod
     @property
-    def acceleration_ms(self):
+    def acceleration_ms(self) -> float:
         """
         Get the acceleration of the stage in millimeters per second squared.
 
@@ -186,7 +187,7 @@ class BaseStage(VoxelDevice):
 
     @abstractmethod
     @acceleration_ms.setter
-    def acceleration_ms(self, acceleration: float):
+    def acceleration_ms(self, acceleration: float) -> None:
         """
         Set the acceleration of the stage in millimeters per second squared.
 
@@ -197,7 +198,7 @@ class BaseStage(VoxelDevice):
 
     @property
     @abstractmethod
-    def mode(self):
+    def mode(self) -> int:
         """
         Get the mode of the stage.
 
@@ -208,7 +209,7 @@ class BaseStage(VoxelDevice):
 
     @abstractmethod
     @mode.setter
-    def mode(self, mode: int):
+    def mode(self, mode: int) -> None:
         """
         Set the mode of the stage.
 
@@ -219,7 +220,7 @@ class BaseStage(VoxelDevice):
 
     @property
     @abstractmethod
-    def joystick_mapping(self):
+    def joystick_mapping(self) -> str:
         """
         Get the joystick mapping.
 
@@ -230,7 +231,7 @@ class BaseStage(VoxelDevice):
 
     @abstractmethod
     @joystick_mapping.setter
-    def joystick_mapping(self, mapping: str):
+    def joystick_mapping(self, mapping: str) -> None:
         """
         Set the joystick mapping.
 
@@ -241,7 +242,7 @@ class BaseStage(VoxelDevice):
 
     @property
     @abstractmethod
-    def joystick_polarity(self):
+    def joystick_polarity(self) -> str:
         """
         Get the joystick polarity.
 
@@ -252,7 +253,7 @@ class BaseStage(VoxelDevice):
 
     @abstractmethod
     @joystick_polarity.setter
-    def joystick_polarity(self, polarity: str):
+    def joystick_polarity(self, polarity: str) -> None:
         """
         Set the joystick polarity.
 
@@ -262,21 +263,21 @@ class BaseStage(VoxelDevice):
         pass
 
     @abstractmethod
-    def lock_external_user_input(self):
+    def lock_external_user_input(self) -> None:
         """
         Lock external user input.
         """
         pass
 
     @abstractmethod
-    def unlock_external_user_input(self):
+    def unlock_external_user_input(self) -> None:
         """
         Unlock external user input.
         """
         pass
 
     @abstractmethod
-    def is_axis_moving(self):
+    def is_axis_moving(self) -> bool:
         """
         Check if the axis is moving.
 
@@ -286,28 +287,28 @@ class BaseStage(VoxelDevice):
         pass
 
     @abstractmethod
-    def zero_in_place(self):
+    def zero_in_place(self) -> None:
         """
         Zero the stage in place.
         """
         pass
 
     @abstractmethod
-    def log_metadata(self):
+    def log_metadata(self) -> None:
         """
         Log metadata.
         """
         pass
 
     @abstractmethod
-    def halts(self):
+    def halts(self) -> None:
         """
         Halt the stage.
         """
         pass
 
     @abstractmethod
-    def close(self):
+    def close(self) -> None:
         """
         Close the stage.
         """

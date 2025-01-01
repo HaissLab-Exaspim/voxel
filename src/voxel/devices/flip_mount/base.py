@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from ..base import VoxelDevice
+from voxel.devices.base import VoxelDevice
 
 
 class BaseFlipMount(VoxelDevice):
@@ -8,7 +8,7 @@ class BaseFlipMount(VoxelDevice):
     Base class for flip mount devices.
     """
 
-    def __init__(self, id: str):
+    def __init__(self, id: str) -> None:
         """
         Initialize the BaseFlipMount object.
 
@@ -30,7 +30,7 @@ class BaseFlipMount(VoxelDevice):
 
     @position.setter
     @abstractmethod
-    def position(self, position_name: str, wait=False):
+    def position(self, position_name: str, wait: bool = False) -> None:
         """
         Set the flip mount to a specific position.
 
@@ -42,14 +42,14 @@ class BaseFlipMount(VoxelDevice):
         pass
 
     @abstractmethod
-    def toggle(self):
+    def toggle(self) -> None:
         """
         Toggle the flip mount position.
         """
         pass
 
     @abstractmethod
-    def wait(self):
+    def wait(self) -> None:
         """
         Wait for the flip mount to finish flipping.
         """
@@ -68,7 +68,7 @@ class BaseFlipMount(VoxelDevice):
 
     @flip_time_ms.setter
     @abstractmethod
-    def flip_time_ms(self, time_ms: int):
+    def flip_time_ms(self, time_ms: int) -> None:
         """
         Set the time it takes to flip the mount in milliseconds.
 

@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from ..base import VoxelDevice
+from voxel.devices.base import VoxelDevice
 
 
 class BaseTunableLens(VoxelDevice):
@@ -10,7 +10,7 @@ class BaseTunableLens(VoxelDevice):
 
     @property
     @abstractmethod
-    def mode(self):
+    def mode(self) -> str:
         """
         Get the mode of the tunable lens.
 
@@ -21,7 +21,7 @@ class BaseTunableLens(VoxelDevice):
 
     @mode.setter
     @abstractmethod
-    def mode(self, mode: str):
+    def mode(self, mode: str) -> None:
         """
         Set the mode of the tunable lens.
 
@@ -32,7 +32,7 @@ class BaseTunableLens(VoxelDevice):
 
     @property
     @abstractmethod
-    def temperature_c(self):
+    def temperature_c(self) -> float:
         """
         Get the temperature of the tunable lens in Celsius.
 
@@ -42,14 +42,14 @@ class BaseTunableLens(VoxelDevice):
         pass
 
     @abstractmethod
-    def log_metadata(self):
+    def log_metadata(self) -> None:
         """
         Log metadata for the tunable lens.
         """
         pass
 
     @abstractmethod
-    def close(self):
+    def close(self) -> None:
         """
         Close the tunable lens device.
         """

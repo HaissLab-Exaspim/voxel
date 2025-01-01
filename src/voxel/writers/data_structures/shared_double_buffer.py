@@ -1,5 +1,6 @@
 from multiprocessing import Event
 from multiprocessing.shared_memory import SharedMemory
+from typing import Tuple
 
 import numpy as np
 
@@ -28,12 +29,13 @@ class SharedDoubleBuffer:
         dbl_buf.toggle_buffers() # read_buf and write_buf have switched places.
     """
 
-    def __init__(self, shape: tuple, dtype: str):
-        """_summary_
+    def __init__(self, shape: Tuple[int, ...], dtype: str) -> None:
+        """
+        Initialize the SharedDoubleBuffer.
 
-        :param shape: _description_
+        :param shape: Shape of the buffer
         :type shape: tuple
-        :param dtype: _description_
+        :param dtype: Data type of the buffer
         :type dtype: str
         """
         # overflow errors without casting for large datasets
@@ -58,7 +60,7 @@ class SharedDoubleBuffer:
         # initialize buffer index
         self.buffer_index = -1
 
-    def toggle_buffers(self):
+    def toggle_buffers(self) -> None:
         """
         Switch read and write references and the locations of their shared\n
         memory.
@@ -74,17 +76,17 @@ class SharedDoubleBuffer:
         self.read_buf_mem_name = self.write_buf_mem_name
         self.write_buf_mem_name = tmp
 
-    def add_image(self, image: np.array):
+    def add_image(self, image: np.ndarray) -> None:
         """Add an image into the buffer at the correct index."""
         self.write_buf[self.buffer_index + 1] = image
         self.buffer_index += 1
 
-    def get_last_image(self):
+    def get_last_image(self) -> np.ndarray:
         """
         Get the last image from the buffer.
 
         :return: Last image from the buffer
-        :rtype: numpy.array
+        :rtype: numpy.ndarray
         """
         if self.buffer_index == -1:
             # buffer just switched, grab last image from read buffer
@@ -93,12 +95,12 @@ class SharedDoubleBuffer:
             # return the image from the write buffer
             return self.write_buf[self.buffer_index]
 
-    def close_and_unlink(self):
+    def close_and_unlink(self) -> None:
         """Shared memory cleanup; call when done using this object."""
         for mem in self.mem_blocks:
             mem.close()
             mem.unlink()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Cleanup called automatically if opened using a `with` statement."""
         self.close_and_unlink()

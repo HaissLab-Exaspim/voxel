@@ -1,6 +1,7 @@
 from numbers import Number
+from typing import Optional
 
-import numpy
+import numpy as np
 from gputools import OCLArray, OCLProgram
 from gputools.convolve._abspath import abspath
 from gputools.core.ocltypes import cl_buffer_datatype_dict
@@ -18,7 +19,7 @@ class GPUToolsRankDownSample2D(BaseDownSample):
     If rank = size[0] x size[1] x size[2] - 1 (or -1) then the maximum is returned
     """
 
-    def __init__(self, binning: int, rank=None, data_type=None):
+    def __init__(self, binning: int, rank: Optional[int] = None, data_type: Optional[str] = None) -> None:
         """
         Module for handling 2D rank-based downsampling processes.
 
@@ -27,10 +28,9 @@ class GPUToolsRankDownSample2D(BaseDownSample):
         :param rank: The rank for the downsampling process, defaults to None.
         :type rank: int, optional
         :param data_type: The data type for the downsampled output, defaults to None.
-        :type data_type: type, optional
+        :type data_type: str, optional
         :raises ValueError: If the binning factor or rank is not valid.
         """
-
         super().__init__(binning)
 
         self._binning = binning
@@ -39,14 +39,14 @@ class GPUToolsRankDownSample2D(BaseDownSample):
 
         self._rank = rank
         if self._rank is None:
-            self._rank = numpy.prod(self._binning) // 2
+            self._rank = np.prod(self._binning) // 2
         else:
-            self._rank = self._rank % numpy.prod(self._binning)
+            self._rank = self._rank % np.prod(self._binning)
 
         if data_type == "uint8":
-            DTYPE = cl_buffer_datatype_dict[numpy.uint8]
+            DTYPE = cl_buffer_datatype_dict[np.uint8]
         elif data_type == "uint16":
-            DTYPE = cl_buffer_datatype_dict[numpy.uint16]
+            DTYPE = cl_buffer_datatype_dict[np.uint16]
         else:
             raise ValueError("Invalid data type: {}".format(self._data_type))
 
@@ -59,16 +59,15 @@ class GPUToolsRankDownSample2D(BaseDownSample):
 
         self._prog = OCLProgram(src_str=rendered)
 
-    def run(self, image: numpy.array):
+    def run(self, image: np.ndarray) -> np.ndarray:
         """
         Run function for rank order image downsampling.
 
         :param image: Input image
-        :type image: numpy.array
+        :type image: numpy.ndarray
         :return: Downsampled image
-        :rtype: numpy.array
+        :rtype: numpy.ndarray
         """
-
         x_g = OCLArray.from_array(image)
         y_g = OCLArray.empty(tuple(s0 // s for s, s0 in zip(self._binning, x_g.shape)), x_g.dtype)
 
@@ -78,8 +77,8 @@ class GPUToolsRankDownSample2D(BaseDownSample):
             None,
             x_g.data,
             y_g.data,
-            numpy.int32(x_g.shape[1]),
-            numpy.int32(x_g.shape[0]),
-            numpy.int32(self._rank),
+            np.int32(x_g.shape[1]),
+            np.int32(x_g.shape[0]),
+            np.int32(self._rank),
         )
         return y_g.get()

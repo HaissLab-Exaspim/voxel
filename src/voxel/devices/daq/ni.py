@@ -2,11 +2,12 @@ import logging
 import math
 import matplotlib.pyplot as plt
 import nidaqmx
-import numpy
+import numpy as np
 from matplotlib.ticker import AutoMinorLocator
 from nidaqmx.constants import AcquisitionType as AcqType
 from nidaqmx.constants import Edge, FrequencyUnits, Level, Slope, TaskMode, AOIdleOutputBehavior
 from scipy import signal
+from typing import Dict, Optional
 
 from voxel.devices.daq.base import BaseDAQ
 
@@ -31,7 +32,7 @@ RETRIGGERABLE = {"on": True, "off": False}
 class DAQ(BaseDAQ):
     """DAQ class for handling NI DAQ devices."""
 
-    def __init__(self, dev: str):
+    def __init__(self, dev: str) -> None:
         """
         Initialize the DAQ object.
 
@@ -39,10 +40,10 @@ class DAQ(BaseDAQ):
         :type dev: str
         :raises ValueError: If the device name is not found in the system
         """
-        self.do_task = None
-        self.ao_task = None
-        self.co_task = None
-        self._tasks = None
+        self.do_task: Optional[nidaqmx.Task] = None
+        self.ao_task: Optional[nidaqmx.Task] = None
+        self.co_task: Optional[nidaqmx.Task] = None
+        self._tasks: Optional[Dict[str, dict]] = None
 
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
         self.devs = list()
@@ -57,7 +58,7 @@ class DAQ(BaseDAQ):
         self.ao_physical_chans = self.dev.ao_physical_chans.channel_names
         self.co_physical_chans = self.dev.co_physical_chans.channel_names
         self.do_physical_chans = self.dev.do_ports.channel_names
-        self.dio_ports = [channel.replace(f"port", "PFI") for channel in self.dev.do_ports.channel_names]
+        self.dio_ports = [channel.replace("port", "PFI") for channel in self.dev.do_ports.channel_names]
         self.dio_lines = self.dev.di_lines.channel_names
         self.max_ao_rate = self.dev.ao_max_rate
         self.min_ao_rate = self.dev.ao_min_rate
@@ -69,7 +70,7 @@ class DAQ(BaseDAQ):
         self.do_waveforms = dict()
 
     @property
-    def tasks(self):
+    def tasks(self) -> Optional[Dict[str, dict]]:
         """
         Get the tasks dictionary.
 
@@ -79,20 +80,16 @@ class DAQ(BaseDAQ):
         return self._tasks
 
     @tasks.setter
-    def tasks(self, tasks_dict: dict):
+    def tasks(self, tasks_dict: Dict[str, dict]) -> None:
         """
         Set the tasks dictionary.
 
         :param tasks_dict: Dictionary of tasks
         :type tasks_dict: dict
         """
-        # # Add waveforms to check if task is configured correctly
-        # for task_type, task_dict in tasks_dict.items():
-        #     pulse_count = task_dict['timing'].get('pulse_count', None)
-        #     self.add_task(task_type[:2], pulse_count)
         self._tasks = tasks_dict
 
-    def add_task(self, task_type: str, pulse_count=None):
+    def add_task(self, task_type: str, pulse_count: Optional[int] = None) -> None:
         """
         Add a task to the DAQ.
 
@@ -127,8 +124,6 @@ class DAQ(BaseDAQ):
             self._timing_checks(task_type)
 
             trigger_port = timing["trigger_port"]
-            # if f"{self.id}/{trigger_port}" not in self.dio_ports:
-            #     raise ValueError("trigger port must be one of %r." % self.dio_ports)
 
             for port, specs in task["ports"].items():
                 # add channel to task
@@ -175,8 +170,6 @@ class DAQ(BaseDAQ):
             self.task_time_s[task["name"]] = total_time_ms / 1000
 
         else:  # co channel
-            # if f"{self.id}/{ timing['output_port']}" not in self.dio_ports:
-            #     raise ValueError("output port must be one of %r." % self.dio_ports)
 
             if timing["frequency_hz"] < 0:
                 raise ValueError("frequency must be >0 Hz")
@@ -205,7 +198,7 @@ class DAQ(BaseDAQ):
 
         setattr(self, f"{task_type}_task", daq_task)  # set task attribute
 
-    def _timing_checks(self, task_type: str):
+    def _timing_checks(self, task_type: str) -> None:
         """
         Perform timing checks for the task.
 
@@ -233,7 +226,7 @@ class DAQ(BaseDAQ):
                                          <{getattr(self, f'{task_type}_max_rate')} Hz!"
             )
 
-    def generate_waveforms(self, task_type: str, wavelength: str):
+    def generate_waveforms(self, task_type: str, wavelength: str) -> None:
         """
         Generate waveforms for the task.
 
@@ -300,7 +293,7 @@ class DAQ(BaseDAQ):
                         )
                     cutoff_frequency_hz = channel["parameters"]["cutoff_frequency_hz"]["channels"][wavelength]
                     if cutoff_frequency_hz < 0:
-                        raise ValueError(f"cutoff frequnecy must be > 0 Hz")
+                        raise ValueError("cutoff frequnecy must be > 0 Hz")
                 except AttributeError:
                     raise ValueError(f"missing input parameter for {waveform}")
 
@@ -319,11 +312,11 @@ class DAQ(BaseDAQ):
             # sanity check voltages for ni card range
             max = getattr(self, "max_ao_volts", 5)
             min = getattr(self, "min_ao_volts", 0)
-            if numpy.max(voltages[:]) > max or numpy.min(voltages[:]) < min:
+            if np.max(voltages[:]) > max or np.min(voltages[:]) < min:
                 raise ValueError(f"voltages are out of ni card range [{max}, {min}] volts")
 
             # sanity check voltages for device range
-            if numpy.max(voltages[:]) > device_max_volts or numpy.min(voltages[:]) < device_min_volts:
+            if np.max(voltages[:]) > device_max_volts or np.min(voltages[:]) < device_min_volts:
                 raise ValueError(f"voltages are out of device range [{device_min_volts}, {device_max_volts}] volts")
 
             # store 1d voltage array into 2d waveform array
@@ -336,14 +329,14 @@ class DAQ(BaseDAQ):
         setattr(self, f"{task_type}_active_edge", TRIGGER_POLARITY[timing["trigger_polarity"]])
         setattr(self, f"{task_type}_sample_mode", SAMPLE_MODE[timing["sample_mode"]])
 
-    def write_ao_waveforms(self, rereserve_buffer=True):
+    def write_ao_waveforms(self, rereserve_buffer: bool = True) -> None:
         """
         Write analog output waveforms to the DAQ.
 
         :param rereserve_buffer: Whether to re-reserve the buffer, defaults to True
         :type rereserve_buffer: bool, optional
         """
-        ao_voltages = numpy.array(list(self.ao_waveforms.values()))
+        ao_voltages = np.array(list(self.ao_waveforms.values()))
 
         if rereserve_buffer:  # don't need to rereseve when rewriting already running tasks
             # unreserve buffer
@@ -358,16 +351,16 @@ class DAQ(BaseDAQ):
             # sets buffer to length of voltages
             self.ao_task.out_stream.output_buf_size = len(ao_voltages[0])
             self.ao_task.control(TaskMode.TASK_COMMIT)
-        self.ao_task.write(numpy.array(ao_voltages))
+        self.ao_task.write(np.array(ao_voltages))
 
-    def write_do_waveforms(self, rereserve_buffer=True):
+    def write_do_waveforms(self, rereserve_buffer: bool = True) -> None:
         """
         Write digital output waveforms to the DAQ.
 
         :param rereserve_buffer: Whether to re-reserve the buffer, defaults to True
         :type rereserve_buffer: bool, optional
         """
-        do_voltages = numpy.array(list(self.do_waveforms.values()))
+        do_voltages = np.array(list(self.do_waveforms.values()))
         if rereserve_buffer:  # don't need to rereseve when rewriting already running tasks
             # unreserve buffer
             self.do_task.control(TaskMode.TASK_UNRESERVE)
@@ -387,7 +380,7 @@ class DAQ(BaseDAQ):
         amplitude_volts: float,
         offset_volts: float,
         cutoff_frequency_hz: float,
-    ):
+    ) -> np.ndarray:
         """
         Generate a sawtooth waveform.
 
@@ -412,8 +405,8 @@ class DAQ(BaseDAQ):
         """
         waveform_length_samples = int(((period_time_ms + rest_time_ms) / 1000) * sampling_frequency_hz)
 
-        time_samples_ms = numpy.linspace(
-            0, 2 * numpy.pi, int(((period_time_ms - start_time_ms) / 1000) * sampling_frequency_hz)
+        time_samples_ms = np.linspace(
+            0, 2 * np.pi, int(((period_time_ms - start_time_ms) / 1000) * sampling_frequency_hz)
         )
         waveform = offset_volts + amplitude_volts * signal.sawtooth(
             t=time_samples_ms, width=end_time_ms / period_time_ms
@@ -421,7 +414,7 @@ class DAQ(BaseDAQ):
 
         # add in delay
         delay_samples = int((start_time_ms / 1000) * sampling_frequency_hz)
-        waveform = numpy.pad(
+        waveform = np.pad(
             array=waveform,
             pad_width=(delay_samples, 0),
             mode="constant",
@@ -430,7 +423,7 @@ class DAQ(BaseDAQ):
 
         # add in rest
         rest_samples = int((rest_time_ms / 1000) * sampling_frequency_hz)
-        waveform = numpy.pad(
+        waveform = np.pad(
             array=waveform,
             pad_width=(0, rest_samples),
             mode="constant",
@@ -445,7 +438,7 @@ class DAQ(BaseDAQ):
 
         if padding > 0:
             # waveform = numpy.hstack([waveform[:padding], waveform, waveform[-padding:]])
-            waveform = numpy.pad(
+            waveform = np.pad(
                 array=waveform,
                 pad_width=(padding, padding),
                 mode="constant",
@@ -456,7 +449,7 @@ class DAQ(BaseDAQ):
         waveform = signal.lfilter(b, a, signal.lfilter(b, a, waveform)[::-1])[::-1]
 
         if padding > 0:
-            waveform = waveform[padding : padding + waveform_length_samples]
+            waveform = waveform[padding:padding + waveform_length_samples]
 
         return waveform
 
@@ -469,7 +462,7 @@ class DAQ(BaseDAQ):
         rest_time_ms: float,
         max_volts: float,
         min_volts: float,
-    ):
+    ) -> np.ndarray:
         """
         Generate a square waveform.
 
@@ -493,7 +486,7 @@ class DAQ(BaseDAQ):
         time_samples = int(((period_time_ms + rest_time_ms) / 1000) * sampling_frequency_hz)
         start_sample = int((start_time_ms / 1000) * sampling_frequency_hz)
         end_sample = int((end_time_ms / 1000) * sampling_frequency_hz)
-        waveform = numpy.zeros(time_samples) + min_volts
+        waveform = np.zeros(time_samples) + min_volts
         waveform[start_sample:end_sample] = max_volts
 
         return waveform
@@ -508,7 +501,7 @@ class DAQ(BaseDAQ):
         amplitude_volts: float,
         offset_volts: float,
         cutoff_frequency_hz: float,
-    ):
+    ) -> np.ndarray:
         """
         Generate a triangle waveform.
 
@@ -545,7 +538,7 @@ class DAQ(BaseDAQ):
 
         return waveform
 
-    def plot_waveforms_to_pdf(self, save=False):
+    def plot_waveforms_to_pdf(self, save: bool = False) -> None:
         """
         Plot waveforms and optionally save to a PDF.
 
@@ -561,19 +554,19 @@ class DAQ(BaseDAQ):
         ax = plt.axes()
 
         if self.ao_waveforms:
-            time_ms = numpy.linspace(
+            time_ms = np.linspace(
                 0, self.ao_total_time_ms, int(self.ao_total_time_ms / 1000 * self.ao_sampling_frequency_hz)
             )
             for waveform in self.ao_waveforms:
                 plt.plot(time_ms, self.ao_waveforms[waveform], label=waveform)
         if self.do_waveforms:
-            time_ms = numpy.linspace(
+            time_ms = np.linspace(
                 0, self.do_total_time_ms, int(self.do_total_time_ms / 1000 * self.do_sampling_frequency_hz)
             )
             for waveform in self.do_waveforms:
                 plt.plot(time_ms, self.do_waveforms[waveform], label=waveform)
 
-        plt.axis([0, numpy.max([self.ao_total_time_ms, self.do_total_time_ms]), -0.2, 5.2])
+        plt.axis([0, np.max([self.ao_total_time_ms, self.do_total_time_ms]), -0.2, 5.2])
         ax.xaxis.set_minor_locator(AutoMinorLocator())
         ax.yaxis.set_minor_locator(AutoMinorLocator())
         ax.spines[["right", "top"]].set_visible(False)
@@ -585,7 +578,7 @@ class DAQ(BaseDAQ):
         if save:
             plt.savefig("waveforms.pdf", bbox_inches="tight")
 
-    def _rereserve_buffer(self, buf_len):
+    def _rereserve_buffer(self, buf_len: int) -> None:
         """
         Re-reserve the buffer for tasks.
 
@@ -608,7 +601,7 @@ class DAQ(BaseDAQ):
         self.do_task.out_stream.output_buf_size = buf_len
         self.do_task.control(TaskMode.TASK_COMMIT)
 
-    def start(self):
+    def start(self) -> None:
         """
         Start all tasks.
         """
@@ -616,7 +609,7 @@ class DAQ(BaseDAQ):
             if task is not None:
                 task.start()
 
-    def stop(self):
+    def stop(self) -> None:
         """
         Stop all tasks.
         """
@@ -624,7 +617,7 @@ class DAQ(BaseDAQ):
             if task is not None:
                 task.stop()
 
-    def close(self):
+    def close(self) -> None:
         """
         Close all tasks.
         """
@@ -632,14 +625,14 @@ class DAQ(BaseDAQ):
             if task is not None:
                 task.close()
 
-    def restart(self):
+    def restart(self) -> None:
         """
         Restart all tasks.
         """
         self.stop()
         self.start()
 
-    def wait_until_done_all(self, timeout=10.0):
+    def wait_until_done_all(self, timeout: float = 10.0) -> None:
         """
         Wait until all tasks are done.
 
@@ -651,7 +644,7 @@ class DAQ(BaseDAQ):
                 print(task)
                 task.wait_until_done(timeout)
 
-    def is_finished_all(self):
+    def is_finished_all(self) -> bool:
         """
         Check if all tasks are finished.
 

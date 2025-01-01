@@ -2,6 +2,7 @@ import logging
 import random
 
 from serial import Serial
+from typing import Dict, List
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.devices.laser.base import BaseLaser
@@ -20,7 +21,7 @@ class SimulatedLaser(BaseLaser):
     SimulatedLaser class for handling simulated laser devices.
     """
 
-    def __init__(self, id: str, wavelength: int, prefix: str = "", coefficients: dict = {}):
+    def __init__(self, id: str, wavelength: int, prefix: str = "", coefficients: Dict[str, float] = {}) -> None:
         """
         Initialize the SimulatedLaser object.
 
@@ -44,22 +45,22 @@ class SimulatedLaser(BaseLaser):
         self._modulation_mode = "digital"
         self._temperature = 20.0
         self._cdrh = "ON"
-        self._status = []
+        self._status: List[str] = []
 
-    def enable(self):
+    def enable(self) -> None:
         """
         Enable the laser.
         """
         pass
 
-    def disable(self):
+    def disable(self) -> None:
         """
         Disable the laser.
         """
         pass
 
     @DeliminatedProperty(minimum=0, maximum=MAX_POWER_MW)
-    def power_setpoint_mw(self):
+    def power_setpoint_mw(self) -> float:
         """
         Get the power setpoint in milliwatts.
 
@@ -69,7 +70,7 @@ class SimulatedLaser(BaseLaser):
         return self._simulated_power_setpoint_mw
 
     @power_setpoint_mw.setter
-    def power_setpoint_mw(self, value: float):
+    def power_setpoint_mw(self, value: float) -> None:
         """
         Set the power setpoint in milliwatts.
 
@@ -79,7 +80,7 @@ class SimulatedLaser(BaseLaser):
         self._simulated_power_setpoint_mw = value
 
     @property
-    def power_mw(self):
+    def power_mw(self) -> float:
         """
         Get the current power in milliwatts.
 
@@ -89,7 +90,7 @@ class SimulatedLaser(BaseLaser):
         return random.gauss(self._simulated_power_setpoint_mw, 0.1)
 
     @property
-    def modulation_mode(self):
+    def modulation_mode(self) -> str:
         """
         Get the modulation mode.
 
@@ -99,7 +100,7 @@ class SimulatedLaser(BaseLaser):
         return self._modulation_mode
 
     @modulation_mode.setter
-    def modulation_mode(self, value: str):
+    def modulation_mode(self, value: str) -> None:
         """
         Set the modulation mode.
 
@@ -114,7 +115,7 @@ class SimulatedLaser(BaseLaser):
             self._modulation_mode = value
 
     @property
-    def temperature_c(self):
+    def temperature_c(self) -> float:
         """
         Get the temperature of the laser in Celsius.
 
@@ -123,7 +124,7 @@ class SimulatedLaser(BaseLaser):
         """
         return self._temperature
 
-    def status(self):
+    def status(self) -> List[str]:
         """
         Get the status of the laser.
 
@@ -133,7 +134,7 @@ class SimulatedLaser(BaseLaser):
         return self._status
 
     @property
-    def cdrh(self):
+    def cdrh(self) -> str:
         """
         Get the CDRH status.
 
@@ -143,7 +144,7 @@ class SimulatedLaser(BaseLaser):
         return self._cdrh
 
     @cdrh.setter
-    def cdrh(self, value: str):
+    def cdrh(self, value: str) -> None:
         """
         Set the CDRH status.
 
@@ -162,7 +163,7 @@ class SimulatedLaser(BaseLaser):
         """
         return self._wavelength
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the laser connection.
         """

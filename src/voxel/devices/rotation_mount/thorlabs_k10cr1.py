@@ -1,6 +1,8 @@
 import logging
+from typing import List, Tuple
 
 from pylablib.devices import Thorlabs
+from voxel.devices.rotation_mount.base import BaseRotationMount
 
 MIN_POSITION_DEG = 0
 MAX_POSITION_DEG = 360
@@ -9,7 +11,7 @@ MIN_SPEED_DEG_S = 0.005
 MAX_SPEED_DEG_S = 10
 
 
-class RotationMount:
+class RotationMount(BaseRotationMount):
     """
     RotationMount class for handling Thorlabs K10CR1 rotation mount devices.
     """
@@ -27,7 +29,7 @@ class RotationMount:
         # this is used to determine the step to scale units of the device
         model = "K10CR1"
         # lets find the device using pyvisa
-        devices = Thorlabs.list_kinesis_devices()
+        devices: List[Tuple[str, str]] = Thorlabs.list_kinesis_devices()
         # device = [(serial number, name)]
         try:
             for device in devices:
@@ -38,12 +40,12 @@ class RotationMount:
                 if info.serial_no == id:
                     self.rotation_mount = rotation_mount
                     break
-        except:
+        except Exception:
             self.log.debug(f"{id} is not a valid thorabs rotation mount")
             raise ValueError(f"could not find power meter with id {id}")
 
     @property
-    def position_deg(self):
+    def position_deg(self) -> float:
         """
         Get the current position of the rotation mount in degrees.
 
@@ -54,7 +56,7 @@ class RotationMount:
         return self.rotation_mount.get_position()
 
     @position_deg.setter
-    def position_deg(self, position_deg: float):
+    def position_deg(self, position_deg: float) -> None:
         """
         Set the position of the rotation mount in degrees.
 
@@ -68,7 +70,7 @@ class RotationMount:
         self.log.info(f"rotation mount {self.id} moved" f"to position {position_deg} deg")
 
     @property
-    def speed_deg_s(self):
+    def speed_deg_s(self) -> float:
         """
         Get the speed of the rotation mount in degrees per second.
 
@@ -80,7 +82,7 @@ class RotationMount:
         return velocity_parameters.max_velocity
 
     @speed_deg_s.setter
-    def speed_deg_s(self, speed_deg_s: float):
+    def speed_deg_s(self, speed_deg_s: float) -> None:
         """
         Set the speed of the rotation mount in degrees per second.
 
@@ -95,7 +97,7 @@ class RotationMount:
         self.rotation_mount.set_velocity_parameters(max_velocity=speed_deg_s)
         self.log.info(f"rotation mount {self.id} set" f"to speed {speed_deg_s} deg/s")
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the rotation mount connection.
         """

@@ -1,5 +1,7 @@
 import logging
 import time
+from typing import Tuple
+
 from voxel.devices.stage.base import BaseStage
 
 
@@ -8,7 +10,7 @@ class Stage(BaseStage):
     Simulated stage class for handling simulated stage devices.
     """
 
-    def __init__(self, hardware_axis: str, instrument_axis: str):
+    def __init__(self, hardware_axis: str, instrument_axis: str) -> None:
         """
         Initialize the Stage object.
 
@@ -20,13 +22,12 @@ class Stage(BaseStage):
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
         self._hardware_axis = hardware_axis.upper()
         self._instrument_axis = instrument_axis.lower()
-        # TODO change this, but self.id for consistency in lookup
         self.id = self.instrument_axis
         self._position_mm = 0
         self._speed = 1.0
         self._limits = [-10000, 10000]
 
-    def move_relative_mm(self, position: float, wait: bool = False):
+    def move_relative_mm(self, position: float, wait: bool = False) -> None:
         """
         Move the stage relative to its current position.
 
@@ -44,7 +45,7 @@ class Stage(BaseStage):
             while time.time() < self.move_end_time_s:
                 time.sleep(0.01)
 
-    def move_absolute_mm(self, position: float, wait: bool = False):
+    def move_absolute_mm(self, position: float, wait: bool = False) -> None:
         """
         Move the stage to an absolute position.
 
@@ -72,7 +73,7 @@ class Stage(BaseStage):
         strip_count: int,
         pattern: str,
         retrace_speed_percent: int,
-    ):
+    ) -> None:
         """
         Setup a stage scan.
 
@@ -95,14 +96,14 @@ class Stage(BaseStage):
         """
         self._position_mm = fast_axis_start_position
 
-    def halts(self):
+    def halts(self) -> None:
         """
         Halt the stage.
         """
         pass
 
     @property
-    def limits_mm(self):
+    def limits_mm(self) -> Tuple[int, int]:
         """
         Get the limits of the stage in millimeters.
 
@@ -112,7 +113,7 @@ class Stage(BaseStage):
         return self._limits
 
     @property
-    def position_mm(self):
+    def position_mm(self) -> float:
         """
         Get the current position of the stage in millimeters.
 
@@ -122,7 +123,7 @@ class Stage(BaseStage):
         return self._position_mm
 
     @position_mm.setter
-    def position_mm(self, value):
+    def position_mm(self, value: float) -> None:
         """
         Set the current position of the stage in millimeters.
 
@@ -132,7 +133,7 @@ class Stage(BaseStage):
         self._position_mm = value
 
     @property
-    def speed_mm_s(self):
+    def speed_mm_s(self) -> float:
         """
         Get the speed of the stage in millimeters per second.
 
@@ -142,7 +143,7 @@ class Stage(BaseStage):
         return self._speed
 
     @speed_mm_s.setter
-    def speed_mm_s(self, speed_mm_s: float):
+    def speed_mm_s(self, speed_mm_s: float) -> None:
         """
         Set the speed of the stage in millimeters per second.
 
@@ -152,7 +153,7 @@ class Stage(BaseStage):
         self._speed = speed_mm_s
 
     @property
-    def hardware_axis(self):
+    def hardware_axis(self) -> str:
         """
         Get the hardware axis.
 
@@ -162,7 +163,7 @@ class Stage(BaseStage):
         return self._hardware_axis
 
     @property
-    def instrument_axis(self):
+    def instrument_axis(self) -> str:
         """
         Get the instrument axis.
 
@@ -171,7 +172,7 @@ class Stage(BaseStage):
         """
         return self._instrument_axis
 
-    def is_axis_moving(self):
+    def is_axis_moving(self) -> bool:
         """
         Check if the axis is moving.
 
@@ -183,13 +184,13 @@ class Stage(BaseStage):
         else:
             return False
 
-    def zero_in_place(self):
+    def zero_in_place(self) -> None:
         """
         Zero the stage in place.
         """
         self._position_mm = 0
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the stage.
         """

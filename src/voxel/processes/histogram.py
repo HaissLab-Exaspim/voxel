@@ -19,9 +19,6 @@ class HistogramProjection:
     intensity_bin_1, data_1_1, data_1_2, ...
     intensity_bin_2, data_2_1, data_2_2, ...
     ...]
-
-    :param path: Path for the histogram projection process
-    :type path: str
     """
 
     def __init__(self, path: str):
@@ -31,7 +28,6 @@ class HistogramProjection:
         :param path: The path to the file or directory.
         :type path: str
         """
-
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self._path = Path(path)
         self._column_count_px = None
@@ -62,7 +58,6 @@ class HistogramProjection:
         :return: Column number in pixels
         :rtype: int
         """
-
         return self._column_count_px
 
     @column_count_px.setter
@@ -72,7 +67,6 @@ class HistogramProjection:
         :param column_count_px: Column number in pixels
         :type column_count_px: int
         """
-
         self.log.info(f"setting column count to: {column_count_px} [px]")
         self._column_count_px = column_count_px
 
@@ -83,7 +77,6 @@ class HistogramProjection:
         :return: Row number in pixels
         :rtype: int
         """
-
         return self._row_count_px
 
     @row_count_px.setter
@@ -93,7 +86,6 @@ class HistogramProjection:
         :param row_count_px: Row number in pixels
         :type row_count_px: int
         """
-
         self.log.info(f"setting row count to: {row_count_px} [px]")
         self._row_count_px = row_count_px
 
@@ -104,7 +96,6 @@ class HistogramProjection:
         :return: Frame number in pixels
         :rtype: int
         """
-
         return self._frame_count_px
 
     @frame_count_px.setter
@@ -114,7 +105,6 @@ class HistogramProjection:
         :param frame_count_px: Frame number in pixels
         :type frame_count_px: int
         """
-
         self.log.info(f"setting frame count to: {frame_count_px} [px]")
         self._frame_count_px_px = frame_count_px
 
@@ -125,7 +115,6 @@ class HistogramProjection:
         :return: X size of bins in pixels
         :rtype: int
         """
-
         return self._x_bin_count_px
 
     @x_bin_count_px.setter
@@ -135,7 +124,6 @@ class HistogramProjection:
         :param x_bin_count_px: X size of bins in pixels
         :type x_bin_count_px: int
         """
-
         self.log.info(f"setting x projection count to: {x_bin_count_px} [px]")
         self._x_bin_count_px = x_bin_count_px
 
@@ -146,7 +134,6 @@ class HistogramProjection:
         :return: Y size of bins in pixels
         :rtype: int
         """
-
         return self._y_bin_count_px
 
     @y_bin_count_px.setter
@@ -156,7 +143,6 @@ class HistogramProjection:
         :param y_bin_count_px: Y size of bins in pixels
         :type y_bin_count_px: int
         """
-
         self.log.info(f"setting y rojection count to: {y_bin_count_px} [px]")
         self._y_bin_count_px = y_bin_count_px
 
@@ -167,7 +153,6 @@ class HistogramProjection:
         :return: Z size of bins in pixels
         :rtype: int
         """
-
         return self._z_bin_count_px
 
     @z_bin_count_px.setter
@@ -177,7 +162,6 @@ class HistogramProjection:
         :param z_bin_count_px: Z size of bins in pixels
         :type z_bin_count_px: int
         """
-
         self.log.info(f"setting z projection count to: {z_bin_count_px} [px]")
         self._z_bin_count_px = z_bin_count_px
 
@@ -188,7 +172,6 @@ class HistogramProjection:
         :return: Number of intensity bins for the x direction
         :rtype: int
         """
-
         return self._x_bins
 
     @x_bins.setter
@@ -198,7 +181,6 @@ class HistogramProjection:
         :param x_bin_count_px: Number of intensity bins for the x direction
         :type x_bin_count_px: int
         """
-
         self.log.info(f"setting x bin count to: {x_bins} [px]")
         self._x_bins = x_bins
 
@@ -209,7 +191,6 @@ class HistogramProjection:
         :return: Number of intensity bins for the y direction
         :rtype: int
         """
-
         return self._y_bins
 
     @y_bins.setter
@@ -219,7 +200,6 @@ class HistogramProjection:
         :param y_bin_count_px: Number of intensity bins for the y direction
         :type y_bin_count_px: int
         """
-
         self.log.info(f"setting x bin count to: {y_bins} [px]")
         self._y_bins = y_bins
 
@@ -230,7 +210,6 @@ class HistogramProjection:
         :return: Number of intensity bins for the z direction
         :rtype: int
         """
-
         return self._z_bins
 
     @z_bins.setter
@@ -240,7 +219,6 @@ class HistogramProjection:
         :param z_bin_count_px: Number of intensity bins for the z direction
         :type z_bin_count_px: int
         """
-
         self.log.info(f"setting x bin count to: {z_bins} [px]")
         self._z_bins = z_bins
 
@@ -251,7 +229,6 @@ class HistogramProjection:
         :return: Minimum histogram intensity for the x direction
         :rtype: int
         """
-
         return self._x_min_value
 
     @x_min_value.setter
@@ -261,7 +238,6 @@ class HistogramProjection:
         :param x_min_value: Minimum histogram intensity for the x direction
         :type x_min_value: int
         """
-
         self.log.info(f"setting x min value to: {x_min_value}")
         self._x_min_value = x_min_value
 
@@ -272,7 +248,6 @@ class HistogramProjection:
         :return: Minimum histogram intensity for the y direction
         :rtype: int
         """
-
         return self._y_min_value
 
     @y_min_value.setter
@@ -282,7 +257,6 @@ class HistogramProjection:
         :param y_min_value: Minimum histogram intensity for the y direction
         :type y_min_value: int
         """
-
         self.log.info(f"setting y min value to: {y_min_value}")
         self._y_min_value = y_min_value
 
@@ -293,7 +267,6 @@ class HistogramProjection:
         :return: Minimum histogram intensity for the z direction
         :rtype: int
         """
-
         return self._z_min_value
 
     @z_min_value.setter
@@ -303,7 +276,6 @@ class HistogramProjection:
         :param z_min_value: Minimum histogram intensity for the z direction
         :type z_min_value: int
         """
-
         self.log.info(f"setting z min value to: {z_min_value}")
         self._z_min_value = z_min_value
 
@@ -314,7 +286,6 @@ class HistogramProjection:
         :return: Maximum histogram intensity for the x direction
         :rtype: int
         """
-
         return self._x_max_value
 
     @x_max_value.setter
@@ -324,7 +295,6 @@ class HistogramProjection:
         :param x_max_value: Maximum histogram intensity for the x direction
         :type x_max_value: int
         """
-
         self.log.info(f"setting x max value to: {x_max_value}")
         self._x_max_value = x_max_value
 
@@ -335,7 +305,6 @@ class HistogramProjection:
         :return: Maximum histogram intensity for the y direction
         :rtype: int
         """
-
         return self._y_max_value
 
     @y_max_value.setter
@@ -345,7 +314,6 @@ class HistogramProjection:
         :param y_max_value: Maximum histogram intensity for the y direction
         :type y_max_value: int
         """
-
         self.log.info(f"setting y max value to: {y_max_value}")
         self._y_max_value = y_max_value
 
@@ -356,7 +324,6 @@ class HistogramProjection:
         :return: Maximum histogram intensity for the z direction
         :rtype: int
         """
-
         return self._z_max_value
 
     @z_max_value.setter
@@ -366,7 +333,6 @@ class HistogramProjection:
         :param z_max_value: Maximum histogram intensity for the z direction
         :type z_max_value: int
         """
-
         self.log.info(f"setting z max value to: {z_max_value}")
         self._z_max_value = z_max_value
 
@@ -377,7 +343,6 @@ class HistogramProjection:
         :return: Data type
         :rtype: numpy.unsignedinteger
         """
-
         return self._data_type
 
     @data_type.setter
@@ -387,7 +352,6 @@ class HistogramProjection:
         :param data_type: Data type
         :type data_type: numpy.unsignedinteger
         """
-
         self.log.info(f"setting data type to: {data_type}")
         self._data_type = data_type
 
@@ -398,7 +362,6 @@ class HistogramProjection:
         :return: Path
         :rtype: Path
         """
-
         return self._path
 
     @property
@@ -409,7 +372,6 @@ class HistogramProjection:
         :return: The base acquisition name
         :rtype: str
         """
-
         return self._acquisition_name
 
     @acquisition_name.setter
@@ -420,7 +382,6 @@ class HistogramProjection:
         :param value: The base acquisition name
         :type value: str
         """
-
         self._acquisition_name = Path(acquisition_name)
         self.log.info(f"setting acquisition name to: {acquisition_name}")
 
@@ -432,7 +393,6 @@ class HistogramProjection:
         :return: The base filename
         :rtype: str
         """
-
         return self._filename
 
     @filename.setter
@@ -443,7 +403,6 @@ class HistogramProjection:
         :param filename: The base filename
         :type filename: str
         """
-
         self._filename = (
             filename.replace(".tiff", "").replace(".tif", "")
             if filename.endswith(".tiff") or filename.endswith(".tif")
@@ -458,7 +417,6 @@ class HistogramProjection:
         :param shm_name: Shared memory name
         :type shm_name: multiprocessing.shared_memory.SharedMemory
         """
-
         self._process = Process(target=self._run)
         self.shm_shape = (self._row_count_px, self._column_count_px)
         # create attributes to open shared memory in run function
@@ -479,7 +437,6 @@ class HistogramProjection:
         :raises ValueError: y projection must be > 0 and < total rows
         :raises ValueError: z projection must be > 0 and < total frames
         """
-
         # check if projection counts were set
         # if not, set to max possible values based on tile
         if self._x_bin_count_px is None:
@@ -589,6 +546,5 @@ class HistogramProjection:
         """
         Wait for the writer to finish.
         """
-
         self.log.info(f"max projection {self.filename}: waiting to finish.")
         self._process.join()

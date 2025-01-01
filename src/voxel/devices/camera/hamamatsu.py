@@ -1,5 +1,8 @@
 import logging
 import time
+from typing import Any, Dict
+
+import numpy as np
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.devices.camera.base import BaseCamera
@@ -120,17 +123,16 @@ class DcamapiSingleton(Dcamapi, metaclass=Singleton):
     :param metaclass: Singleton metaclass
     :type metaclass: type, optional
     """
-    def __init__(self):
-        """Initialize the DcamapiSingleton instance.
-        """
+
+    def __init__(self) -> None:
+        """Initialize the DcamapiSingleton instance."""
         super(DcamapiSingleton, self).__init__()
 
 
 class Camera(BaseCamera):
-    """Camera class for handling Hamamatsu DCAM operations.
-    """
+    """Camera class for handling Hamamatsu DCAM operations."""
 
-    def __init__(self, id: str):
+    def __init__(self, id: str) -> None:
         """Initialize the Camera instance.
 
         :param id: Camera ID
@@ -166,7 +168,7 @@ class Camera(BaseCamera):
         self._update_parameters()
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
-    def exposure_time_ms(self):
+    def exposure_time_ms(self) -> float:
         """Get the exposure time in milliseconds.
 
         :return: Exposure time in milliseconds
@@ -176,7 +178,7 @@ class Camera(BaseCamera):
         return self.dcam.prop_getvalue(PROPERTIES["exposure_time"]) * 1000
 
     @exposure_time_ms.setter
-    def exposure_time_ms(self, exposure_time_ms: float):
+    def exposure_time_ms(self, exposure_time_ms: float) -> None:
         """Set the exposure time in milliseconds.
 
         :param exposure_time_ms: Exposure time in milliseconds
@@ -188,7 +190,7 @@ class Camera(BaseCamera):
         self._update_parameters()
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
-    def width_px(self):
+    def width_px(self) -> int:
         """Get the width in pixels.
 
         :return: Width in pixels
@@ -197,7 +199,7 @@ class Camera(BaseCamera):
         return int(self.dcam.prop_getvalue(PROPERTIES["subarray_hsize"]))
 
     @width_px.setter
-    def width_px(self, value: int):
+    def width_px(self, value: int) -> None:
         """Set the width in pixels.
 
         :param value: Width in pixels
@@ -215,7 +217,7 @@ class Camera(BaseCamera):
         self._update_parameters()
 
     @property
-    def width_offset_px(self):
+    def width_offset_px(self) -> int:
         """Get the width offset in pixels.
 
         :return: Width offset in pixels
@@ -224,7 +226,7 @@ class Camera(BaseCamera):
         return int(self.dcam.prop_getvalue(PROPERTIES["subarray_hpos"]))
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
-    def height_px(self):
+    def height_px(self) -> int:
         """Get the height in pixels.
 
         :return: Height in pixels
@@ -233,7 +235,7 @@ class Camera(BaseCamera):
         return int(self.dcam.prop_getvalue(PROPERTIES["subarray_vsize"]))
 
     @height_px.setter
-    def height_px(self, value: int):
+    def height_px(self, value: int) -> None:
         """Set the height in pixels.
 
         :param value: Height in pixels
@@ -251,7 +253,7 @@ class Camera(BaseCamera):
         self._update_parameters()
 
     @property
-    def height_offset_px(self):
+    def height_offset_px(self) -> int:
         """Get the height offset in pixels.
 
         :return: Height offset in pixels
@@ -260,7 +262,7 @@ class Camera(BaseCamera):
         return int(self.dcam.prop_getvalue(PROPERTIES["subarray_vpos"]))
 
     @property
-    def pixel_type(self):
+    def pixel_type(self) -> str:
         """Get the pixel type.
 
         :return: Pixel type
@@ -271,7 +273,7 @@ class Camera(BaseCamera):
         return next(key for key, value in PIXEL_TYPES.items() if value == pixel_type)
 
     @pixel_type.setter
-    def pixel_type(self, pixel_type_bits: str):
+    def pixel_type(self, pixel_type_bits: str) -> None:
         """Set the pixel type.
 
         :param pixel_type_bits: Pixel type bits
@@ -288,7 +290,7 @@ class Camera(BaseCamera):
         self._update_parameters()
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
-    def line_interval_us(self):
+    def line_interval_us(self) -> float:
         """Get the line interval in microseconds.
 
         :return: Line interval in microseconds
@@ -299,7 +301,7 @@ class Camera(BaseCamera):
         return line_interval_s * 1e6
 
     @line_interval_us.setter
-    def line_interval_us(self, line_interval_us: float):
+    def line_interval_us(self, line_interval_us: float) -> None:
         """Set the line interval in microseconds.
 
         :param line_interval_us: Line interval in microseconds
@@ -312,19 +314,19 @@ class Camera(BaseCamera):
         self._update_parameters()
 
     @property
-    def frame_time_ms(self):
+    def frame_time_ms(self) -> float:
         """Get the frame time in milliseconds.
 
         :return: Frame time in milliseconds
         :rtype: float
         """
-        if 'light sheet' in self.readout_mode:
-            return (self.line_interval_us * self.height_px)/1000 + self.exposure_time_ms
+        if "light sheet" in self.readout_mode:
+            return (self.line_interval_us * self.height_px) / 1000 + self.exposure_time_ms
         else:
-            return (self.line_interval_us * self.height_px/2)/1000 + self.exposure_time_ms
+            return (self.line_interval_us * self.height_px / 2) / 1000 + self.exposure_time_ms
 
     @property
-    def trigger(self):
+    def trigger(self) -> Dict[str, str]:
         """Get the trigger settings.
 
         :return: Trigger settings
@@ -340,7 +342,7 @@ class Camera(BaseCamera):
         }
 
     @trigger.setter
-    def trigger(self, trigger: dict):
+    def trigger(self, trigger: Dict[str, str]) -> None:
         """Set the trigger settings.
 
         :param trigger: Trigger settings
@@ -373,7 +375,7 @@ class Camera(BaseCamera):
         self._update_parameters()
 
     @property
-    def binning(self):
+    def binning(self) -> int:
         """Get the binning setting.
 
         :return: Binning setting
@@ -383,7 +385,7 @@ class Camera(BaseCamera):
         return binning
 
     @binning.setter
-    def binning(self, binning: str):
+    def binning(self, binning: str) -> None:
         """Set the binning setting.
 
         :param binning: Binning setting
@@ -399,7 +401,7 @@ class Camera(BaseCamera):
             self._update_parameters()
 
     @property
-    def sensor_width_px(self):
+    def sensor_width_px(self) -> int:
         """Get the sensor width in pixels.
 
         :return: Sensor width in pixels
@@ -408,7 +410,7 @@ class Camera(BaseCamera):
         return self.max_width_px
 
     @property
-    def sensor_height_px(self):
+    def sensor_height_px(self) -> int:
         """Get the sensor height in pixels.
 
         :return: Sensor height in pixels
@@ -417,7 +419,7 @@ class Camera(BaseCamera):
         return self.min_width_px
 
     @property
-    def sensor_temperature_c(self):
+    def sensor_temperature_c(self) -> float:
         """Get the sensor temperature in degrees Celsius.
 
         :return: Sensor temperature in degrees Celsius
@@ -427,7 +429,7 @@ class Camera(BaseCamera):
         return temperature
 
     @property
-    def sensor_mode(self):
+    def sensor_mode(self) -> str:
         """Get the sensor mode.
 
         :return: Sensor mode
@@ -437,7 +439,7 @@ class Camera(BaseCamera):
         return next(key for key, value in SENSOR_MODES.items() if value == sensor_mode)
 
     @sensor_mode.setter
-    def sensor_mode(self, sensor_mode: str):
+    def sensor_mode(self, sensor_mode: str) -> None:
         """Set the sensor mode.
 
         :param sensor_mode: Sensor mode
@@ -454,7 +456,7 @@ class Camera(BaseCamera):
         self._update_parameters()
 
     @property
-    def readout_direction(self):
+    def readout_direction(self) -> str:
         """Get the readout direction.
 
         :return: Readout direction
@@ -464,7 +466,7 @@ class Camera(BaseCamera):
         return next(key for key, value in READOUT_DIRECTIONS.items() if value == readout_direction)
 
     @readout_direction.setter
-    def readout_direction(self, readout_direction: str):
+    def readout_direction(self, readout_direction: str) -> None:
         """Set the readout direction.
 
         :param readout_direction: Readout direction
@@ -480,278 +482,260 @@ class Camera(BaseCamera):
         # refresh parameter values
         self._update_parameters()
 
-    def prepare(self):
-        """Prepare the camera for acquisition.
-        """
+    def prepare(self) -> None:
+        """Prepare the camera for acquisition."""
         # determine bits to bytes
         if self.pixel_type == "mono8":
             bit_to_byte = 1
         else:
             bit_to_byte = 2
-        frame_size_mb = self.width_px * self.height_px / self.binning**2 * bit_to_byte / 1e6
+        frame_size_mb = self.width_px * self.height_px / self.binning**2 * bit_to_byte / 1024**2
         self.buffer_size_frames = round(BUFFER_SIZE_MB / frame_size_mb)
         # realloc buffers appears to be allocating ram on the pc side, not camera side.
         self.dcam.buf_alloc(self.buffer_size_frames)
         self.log.info(f"buffer set to: {self.buffer_size_frames} frames")
 
-    def start(self):
-            """Start the camera acquisition.
-            """
-            # initialize variables for acquisition run
-            self.dropped_frames = 0
-            self.pre_frame_time = 0
-            self.pre_frame_count_px = 0
-            self.dcam.cap_start()
-    
-        def abort(self):
-            """Abort the camera acquisition.
-            """
-            self.stop()
-    
-        def stop(self):
-            """Stop the camera acquisition.
-            """
-            self.dcam.buf_release()
-            self.dcam.cap_stop()
-    
-        def close(self):
-            """Close the camera connection.
-            """
-            if self.dcam.is_opened():
-                self.dcam.dev_close()
-                DcamapiSingleton.uninit()
-    
-        def reset(self):
-            """Reset the camera instance.
-            """
-            if self.dcam.is_opened():
-                self.dcam.dev_close()
-                DcamapiSingleton.uninit()
-                del self.dcam
-                if DcamapiSingleton.init() is not False:
-                    self.dcam = Dcam(self.cam_num)
-                    self.dcam.dev_open()
-    
-        def grab_frame(self):
-            """Retrieve a frame as a 2D numpy array with shape (rows, cols).
-    
-            :return: Frame as a 2D numpy array
-            :rtype: numpy.ndarray
-            """
-            timeout_ms = 1000
-            if self.dcam.wait_capevent_frameready(timeout_ms) is not False:
-                image = self._latest_frame = self.dcam.buf_getlastframedata()
-                return image
-    
-        @property
-        def latest_frame(self):
-            """Get the latest frame.
-    
-            :return: Latest frame
-            :rtype: numpy.ndarray
-            """
-            return self._latest_frame
-    
-        def signal_acquisition_state(self):
-            """Return a dict with the state of the acquisition buffers.
-    
-            :return: State of the acquisition buffers
-            :rtype: dict
-            """
-            cap_info = DCAMCAP_TRANSFERINFO()
-            # __hdcam inside class Dcam referenced as _Dcam__hdcam
-            dcamcap_transferinfo(self.dcam._Dcam__hdcam, byref(cap_info))
-            self.post_frame_time = time.time()
-            frame_index = cap_info.nFrameCount
-            out_buffer_size = frame_index - self.pre_frame_count_px
-            in_buffer_size = self.buffer_size_frames - out_buffer_size
-            if out_buffer_size > self.buffer_size_frames:
-                new_dropped_frames = out_buffer_size - self.buffer_size_frames
-                self.dropped_frames += new_dropped_frames
-            frame_rate = out_buffer_size / (self.post_frame_time - self.pre_frame_time)
-            # determine bits to bytes
-            if self.pixel_type == "mono8":
-                bit_to_byte = 1
-            else:
-                bit_to_byte = 2
-            data_rate = frame_rate * self.width_px * self.height_px / self.binning**2 * bit_to_byte / 1e6
-            state = {}
-            state["Frame Index"] = frame_index
-            state["Input Buffer Size"] = in_buffer_size
-            state["Output Buffer Size"] = out_buffer_size
-            # number of underrun, i.e. dropped frames
-            state["Dropped Frames"] = self.dropped_frames
-            state["Data Rate [MB/s]"] = data_rate
-            state["Frame Rate [fps]"] = frame_rate
-            self.log.info(
-                f"id: {self.id}, "
-                f"frame: {state['Frame Index']}, "
-                f"input: {state['Input Buffer Size']}, "
-                f"output: {state['Output Buffer Size']}, "
-                f"dropped: {state['Dropped Frames']}, "
-                f"data rate: {state['Data Rate [MB/s]']:.2f} [MB/s], "
-                f"frame rate: {state['Frame Rate [fps]']:.2f} [fps]."
-            )
-            self.pre_frame_time = time.time()
-            self.pre_frame_count_px = cap_info.nFrameCount
-    
-            return state
-    
-        def log_metadata(self):
-            """Log the camera metadata.
-            """
-            # log dcam camera settings
-            self.log.info("dcam camera parameters")
-            idprop = self.dcam.prop_getnextid(0)
-            while idprop is not False:
-                propname = self.dcam.prop_getname(idprop)
-                propvalue = self.dcam.prop_getvalue(idprop)
-                self.log.info(f"{propname}, {propvalue}")
-                idprop = self.dcam.prop_getnextid(idprop)
-    
-        def _update_parameters(self):
-            """Update the camera parameters.
-            """
-            # grab parameter values
-            self._get_min_max_step_values()
-            # check binning options
-            self._query_binning()
-            # check pixel type options
-            self._query_pixel_types()
-            # check trigger mode options
-            self._query_trigger_modes()
-            # check trigger source options
-            self._query_trigger_sources()
-            # check trigger polarity options
-            self._query_trigger_polarities()
-            # check sensor mode options
-            self._query_sensor_modes()
-            # check readout direction options
-            self._query_readout_directions()
-    
-        def _get_min_max_step_values(self):
-            """Get the minimum, maximum, and step values for camera parameters.
-            """
-            # gather min max values
-            # convert from s to ms
-            self.min_exposure_time_ms = type(self).exposure_time_ms.minimum = (
-                self.dcam.prop_getattr(PROPERTIES["exposure_time"]).valuemin * 1e3
-            )
-            self.max_exposure_time_ms = type(self).exposure_time_ms.maximum = (
-                self.dcam.prop_getattr(PROPERTIES["exposure_time"]).valuemax * 1e3
-            )
-            # convert from s to us
-            self.min_line_interval_us = type(self).line_interval_us.minimum = (
-                self.dcam.prop_getattr(PROPERTIES["line_interval"]).valuemin * 1e6
-            )
-            self.max_line_interval_us = type(self).line_interval_us.minimum = (
-                self.dcam.prop_getattr(PROPERTIES["line_interval"]).valuemax * 1e6
-            )
-            self.min_width_px = type(self).width_px.minimum = self.dcam.prop_getattr(PROPERTIES["image_width"]).valuemin
-            self.max_width_px = type(self).width_px.maximum = self.dcam.prop_getattr(PROPERTIES["image_width"]).valuemax
-            self.min_height_px = type(self).height_px.minimum = self.dcam.prop_getattr(PROPERTIES["image_height"]).valuemin
-            self.max_height_px = type(self).height_px.maximum = self.dcam.prop_getattr(PROPERTIES["image_height"]).valuemax
-            self.min_offset_x_px = self.dcam.prop_getattr(PROPERTIES["subarray_hpos"]).valuemin
-            self.max_offset_x_px = self.dcam.prop_getattr(PROPERTIES["subarray_hpos"]).valuemax
-            self.min_offset_y_px = self.dcam.prop_getattr(PROPERTIES["subarray_vpos"]).valuemin
-            self.max_offset_y_px = self.dcam.prop_getattr(PROPERTIES["subarray_vpos"]).valuemax
-            # convert from s to us
-            self.step_exposure_time_ms = type(self).exposure_time_ms.step = (
-                self.dcam.prop_getattr(PROPERTIES["exposure_time"]).valuestep * 1e3
-            )
-            self.step_line_interval_us = type(self).line_interval_us.step = (
-                self.dcam.prop_getattr(PROPERTIES["line_interval"]).valuestep * 1e6
-            )
-            self.step_width_px = type(self).width_px.step = self.dcam.prop_getattr(PROPERTIES["image_width"]).valuestep
-            self.step_height_px = type(self).height_px.step = self.dcam.prop_getattr(PROPERTIES["image_height"]).valuestep
-            self.step_offset_x_px = self.dcam.prop_getattr(PROPERTIES["subarray_hpos"]).valuestep
-            self.step_offset_y_px = self.dcam.prop_getattr(PROPERTIES["subarray_vpos"]).valuestep
-    
-            self.log.debug(f"min exposure time is: {self.min_exposure_time_ms} ms")
-            self.log.debug(f"max exposure time is: {self.max_exposure_time_ms} ms")
-            self.log.debug(f"min line interval is: {self.min_line_interval_us} us")
-            self.log.debug(f"max line interval is: {self.max_line_interval_us} us")
-            self.log.debug(f"min width is: {self.min_width_px} px")
-            self.log.debug(f"max width is: {self.max_width_px} px")
-            self.log.debug(f"min height is: {self.min_height_px} px")
-            self.log.debug(f"max height is: {self.max_height_px} px")
-            self.log.debug(f"min offset x is: {self.min_offset_x_px} px")
-            self.log.debug(f"max offset x is: {self.max_offset_x_px} px")
-            self.log.debug(f"min offset y is: {self.min_offset_y_px} px")
-            self.log.debug(f"max offset y is: {self.max_offset_y_px} px")
-            self.log.debug(f"step exposure time is: {self.step_exposure_time_ms} ms")
-            self.log.debug(f"step line interval is: {self.step_line_interval_us} us")
-            self.log.debug(f"step width is: {self.step_width_px} px")
-            self.log.debug(f"step height is: {self.step_height_px} px")
-            self.log.debug(f"step offset x is: {self.step_offset_x_px} px")
-            self.log.debug(f"step offset y is: {self.step_offset_y_px} px")
-    
-        def _query_trigger_modes(self):
-            """Query the available trigger modes.
-            """
-            min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_mode"]).valuemin)
-            max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_mode"]).valuemax)
-            for prop_value in range(min_prop_value, max_prop_value + 1):
-                reply = self.dcam.prop_getvaluetext(PROPERTIES["trigger_mode"], prop_value)
-                if reply != False:
-                    TRIGGERS["mode"][reply.lower()] = prop_value
-    
-        def _query_trigger_sources(self):
-            """Query the available trigger sources.
-            """
-            min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_source"]).valuemin)
-            max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_source"]).valuemax)
-            for prop_value in range(min_prop_value, max_prop_value + 1):
-                reply = self.dcam.prop_getvaluetext(PROPERTIES["trigger_source"], prop_value)
-                if reply != False:
-                    TRIGGERS["source"][reply.lower()] = prop_value
-    
-        def _query_trigger_polarities(self):
-            """Query the available trigger polarities.
-            """
-            min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_polarity"]).valuemin)
-            max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_polarity"]).valuemax)
-            for prop_value in range(min_prop_value, max_prop_value + 1):
-                reply = self.dcam.prop_getvaluetext(PROPERTIES["trigger_polarity"], prop_value)
-                if reply != False:
-                    TRIGGERS["polarity"][reply.lower()] = prop_value
-    
-        def _query_sensor_modes(self):
-            """Query the available sensor modes.
-            """
-            min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["sensor_mode"]).valuemin)
-            max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["sensor_mode"]).valuemax)
-            for prop_value in range(min_prop_value, max_prop_value + 1):
-                reply = self.dcam.prop_getvaluetext(PROPERTIES["sensor_mode"], prop_value)
-                if reply != False:
-                    SENSOR_MODES[reply.lower()] = prop_value
-    
-        def _query_readout_directions(self):
-            """Query the available readout directions.
-            """
-            min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["readout_direction"]).valuemin)
-            max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["readout_direction"]).valuemax)
-            for prop_value in range(min_prop_value, max_prop_value + 1):
-                reply = self.dcam.prop_getvaluetext(PROPERTIES["readout_direction"], prop_value)
-                if reply != False:
-                    READOUT_DIRECTIONS[reply.lower()] = prop_value
-    
-        def _query_binning(self):
-            """Query the available binning options.
-            """
-            min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["binning"]).valuemin)
-            max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["binning"]).valuemax)
-            for prop_value in range(min_prop_value, max_prop_value + 1):
-                reply = self.dcam.prop_getvaluetext(PROPERTIES["binning"], prop_value)
-                if reply != False:
-                    BINNING[reply.lower()] = prop_value
-    
-        def _query_pixel_types(self):
-            """Query the available pixel types.
-            """
-            min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["pixel_type"]).valuemin)
-            max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["pixel_type"]).valuemax)
-            for prop_value in range(min_prop_value, max_prop_value + 1):
-                reply = self.dcam.prop_getvaluetext(PROPERTIES["pixel_type"], prop_value)
-                if reply != False:
-                    PIXEL_TYPES[reply.lower()] = prop_value
+    def start(self) -> None:
+        """Start the camera acquisition."""
+        # initialize variables for acquisition run
+        self.dropped_frames = 0
+        self.pre_frame_time = 0
+        self.pre_frame_count_px = 0
+        self.dcam.cap_start()
+
+    def abort(self) -> None:
+        """Abort the camera acquisition."""
+        self.stop()
+
+    def stop(self) -> None:
+        """Stop the camera acquisition."""
+        self.dcam.buf_release()
+        self.dcam.cap_stop()
+
+    def close(self) -> None:
+        """Close the camera connection."""
+        if self.dcam.is_opened():
+            self.dcam.dev_close()
+            DcamapiSingleton.uninit()
+
+    def reset(self) -> None:
+        """Reset the camera instance."""
+        if self.dcam.is_opened():
+            self.dcam.dev_close()
+            DcamapiSingleton.uninit()
+            del self.dcam
+            if DcamapiSingleton.init() is not False:
+                self.dcam = Dcam(self.cam_num)
+                self.dcam.dev_open()
+
+    def grab_frame(self) -> np.ndarray:
+        """Retrieve a frame as a 2D numpy array with shape (rows, cols).
+
+        :return: Frame as a 2D numpy array
+        :rtype: numpy.ndarray
+        """
+        timeout_ms = 1000
+        if self.dcam.wait_capevent_frameready(timeout_ms) is not False:
+            image = self._latest_frame = self.dcam.buf_getlastframedata()
+            return image
+
+    @property
+    def latest_frame(self) -> np.ndarray:
+        """Get the latest frame.
+
+        :return: Latest frame
+        :rtype: numpy.ndarray
+        """
+        return self._latest_frame
+
+    def signal_acquisition_state(self) -> Dict[str, Any]:
+        """Return a dict with the state of the acquisition buffers.
+
+        :return: State of the acquisition buffers
+        :rtype: dict
+        """
+        cap_info = DCAMCAP_TRANSFERINFO()
+        # __hdcam inside class Dcam referenced as _Dcam__hdcam
+        dcamcap_transferinfo(self.dcam._Dcam__hdcam, byref(cap_info))
+        self.post_frame_time = time.time()
+        frame_index = cap_info.nFrameCount
+        out_buffer_size = frame_index - self.pre_frame_count_px
+        in_buffer_size = self.buffer_size_frames - out_buffer_size
+        if out_buffer_size > self.buffer_size_frames:
+            new_dropped_frames = out_buffer_size - self.buffer_size_frames
+            self.dropped_frames += new_dropped_frames
+        frame_rate = out_buffer_size / (self.post_frame_time - self.pre_frame_time)
+        # determine bits to bytes
+        if self.pixel_type == "mono8":
+            bit_to_byte = 1
+        else:
+            bit_to_byte = 2
+        data_rate = frame_rate * self.width_px * self.height_px / self.binning**2 * bit_to_byte / 1024**2
+        state = {}
+        state["Frame Index"] = frame_index
+        state["Input Buffer Size"] = in_buffer_size
+        state["Output Buffer Size"] = out_buffer_size
+        # number of underrun, i.e. dropped frames
+        state["Dropped Frames"] = self.dropped_frames
+        state["Data Rate [MB/s]"] = data_rate
+        state["Frame Rate [fps]"] = frame_rate
+        self.log.info(
+            f"id: {self.id}, "
+            f"frame: {state['Frame Index']}, "
+            f"input: {state['Input Buffer Size']}, "
+            f"output: {state['Output Buffer Size']}, "
+            f"dropped: {state['Dropped Frames']}, "
+            f"data rate: {state['Data Rate [MB/s]']:.2f} [MB/s], "
+            f"frame rate: {state['Frame Rate [fps]']:.2f} [fps]."
+        )
+        self.pre_frame_time = time.time()
+        self.pre_frame_count_px = cap_info.nFrameCount
+
+        return state
+
+    def log_metadata(self) -> None:
+        """Log the camera metadata."""
+        # log dcam camera settings
+        self.log.info("dcam camera parameters")
+        idprop = self.dcam.prop_getnextid(0)
+        while idprop is not False:
+            propname = self.dcam.prop_getname(idprop)
+            propvalue = self.dcam.prop_getvalue(idprop)
+            self.log.info(f"{propname}, {propvalue}")
+            idprop = self.dcam.prop_getnextid(idprop)
+
+    def _update_parameters(self) -> None:
+        """Update the camera parameters."""
+        # grab parameter values
+        self._get_min_max_step_values()
+        # check binning options
+        self._query_binning()
+        # check pixel type options
+        self._query_pixel_types()
+        # check trigger mode options
+        self._query_trigger_modes()
+        # check trigger source options
+        self._query_trigger_sources()
+        # check trigger polarity options
+        self._query_sensor_modes()
+        # check readout direction options
+        self._query_readout_directions()
+
+    def _get_min_max_step_values(self) -> None:
+        """Get the minimum, maximum, and step values for camera parameters."""
+        # gather min max values
+        # convert from s to ms
+        self.min_exposure_time_ms = type(self).exposure_time_ms.minimum = (
+            self.dcam.prop_getattr(PROPERTIES["exposure_time"]).valuemin * 1e3
+        )
+        self.max_exposure_time_ms = type(self).exposure_time_ms.maximum = (
+            self.dcam.prop_getattr(PROPERTIES["exposure_time"]).valuemax * 1e3
+        )
+        # convert from s to us
+        self.min_line_interval_us = type(self).line_interval_us.minimum = (
+            self.dcam.prop_getattr(PROPERTIES["line_interval"]).valuemin * 1e6
+        )
+        self.max_line_interval_us = type(self).line_interval_us.minimum = (
+            self.dcam.prop_getattr(PROPERTIES["line_interval"]).valuemax * 1e6
+        )
+        self.min_width_px = type(self).width_px.minimum = self.dcam.prop_getattr(PROPERTIES["image_width"]).valuemin
+        self.max_width_px = type(self).width_px.maximum = self.dcam.prop_getattr(PROPERTIES["image_width"]).valuemax
+        self.min_height_px = type(self).height_px.minimum = self.dcam.prop_getattr(PROPERTIES["image_height"]).valuemin
+        self.max_height_px = type(self).height_px.maximum = self.dcam.prop_getattr(PROPERTIES["image_height"]).valuemax
+        self.min_offset_x_px = self.dcam.prop_getattr(PROPERTIES["subarray_hpos"]).valuemin
+        self.max_offset_x_px = self.dcam.prop_getattr(PROPERTIES["subarray_hpos"]).valuemax
+        self.min_offset_y_px = self.dcam.prop_getattr(PROPERTIES["subarray_vpos"]).valuemin
+        self.max_offset_y_px = self.dcam.prop_getattr(PROPERTIES["subarray_vpos"]).valuemax
+        # convert from s to us
+        self.step_exposure_time_ms = type(self).exposure_time_ms.step = (
+            self.dcam.prop_getattr(PROPERTIES["exposure_time"]).valuestep * 1e3
+        )
+        self.step_line_interval_us = type(self).line_interval_us.step = (
+            self.dcam.prop_getattr(PROPERTIES["line_interval"]).valuestep * 1e6
+        )
+        self.step_width_px = type(self).width_px.step = self.dcam.prop_getattr(PROPERTIES["image_width"]).valuestep
+        self.step_height_px = type(self).height_px.step = self.dcam.prop_getattr(PROPERTIES["image_height"]).valuestep
+        self.step_offset_x_px = self.dcam.prop_getattr(PROPERTIES["subarray_hpos"]).valuestep
+        self.step_offset_y_px = self.dcam.prop_getattr(PROPERTIES["subarray_vpos"]).valuestep
+
+        self.log.debug(f"min exposure time is: {self.min_exposure_time_ms} ms")
+        self.log.debug(f"max exposure time is: {self.max_exposure_time_ms} ms")
+        self.log.debug(f"min line interval is: {self.min_line_interval_us} us")
+        self.log.debug(f"max line interval is: {self.max_line_interval_us} us")
+        self.log.debug(f"min width is: {self.min_width_px} px")
+        self.log.debug(f"max width is: {self.max_width_px} px")
+        self.log.debug(f"min height is: {self.min_height_px} px")
+        self.log.debug(f"max height is: {self.max_height_px} px")
+        self.log.debug(f"min offset x is: {self.min_offset_x_px} px")
+        self.log.debug(f"max offset x is: {self.max_offset_x_px} px")
+        self.log.debug(f"min offset y is: {self.min_offset_y_px} px")
+        self.log.debug(f"max offset y is: {self.max_offset_y_px} px")
+        self.log.debug(f"step exposure time is: {self.step_exposure_time_ms} ms")
+        self.log.debug(f"step line interval is: {self.step_line_interval_us} us")
+        self.log.debug(f"step width is: {self.step_width_px} px")
+        self.log.debug(f"step height is: {self.step_height_px} px")
+        self.log.debug(f"step offset x is: {self.step_offset_x_px} px")
+        self.log.debug(f"step offset y is: {self.step_offset_y_px} px")
+
+    def _query_trigger_modes(self) -> None:
+        """Query the available trigger modes."""
+        min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_mode"]).valuemin)
+        max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_mode"]).valuemax)
+        for prop_value in range(min_prop_value, max_prop_value + 1):
+            reply = self.dcam.prop_getvaluetext(PROPERTIES["trigger_mode"], prop_value)
+            if reply:
+                TRIGGERS["mode"][reply.lower()] = prop_value
+
+    def _query_trigger_sources(self) -> None:
+        """Query the available trigger sources."""
+        min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_source"]).valuemin)
+        max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_source"]).valuemax)
+        for prop_value in range(min_prop_value, max_prop_value + 1):
+            reply = self.dcam.prop_getvaluetext(PROPERTIES["trigger_source"], prop_value)
+            if reply:
+                TRIGGERS["source"][reply.lower()] = prop_value
+
+    def _query_trigger_polarities(self) -> None:
+        """Query the available trigger polarities."""
+        min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_polarity"]).valuemin)
+        max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["trigger_polarity"]).valuemax)
+        for prop_value in range(min_prop_value, max_prop_value + 1):
+            reply = self.dcam.prop_getvaluetext(PROPERTIES["trigger_polarity"], prop_value)
+            if reply:
+                TRIGGERS["polarity"][reply.lower()] = prop_value
+
+    def _query_sensor_modes(self) -> None:
+        """Query the available sensor modes."""
+        min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["sensor_mode"]).valuemin)
+        max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["sensor_mode"]).valuemax)
+        for prop_value in range(min_prop_value, max_prop_value + 1):
+            reply = self.dcam.prop_getvaluetext(PROPERTIES["sensor_mode"], prop_value)
+            if reply:
+                SENSOR_MODES[reply.lower()] = prop_value
+
+    def _query_readout_directions(self) -> None:
+        """Query the available readout directions."""
+        min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["readout_direction"]).valuemin)
+        max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["readout_direction"]).valuemax)
+        for prop_value in range(min_prop_value, max_prop_value + 1):
+            reply = self.dcam.prop_getvaluetext(PROPERTIES["readout_direction"], prop_value)
+            if reply:
+                READOUT_DIRECTIONS[reply.lower()] = prop_value
+
+    def _query_binning(self) -> None:
+        """Query the available binning options."""
+        min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["binning"]).valuemin)
+        max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["binning"]).valuemax)
+        for prop_value in range(min_prop_value, max_prop_value + 1):
+            reply = self.dcam.prop_getvaluetext(PROPERTIES["binning"], prop_value)
+            if reply:
+                BINNING[reply.lower()] = prop_value
+
+    def _query_pixel_types(self) -> None:
+        """Query the available pixel types."""
+        min_prop_value = int(self.dcam.prop_getattr(PROPERTIES["pixel_type"]).valuemin)
+        max_prop_value = int(self.dcam.prop_getattr(PROPERTIES["pixel_type"]).valuemax)
+        for prop_value in range(min_prop_value, max_prop_value + 1):
+            reply = self.dcam.prop_getvaluetext(PROPERTIES["pixel_type"], prop_value)
+            if reply:
+                PIXEL_TYPES[reply.lower()] = prop_value

@@ -30,7 +30,7 @@ class RobocopyFileTransfer(BaseFileTransfer):
         super().__init__(external_path, local_path)
         self._protocol = "robocopy"
 
-    def _run(self):
+    def _run(self) -> None:
         """
         Run the file transfer process.
 
@@ -73,7 +73,7 @@ class RobocopyFileTransfer(BaseFileTransfer):
                 for file_path, file_size_mb in sorted_file_list.items():
                     # transfer just one file and iterate
                     # split filename and path
-                    [local_dir, filename] = os.path.split(file_path)
+                    local_dir, filename = os.path.split(file_path)
                     self.log.info(f"transfering {filename}")
                     # specify external directory
                     # need to change directories to str because they are Path objects
@@ -103,17 +103,15 @@ class RobocopyFileTransfer(BaseFileTransfer):
                         while file_progress < 100:
                             start_time_s = time.time()
                             # open log file
-                            f = open(log_path, "r")
-                            # read the last line
-                            line = f.readlines()[-1]
-                            # close the log file
-                            f.close()
+                            with open(log_path, "r") as f:
+                                # read the last line
+                                line = f.readlines()[-1]
                             # try to find if there is a % in the last line
                             try:
                                 # convert the string to a float
                                 file_progress = float(line.replace("%", ""))
                             # line did not contain %
-                            except:
+                            except ValueError:
                                 file_progress = 0
                             # sum to transferred amount to track progress
                             self._progress = (
@@ -133,6 +131,7 @@ class RobocopyFileTransfer(BaseFileTransfer):
                             self.log.info(f"{self.filename} transfer is {self.progress:.2f} [%] complete.")
                             # pause for 10 sec
                             time.sleep(10.0)
+                        subprocess.wait()
                     else:
                         subprocess.wait()
                         self._progress = (total_transferred_mb + file_size_mb) / total_size_mb * 100
@@ -169,7 +168,7 @@ class RobocopyFileTransfer(BaseFileTransfer):
                                     self.log.info(f"hashes did not match, deleting {external_file_path}")
                                     os.remove(external_file_path)
                                     pass
-                            except:
+                            except FileNotFoundError:
                                 self.log.warning(f"no external file exists at {external_file_path}")
                         else:
                             # remove local file

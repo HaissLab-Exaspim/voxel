@@ -9,7 +9,7 @@ class TSDownSample3D(BaseDownSample):
     Voxel 3D downsampling with tensorstore.
     """
 
-    def __init__(self, binning: int):
+    def __init__(self, binning: int) -> None:
         """
         Module for handling 3D downsampling processes.
 
@@ -17,19 +17,17 @@ class TSDownSample3D(BaseDownSample):
         :type binning: int
         :raises ValueError: If the binning factor is not valid.
         """
-
         super().__init__(binning)
 
-    def run(self, image: numpy.array):
+    def run(self, image: numpy.ndarray) -> numpy.ndarray:
         """
         Run function for image downsampling.
 
         :param image: Input image
-        :type image: numpy.array
+        :type image: numpy.ndarray
         :return: Downsampled image
-        :rtype: numpy.array
+        :rtype: numpy.ndarray
         """
-
         downsampled_image = (
             ts.downsample(
                 ts.array(image),

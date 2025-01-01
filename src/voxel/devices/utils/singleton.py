@@ -1,8 +1,11 @@
 from functools import wraps
 from threading import Lock
+from typing import Callable, Any, TypeVar, Type
+
+T = TypeVar('T')
 
 
-def thread_safe_singleton(func):
+def thread_safe_singleton(func: Callable[..., T]) -> Callable[..., T]:
     """
     A decorator that makes a function a thread-safe singleton.
     The decorated function will only be executed once, and its result
@@ -13,19 +16,17 @@ def thread_safe_singleton(func):
     :return: The singleton instance of the function.
     :rtype: function
     """
-
     lock = Lock()
-    instance = None
+    instance: T = None
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> T:
         """
         Wrapper function to ensure thread-safe singleton behavior.
 
         :return: The singleton instance of the function.
         :rtype: function
         """
-
         nonlocal instance
         if instance is None:
             with lock:
@@ -41,7 +42,7 @@ class Singleton(type):
     This is a thread-safe implementation of Singleton.
     """
 
-    _instances = {}
+    _instances: dict[Type, Any] = {}
 
     _lock: Lock = Lock()
     """
@@ -49,7 +50,7 @@ class Singleton(type):
     first access to the Singleton.
     """
 
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls: Type[T], *args: Any, **kwargs: Any) -> T:
         """
         Ensure that only one instance of the class is created.
 

@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 from gputools import OCLArray, OCLProgram
 
 from voxel.processes.downsample.base import BaseDownSample
@@ -9,7 +9,7 @@ class GPUToolsDownSample3D(BaseDownSample):
     Voxel 3D downsampling with gputools.
     """
 
-    def __init__(self, binning: int):
+    def __init__(self, binning: int) -> None:
         """
         Module for handling 3D downsampling processes.
 
@@ -17,7 +17,6 @@ class GPUToolsDownSample3D(BaseDownSample):
         :type binning: int
         :raises ValueError: If the binning factor is not valid.
         """
-
         super().__init__(binning)
         # opencl kernel
         self._kernel = """
@@ -41,16 +40,15 @@ class GPUToolsDownSample3D(BaseDownSample):
 
         self._prog = OCLProgram(src_str=self._kernel, build_options=["-D", f"BLOCK={self._binning}"])
 
-    def run(self, image: numpy.array):
+    def run(self, image: np.ndarray) -> np.ndarray:
         """
         Run function for image downsampling.
 
         :param image: Input image
-        :type image: numpy.array
+        :type image: numpy.ndarray
         :return: Downsampled image
-        :rtype: numpy.array
+        :rtype: numpy.ndarray
         """
-
         x_g = OCLArray.from_array(image)
         y_g = OCLArray.empty(tuple(s // self._binning for s in image.shape), image.dtype)
         self._prog.run_kernel("downsample3d", y_g.shape[::-1], None, x_g.data, y_g.data)

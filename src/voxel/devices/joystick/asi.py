@@ -1,4 +1,5 @@
 import logging
+from typing import Dict, Optional
 
 from tigerasi.device_codes import *
 from tigerasi.tiger_controller import TigerController
@@ -26,7 +27,12 @@ class Joystick(BaseJoystick):
     Joystick class for handling ASI joystick devices.
     """
 
-    def __init__(self, tigerbox: TigerController, axis_mapping: dict, joystick_mapping: dict = None):
+    def __init__(
+        self,
+        tigerbox: TigerController,
+        axis_mapping: Dict[str, str],
+        joystick_mapping: Optional[Dict[str, Dict[str, str]]] = None,
+    ) -> None:
         """
         Initialize the Joystick object.
 
@@ -81,7 +87,7 @@ class Joystick(BaseJoystick):
                 )
 
     @property
-    def stage_axes(self):
+    def stage_axes(self) -> Dict[str, str]:
         """
         Get the stage axes controlled by the joystick.
 
@@ -91,7 +97,7 @@ class Joystick(BaseJoystick):
         return self._stage_axes
 
     @property
-    def joystick_mapping(self):
+    def joystick_mapping(self) -> Dict[str, Dict[str, str]]:
         """
         Get the joystick mapping.
 
@@ -101,7 +107,7 @@ class Joystick(BaseJoystick):
         return self._joystick_mapping
 
     @joystick_mapping.setter
-    def joystick_mapping(self, joystick_mapping):
+    def joystick_mapping(self, joystick_mapping: Dict[str, Dict[str, str]]) -> None:
         """
         Set the joystick mapping.
 
@@ -127,7 +133,7 @@ class Joystick(BaseJoystick):
                 )
         self._joystick_mapping = joystick_mapping
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the joystick device.
         """

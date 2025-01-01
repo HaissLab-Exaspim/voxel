@@ -7,14 +7,14 @@ class _DeliminatedProperty(property):
     """
 
     def __init__(
-        self, 
-        fget: Callable[[Any], Any], 
-        fset: Optional[Callable[[Any, Any], None]] = None, 
-        fdel: Optional[Callable[[Any], None]] = None, 
-        minimum: Union[float, Callable[[Any], float]] = float("-inf"), 
-        maximum: Union[float, Callable[[Any], float]] = float("inf"), 
-        step: Optional[float] = None, 
-        unit: Optional[str] = None
+        self,
+        fget: Callable[[Any], Any],
+        fset: Optional[Callable[[Any, Any], None]] = None,
+        fdel: Optional[Callable[[Any], None]] = None,
+        minimum: Union[float, Callable[[Any], float]] = float("-inf"),
+        maximum: Union[float, Callable[[Any], float]] = float("inf"),
+        step: Optional[float] = None,
+        unit: Optional[str] = None,
     ):
         """
         Initialize the _DeliminatedProperty.
@@ -102,7 +102,7 @@ class _DeliminatedProperty(property):
         """
         self._name = f"_{name}"
 
-    def __call__(self, func: Callable[[Any], Any]) -> '_DeliminatedProperty':
+    def __call__(self, func: Callable[[Any], Any]) -> "_DeliminatedProperty":
         """
         Make the property callable.
 
@@ -114,7 +114,7 @@ class _DeliminatedProperty(property):
         self._fget = func
         return self
 
-    def setter(self, fset: Callable[[Any, Any], None]) -> '_DeliminatedProperty':
+    def setter(self, fset: Callable[[Any, Any], None]) -> "_DeliminatedProperty":
         """
         Set the setter function for the property.
 
@@ -125,7 +125,7 @@ class _DeliminatedProperty(property):
         """
         return type(self)(self._fget, fset, self._fdel, self.minimum, self.maximum, self.step, self.unit)
 
-    def deleter(self, fdel: Callable[[Any], None]) -> '_DeliminatedProperty':
+    def deleter(self, fdel: Callable[[Any], None]) -> "_DeliminatedProperty":
         """
         Set the deleter function for the property.
 
@@ -148,7 +148,9 @@ class _DeliminatedProperty(property):
 
 
 # wrap _DeliminatedProperty to allow for deferred calling
-def DeliminatedProperty(fget: Optional[Callable[[Any], Any]] = None, *args, **kwargs) -> Union[_DeliminatedProperty, Callable[[Callable[[Any], Any]], _DeliminatedProperty]]:
+def DeliminatedProperty(
+    fget: Optional[Callable[[Any], Any]] = None, *args, **kwargs
+) -> Union[_DeliminatedProperty, Callable[[Callable[[Any], Any]], _DeliminatedProperty]]:
     """
     Create a _DeliminatedProperty instance or a wrapper for deferred calling.
 
@@ -160,6 +162,8 @@ def DeliminatedProperty(fget: Optional[Callable[[Any], Any]] = None, *args, **kw
     if fget:
         return _DeliminatedProperty(fget, *args, **kwargs)
     else:
+
         def wrapper(fget: Callable[[Any], Any]) -> _DeliminatedProperty:
             return _DeliminatedProperty(fget, *args, **kwargs)
+
         return wrapper

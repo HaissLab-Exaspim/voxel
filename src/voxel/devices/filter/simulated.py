@@ -8,7 +8,7 @@ class Filter(BaseFilter):
     """
     Filter class for handling simulated filter devices.
     """
-    def __init__(self, wheel: FilterWheel, id: str):
+    def __init__(self, wheel: FilterWheel, id: str) -> None:
         """
         Initialize the Filter object.
 
@@ -21,13 +21,13 @@ class Filter(BaseFilter):
         self.id = id
         self.wheel = wheel
 
-    def enable(self):
+    def enable(self) -> None:
         """
         Enable the filter device.
         """    
         self.wheel.filter = self.id
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the filter device.
         """   

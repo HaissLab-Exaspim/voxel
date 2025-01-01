@@ -8,11 +8,11 @@ from multiprocessing import Array, Process
 from multiprocessing.shared_memory import SharedMemory
 from pathlib import Path
 from time import perf_counter, sleep
+from typing import List
 
 import numpy as np
 import acquire_zarr as aqz
 
-from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.writers.base import BaseWriter
 
 CHUNK_COUNT_PX = 64
@@ -38,7 +38,7 @@ class ZarrWriter(BaseWriter):
     path\\acquisition_name\\filename.zarr
     """
 
-    def __init__(self, path: str):
+    def __init__(self, path: str) -> None:
         """
         Module for handling Zarr data writing processes.
 
@@ -48,7 +48,7 @@ class ZarrWriter(BaseWriter):
         super().__init__(path)
 
     @property
-    def chunk_size_x_px(self):
+    def chunk_size_x_px(self) -> int:
         """Get the chunk size x of the writer.
 
         :return: Chunk size in x in pixels
@@ -57,17 +57,17 @@ class ZarrWriter(BaseWriter):
         return self._chunk_size_x_px
 
     @chunk_size_x_px.setter
-    def chunk_size_x_px(self, chunk_size_x_px: int):
+    def chunk_size_x_px(self, chunk_size_x_px: int) -> None:
         """Set the chunk size in x of the writer.
 
-        :param value: Chynk size in x in pixels
+        :param value: Chunk size in x in pixels
         :type value: int
         """
         self.log.info(f"setting chunk size in x to: {chunk_size_x_px} [px]")
         self._chunk_size_x_px = chunk_size_x_px
 
     @property
-    def chunk_size_y_px(self):
+    def chunk_size_y_px(self) -> int:
         """Get the chunk size y of the writer.
 
         :return: Chunk size in y in pixels
@@ -76,17 +76,17 @@ class ZarrWriter(BaseWriter):
         return self._chunk_size_y_px
 
     @chunk_size_y_px.setter
-    def chunk_size_y_px(self, chunk_size_y_px: int):
+    def chunk_size_y_px(self, chunk_size_y_px: int) -> None:
         """Set the chunk size in y of the writer.
 
-        :param value: Chynk size in y in pixels
+        :param value: Chunk size in y in pixels
         :type value: int
         """
         self.log.info(f"setting chunk size in y to: {chunk_size_y_px} [px]")
         self._chunk_size_y_px = chunk_size_y_px
 
     @property
-    def chunk_size_z_px(self):
+    def chunk_size_z_px(self) -> int:
         """Get the chunk size z of the writer.
 
         :return: Chunk size in z in pixels
@@ -95,17 +95,17 @@ class ZarrWriter(BaseWriter):
         return self._chunk_size_z_px
 
     @chunk_size_z_px.setter
-    def chunk_size_z_px(self, chunk_size_z_px: int):
+    def chunk_size_z_px(self, chunk_size_z_px: int) -> None:
         """Set the chunk size in z of the writer.
 
-        :param value: Chynk size in z in pixels
+        :param value: Chunk size in z in pixels
         :type value: int
         """
         self.log.info(f"setting chunk size in z to: {chunk_size_z_px} [px]")
         self._chunk_size_z_px = chunk_size_z_px
 
     @property
-    def frame_count_px(self):
+    def frame_count_px(self) -> int:
         """Get the number of frames in the writer.
 
         :return: Frame number in pixels
@@ -114,7 +114,7 @@ class ZarrWriter(BaseWriter):
         return self._frame_count_px
 
     @frame_count_px.setter
-    def frame_count_px(self, frame_count_px: int):
+    def frame_count_px(self, frame_count_px: int) -> None:
         """Set the number of frames in the writer.
 
         :param value: Frame number in pixels
@@ -127,7 +127,7 @@ class ZarrWriter(BaseWriter):
         self._frame_count_px = frame_count_px
 
     @property
-    def chunk_count_px(self):
+    def chunk_count_px(self) -> int:
         """Get the chunk count in pixels
 
         :return: Chunk count in pixels
@@ -136,16 +136,16 @@ class ZarrWriter(BaseWriter):
         return CHUNK_COUNT_PX
 
     @property
-    def multiscale(self):
+    def multiscale(self) -> bool:
         """Get the multiscale setting of the zarr writer.
 
         :return: Multiscale setting
         :rtype: bool
         """
-        return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
+        return self._multiscale
 
     @multiscale.setter
-    def multiscale(self, multiscale: bool):
+    def multiscale(self, multiscale: bool) -> None:
         """Set the multiscale setting of the zarr writer.
 
         :param value: Multiscale setting
@@ -157,16 +157,16 @@ class ZarrWriter(BaseWriter):
         self._multiscale = multiscale
 
     @property
-    def version(self):
+    def version(self) -> str:
         """Get the version of the zarr writer.
 
         :return: Zarr version
         :rtype: str
         """
-        return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
+        return next(key for key, value in VERSIONS.items() if value == self._version)
 
     @version.setter
-    def version(self, version: str):
+    def version(self, version: str) -> None:
         """Set the version of the zarr writer.
 
         :param value: Zarr version
@@ -181,7 +181,7 @@ class ZarrWriter(BaseWriter):
         self._version = VERSIONS[version]
 
     @property
-    def compression(self):
+    def compression(self) -> str:
         """Get the compression codec of the writer.
 
         :return: Compression codec
@@ -190,7 +190,7 @@ class ZarrWriter(BaseWriter):
         return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
 
     @compression.setter
-    def compression(self, compression: str):
+    def compression(self, compression: str) -> None:
         """Set the compression codec of the writer.
 
         :param value: Compression codec
@@ -206,7 +206,7 @@ class ZarrWriter(BaseWriter):
         self._compression = COMPRESSIONS[compression]
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         """
         The base filename of file writer.
 
@@ -216,7 +216,7 @@ class ZarrWriter(BaseWriter):
         return self._filename
 
     @filename.setter
-    def filename(self, filename: str):
+    def filename(self, filename: str) -> None:
         """
         The base filename of file writer.
 
@@ -226,12 +226,12 @@ class ZarrWriter(BaseWriter):
         self._filename = filename if filename.endswith(".zarr") else f"{filename}.zarr"
         self.log.info(f"setting filename to: {filename}")
 
-    def delete_files(self):
+    def delete_files(self) -> None:
         """Delete all files generated by the writer."""
         filepath = Path(self._path, self._acquisition_name, self._filename).absolute()
         os.remove(filepath)
 
-    def prepare(self):
+    def prepare(self) -> None:
         """Prepare the writer."""
         self.log.info(f"{self._filename}: intializing writer.")
         # Specs for reconstructing the shared memory object.
@@ -260,11 +260,11 @@ class ZarrWriter(BaseWriter):
 
     def _run(
         self,
-        shm_shape: list,
+        shm_shape: List[int],
         shm_nbytes: int,
         shared_progress: multiprocessing.Value,
         shared_log_queue: multiprocessing.Queue,
-    ):
+    ) -> None:
         """
         Main run function of the Zarr writer.
 

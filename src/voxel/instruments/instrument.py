@@ -5,6 +5,7 @@ import logging
 from functools import wraps
 from pathlib import Path
 from threading import Lock, RLock
+from typing import Any, Dict, Optional, Type
 
 import inflection
 from ruamel.yaml import YAML
@@ -16,7 +17,7 @@ from voxel.descriptors.deliminated_property import _DeliminatedProperty
 class Instrument:
     """Represents an instrument with various devices and configurations."""
 
-    def __init__(self, config_path: str, yaml_handler: YAML = None, log_level="INFO"):
+    def __init__(self, config_path: str, yaml_handler: Optional[YAML] = None, log_level: str = "INFO"):
         """
         Initialize the Instrument class.
 
@@ -37,13 +38,13 @@ class Instrument:
         self.config = self.yaml.load(self.config_path)
 
         # store a dict of {device name: device type} for convenience
-        self.channels = {}
-        self.stage_axes = []
+        self.channels: Dict[str, Any] = {}
+        self.stage_axes: list = []
 
         # construct microscope
         self._construct()
 
-    def _construct(self):
+    def _construct(self) -> None:
         """
         Construct the instrument from the configuration file.
 
@@ -53,7 +54,7 @@ class Instrument:
         # grab instrument id
         try:
             self.id = self.config["instrument"]["id"]
-        except:
+        except KeyError:
             raise ValueError("no instrument id defined. check yaml file.")
         # construct devices
         for device_name, device_specs in self.config["instrument"]["devices"].items():
@@ -72,7 +73,7 @@ class Instrument:
                     raise ValueError(f"filter {filter} not associated with any filter wheel: {self.filter_wheels}")
         self.channels = self.config["instrument"]["channels"]
 
-    def _construct_device(self, device_name, device_specs, lock: Lock = None):
+    def _construct_device(self, device_name: str, device_specs: Dict[str, Any], lock: Optional[Lock] = None) -> None:
         """
         Construct a device based on its specifications.
 
@@ -112,7 +113,9 @@ class Instrument:
             # copy so config is not altered by adding in parent devices
             self._construct_subdevice(device_object, subdevice_name, copy.deepcopy(subdevice_specs), lock)
 
-    def _construct_subdevice(self, device_object, subdevice_name, subdevice_specs, lock):
+    def _construct_subdevice(
+        self, device_object: Any, subdevice_name: str, subdevice_specs: Dict[str, Any], lock: Lock
+    ) -> None:
         """
         Construct a subdevice based on its specifications.
 
@@ -128,7 +131,6 @@ class Instrument:
         # Import subdevice class in order to access keyword argument required in the init of the device
         subdevice_class = getattr(importlib.import_module(subdevice_specs["driver"]), subdevice_specs["module"])
         subdevice_needs = inspect.signature(subdevice_class.__init__).parameters
-        kwds = {}
         for name, parameter in subdevice_needs.items():
             # If subdevice init needs a serial port, add device's serial port to init arguments
             if parameter.annotation == Serial and Serial in [type(v) for v in device_object.__dict__.values()]:
@@ -139,7 +141,7 @@ class Instrument:
                 subdevice_specs["init"][name] = device_object
         self._construct_device(subdevice_name, subdevice_specs, lock)
 
-    def _load_device(self, driver: str, module: str, kwds, lock: Lock):
+    def _load_device(self, driver: str, module: str, kwds: Dict[str, Any], lock: Lock) -> Any:
         """
         Load a device class and make it thread-safe.
 
@@ -159,7 +161,7 @@ class Instrument:
         thread_safe_device_class = for_all_methods(lock, device_class)
         return thread_safe_device_class(**kwds)
 
-    def _setup_device(self, device: object, properties: dict):
+    def _setup_device(self, device: Any, properties: Dict[str, Any]) -> None:
         """
         Set up a device with its properties.
 
@@ -176,7 +178,7 @@ class Instrument:
             except (TypeError, AttributeError):
                 self.log.info(f"{device} property {key} has no setter")
 
-    def update_current_state_config(self):
+    def update_current_state_config(self) -> None:
         """
         Update the current state configuration of the instrument.
         """
@@ -191,7 +193,7 @@ class Instrument:
                     properties[attr_name] = getattr(device, attr_name)
             device_specs["properties"] = properties
 
-    def save_config(self, path: Path):
+    def save_config(self, path: Path) -> None:
         """
         Save the current configuration to a file.
 
@@ -201,14 +203,14 @@ class Instrument:
         with path.open("w") as f:
             self.yaml.dump(self.config, f)
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the instrument and release any resources.
         """
         pass
 
 
-def for_all_methods(lock, cls):
+def for_all_methods(lock: Lock, cls: Type) -> Type:
     """
     Apply a lock to all methods of a class to make them thread-safe.
 
@@ -236,7 +238,7 @@ def for_all_methods(lock, cls):
     return cls
 
 
-def lock_methods(fn, lock):
+def lock_methods(fn: Callable, lock: Lock) -> Callable:
     """
     Apply a lock to a method to make it thread-safe.
 
@@ -249,7 +251,7 @@ def lock_methods(fn, lock):
     """
 
     @wraps(fn)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args: Any, **kwargs: Any) -> Any:
         """
         Wrapper function to apply the lock.
 

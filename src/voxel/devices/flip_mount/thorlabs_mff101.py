@@ -1,15 +1,14 @@
 from time import sleep
-from typing import Optional
+from typing import Dict, Optional
 
 from pylablib.devices import Thorlabs
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
-
-from . import BaseFlipMount
+from voxel.devices.flip_mount.base import BaseFlipMount
 
 VALID_POSITIONS = [0, 1]
-POSITIONS = dict()
 FLIP_TIME_RANGE_MS = (500, 2800, 100)
+POSITIONS = dict()
 
 
 class ThorlabsFlipMount(BaseFlipMount):
@@ -17,7 +16,7 @@ class ThorlabsFlipMount(BaseFlipMount):
     ThorlabsFlipMount class for handling Thorlabs flip mount devices.
     """
 
-    def __init__(self, id, conn, positions):
+    def __init__(self, id: str, conn: object, positions: Dict[str, int]) -> None:
         """
         Initialize the ThorlabsFlipMount object.
 
@@ -41,7 +40,7 @@ class ThorlabsFlipMount(BaseFlipMount):
                 )
             POSITIONS[key] = value
 
-    def _connect(self):
+    def _connect(self) -> None:
         """
         Connect to the flip mount.
 
@@ -54,7 +53,7 @@ class ThorlabsFlipMount(BaseFlipMount):
             self.log.error(f"Could not connect to flip mount {self.id}: {e}")
             raise e
 
-    def _disconnect(self):
+    def _disconnect(self) -> None:
         """
         Disconnect the flip mount.
         """
@@ -63,13 +62,13 @@ class ThorlabsFlipMount(BaseFlipMount):
             self._inst = None
             self.log.info(f"Flip mount {self.id} disconnected")
 
-    def wait(self):
+    def wait(self) -> None:
         """
         Wait for the flip mount to finish flipping.
         """
         sleep(self.flip_time_ms * 1e-3)  # type: ignore
 
-    def toggle(self, wait=False):
+    def toggle(self, wait: bool = False) -> None:
         """
         Toggle the flip mount position.
 
@@ -85,7 +84,7 @@ class ThorlabsFlipMount(BaseFlipMount):
             self.wait()
 
     @property
-    def position(self) -> str | None:
+    def position(self) -> Optional[str]:
         """
         Get the current position of the flip mount.
 
@@ -99,7 +98,7 @@ class ThorlabsFlipMount(BaseFlipMount):
         return next((key for key, value in POSITIONS.items() if value == pos_idx), "Unknown")
 
     @position.setter
-    def position(self, position_name: str):
+    def position(self, position_name: str) -> None:
         """
         Set the flip mount to a specific position.
 
@@ -133,7 +132,7 @@ class ThorlabsFlipMount(BaseFlipMount):
         return flip_time_ms
 
     @flip_time_ms.setter
-    def flip_time_ms(self, time_ms: float):
+    def flip_time_ms(self, time_ms: float) -> None:
         """
         Set the time it takes to flip the mount in milliseconds.
 
@@ -152,7 +151,7 @@ class ThorlabsFlipMount(BaseFlipMount):
         except Exception as e:
             raise ValueError(f"Could not set flip time: {e}")
 
-    def close(self):
+    def close(self) -> None:
         """Close the flip mount connection."""
         self._disconnect()
         self.log.info(f"Flip mount {self.id} shutdown")

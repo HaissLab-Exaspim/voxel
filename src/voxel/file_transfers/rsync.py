@@ -42,7 +42,7 @@ class RsyncFileTransfer(BaseFileTransfer):
         # --info=progress2 outputs % progress for all files not sequentially for each file
         self._flags = ["--progress", "--recursive", "--info=progress2"]
 
-    def _run(self):
+    def _run(self) -> None:
         """
         Run the file transfer process.
 
@@ -57,7 +57,7 @@ class RsyncFileTransfer(BaseFileTransfer):
         # loop over number of attempts in the event that a file transfer fails
         while transfer_complete is False and retry_num <= self._max_retry - 1:
             # generate a list of subdirs and files in the parent local dir to delete at the end
-            delete_list = []
+            delete_list: List[str] = []
             for name in os.listdir(local_directory.absolute()):
                 if self.filename in name:
                     delete_list.append(name)
@@ -65,7 +65,7 @@ class RsyncFileTransfer(BaseFileTransfer):
             # path is the entire experiment path
             # subdirs is any tile specific subdir i.e. zarr store
             # files are any tile specific files
-            file_list = dict()
+            file_list: Dict[str, float] = {}
             for path, subdirs, files in os.walk(local_directory.absolute()):
                 for name in files:
                     # check and only add if filename matches tranfer's filename
@@ -176,6 +176,7 @@ class RsyncFileTransfer(BaseFileTransfer):
                             f.close()
                             # pause for 10 sec
                             time.sleep(10.0)
+                        subprocess.wait()
                     else:
                         subprocess.wait()
                         self.progress = (total_transferred_mb + file_size_mb) / total_size_mb * 100

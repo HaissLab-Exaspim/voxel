@@ -1,6 +1,7 @@
 from oxxius_laser import LBX, BoolVal
 from serial import Serial
 from sympy import Expr, solve, symbols
+from typing import Union, Dict
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.devices.laser.base import BaseLaser
@@ -17,7 +18,9 @@ class OxxiusLBXLaser(BaseLaser):
     OxxiusLBXLaser class for handling Oxxius LBX laser devices.
     """
 
-    def __init__(self, id: str, port: Serial or str, wavelength: int, prefix: str, coefficients: dict):
+    def __init__(
+        self, id: str, port: Union[Serial, str], wavelength: int, prefix: str, coefficients: Dict[str, float]
+    ) -> None:
         """
         Initialize the OxxiusLBXLaser object.
 
@@ -48,13 +51,13 @@ class OxxiusLBXLaser(BaseLaser):
         """
         return self._wavelength
 
-    def enable(self):
+    def enable(self) -> None:
         """
         Enable the laser.
         """
         self._inst.enable()
 
-    def disable(self):
+    def disable(self) -> None:
         """
         Disable the laser.
         """
@@ -62,7 +65,7 @@ class OxxiusLBXLaser(BaseLaser):
 
     @property
     @DeliminatedProperty(minimum=0, maximum=lambda self: self.max_power)
-    def power_setpoint_mw(self):
+    def power_setpoint_mw(self) -> float:
         """
         Get the power setpoint in milliwatts.
 
@@ -75,7 +78,7 @@ class OxxiusLBXLaser(BaseLaser):
             return int(self._inst.power_setpoint)
 
     @power_setpoint_mw.setter
-    def power_setpoint_mw(self, value: float or int):
+    def power_setpoint_mw(self, value: Union[float, int]) -> None:
         """
         Set the power setpoint in milliwatts.
 
@@ -94,7 +97,7 @@ class OxxiusLBXLaser(BaseLaser):
             self._inst.power_setpoint = value
 
     @property
-    def modulation_mode(self):
+    def modulation_mode(self) -> str:
         """
         Get the modulation mode.
 
@@ -109,7 +112,7 @@ class OxxiusLBXLaser(BaseLaser):
             return "off"
 
     @modulation_mode.setter
-    def modulation_mode(self, value: str):
+    def modulation_mode(self, value: str) -> None:
         """
         Set the modulation mode.
 
@@ -123,7 +126,7 @@ class OxxiusLBXLaser(BaseLaser):
             setattr(self._inst, attribute, state)
         self._set_max_power()
 
-    def status(self):
+    def status(self) -> Dict[str, Union[str, float]]:
         """
         Get the status of the laser.
 
@@ -132,7 +135,7 @@ class OxxiusLBXLaser(BaseLaser):
         """
         return self._inst.faults()
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the laser connection.
         """
@@ -149,7 +152,7 @@ class OxxiusLBXLaser(BaseLaser):
         return self._inst.power
 
     @property
-    def temperature_c(self):
+    def temperature_c(self) -> float:
         """
         Get the temperature of the laser in Celsius.
 
@@ -172,7 +175,7 @@ class OxxiusLBXLaser(BaseLaser):
         return func
 
     @property
-    def max_power(self):
+    def max_power(self) -> float:
         """
         Get the maximum power in milliwatts.
 
@@ -184,7 +187,7 @@ class OxxiusLBXLaser(BaseLaser):
         else:
             return self._inst.max_power
 
-    def _set_max_power(self):
+    def _set_max_power(self) -> None:
         """
         Set the maximum power.
         """

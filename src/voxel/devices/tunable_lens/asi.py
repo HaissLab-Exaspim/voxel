@@ -25,7 +25,7 @@ class TigerControllerSingleton(TigerController, metaclass=Singleton):
     :type metaclass: type
     """
 
-    def __init__(self, com_port):
+    def __init__(self, com_port: str) -> None:
         """
         Initialize the TigerControllerSingleton object.
 
@@ -40,7 +40,7 @@ class TunableLens(BaseTunableLens):
     TunableLens class for handling ASI tunable lens devices.
     """
 
-    def __init__(self, port: str, hardware_axis: str):
+    def __init__(self, port: str, hardware_axis: str) -> None:
         """
         Initialize the TunableLens object.
 
@@ -56,7 +56,7 @@ class TunableLens(BaseTunableLens):
         self.id = self.hardware_axis
 
     @property
-    def mode(self):
+    def mode(self) -> str:
         """
         Get the mode of the tunable lens.
 
@@ -68,7 +68,7 @@ class TunableLens(BaseTunableLens):
         return converted_mode
 
     @mode.setter
-    def mode(self, mode: str):
+    def mode(self, mode: str) -> None:
         """
         Set the mode of the tunable lens.
 
@@ -83,7 +83,7 @@ class TunableLens(BaseTunableLens):
         self.tigerbox.set_axis_control_mode(**{self.hardware_axis: MODES[mode]})
 
     @property
-    def temperature_c(self):
+    def temperature_c(self) -> float:
         """
         Get the temperature of the tunable lens in Celsius.
 
@@ -92,7 +92,7 @@ class TunableLens(BaseTunableLens):
         """
         return self.tigerbox.get_etl_temp(self.hardware_axis)
 
-    def log_metadata(self):
+    def log_metadata(self) -> None:
         """
         Log metadata for the tunable lens.
         """
@@ -104,7 +104,7 @@ class TunableLens(BaseTunableLens):
         for setting in axis_settings:
             self.log.info(f"{self.hardware_axis} axis, {setting}, {axis_settings[setting]}")
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the tunable lens device.
         """

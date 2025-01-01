@@ -1,5 +1,4 @@
 import logging
-import time
 
 from sdks import pco
 
@@ -31,7 +30,7 @@ class pcoSingleton(pco, metaclass=Singleton):
     :type metaclass: Singleton
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize the pcoSingleton instance.
         """
@@ -46,7 +45,7 @@ class Camera(BaseCamera):
     :type BaseCamera: BaseCamera
     """
 
-    def __init__(self, id=str):
+    def __init__(self, id: str) -> None:
         """
         Initialize the Camera instance.
 
@@ -68,17 +67,17 @@ class Camera(BaseCamera):
 
         self._latest_frame = None
 
-    def reset(self):
+    def reset(self) -> None:
         """
         Reset the camera instance.
-        """    
+        """
         if self.pco:
             self.pco.close()
             del self.pco
         self.pco = pcoSingleton.Camera(id=self.id)
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
-    def exposure_time_ms(self):
+    def exposure_time_ms(self) -> float:
         """
         Get the exposure time in milliseconds.
 
@@ -89,7 +88,7 @@ class Camera(BaseCamera):
         return self.pco.exposure_time * 1000
 
     @exposure_time_ms.setter
-    def exposure_time_ms(self, exposure_time_ms: float):
+    def exposure_time_ms(self, exposure_time_ms: float) -> None:
         """
         Set the exposure time in milliseconds.
 
@@ -103,7 +102,7 @@ class Camera(BaseCamera):
         self._get_min_max_step_values()
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
-    def width_px(self):
+    def width_px(self) -> int:
         """
         Get the width in pixels.
 
@@ -114,7 +113,7 @@ class Camera(BaseCamera):
         return roi["x1"] - roi["x0"] + 1
 
     @width_px.setter
-    def width_px(self, value: int):
+    def width_px(self, value: int) -> None:
         """
         Set the width in pixels.
 
@@ -131,7 +130,7 @@ class Camera(BaseCamera):
         self.log.info(f"width set to: {value} px")
 
     @property
-    def width_offset_px(self):
+    def width_offset_px(self) -> int:
         """
         Get the width offset in pixels.
 
@@ -142,7 +141,7 @@ class Camera(BaseCamera):
         return roi["x0"] - 1
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
-    def height_px(self):
+    def height_px(self) -> int:
         """
         Get the height in pixels.
 
@@ -154,7 +153,7 @@ class Camera(BaseCamera):
         return height_px
 
     @height_px.setter
-    def height_px(self, value: int):
+    def height_px(self, value: int) -> None:
         """
         Set the height in pixels.
 
@@ -170,7 +169,7 @@ class Camera(BaseCamera):
         self.log.info(f"height set to: {value} px")
 
     @property
-    def height_offset_px(self):
+    def height_offset_px(self) -> int:
         """
         Get the height offset in pixels.
 
@@ -181,7 +180,7 @@ class Camera(BaseCamera):
         return roi["y0"] - 1
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
-    def line_interval_us(self):
+    def line_interval_us(self) -> float:
         """
         Get the line interval in microseconds.
 
@@ -193,7 +192,7 @@ class Camera(BaseCamera):
         return line_interval_s * 1e6
 
     @line_interval_us.setter
-    def line_interval_us(self, line_interval_us: float):
+    def line_interval_us(self, line_interval_us: float) -> None:
         """
         Set the line interval in microseconds.
 
@@ -207,7 +206,7 @@ class Camera(BaseCamera):
         self._get_min_max_step_values()
 
     @property
-    def frame_time_ms(self):
+    def frame_time_ms(self) -> float:
         """
         Get the frame time in milliseconds.
 
@@ -220,7 +219,7 @@ class Camera(BaseCamera):
             return (self.line_interval_us * self.height_px / 2) / 1000 + self.exposure_time_ms
 
     @property
-    def trigger(self):
+    def trigger(self) -> dict:
         """
         Get the trigger settings.
 
@@ -233,11 +232,11 @@ class Camera(BaseCamera):
         return {
             "mode": next(key for key, value in TRIGGERS["modes"].items() if value == mode),
             "source": next(key for key, value in TRIGGERS["sources"].items() if value == source),
-            "polarity": None,
+            "polarity": polarity,
         }
 
     @trigger.setter
-    def trigger(self, trigger: dict):
+    def trigger(self, trigger: dict) -> None:
         """
         Set the trigger settings.
 
@@ -258,6 +257,7 @@ class Camera(BaseCamera):
         valid_source = list(TRIGGERS["sources"].keys())
         if source not in valid_source:
             raise ValueError("source must be one of %r." % valid_source)
+        valid_polarity = None
         if polarity is not None:
             raise ValueError("polarity must be one of %r." % valid_polarity)
 
@@ -268,7 +268,7 @@ class Camera(BaseCamera):
         self._get_min_max_step_values()
 
     @property
-    def binning(self):
+    def binning(self) -> int:
         """
         Get the binning setting.
 
@@ -280,12 +280,12 @@ class Camera(BaseCamera):
         return binning
 
     @binning.setter
-    def binning(self, binning: str):
+    def binning(self, binning: int) -> None:
         """
         Set the binning setting.
 
         :param binning: Binning setting
-        :type binning: str
+        :type binning: int
         :raises ValueError: If binning is not valid
         """
         # pco binning can be different in x, y. set same for both,
@@ -297,7 +297,7 @@ class Camera(BaseCamera):
         self._get_min_max_step_values()
 
     @property
-    def sensor_width_px(self):
+    def sensor_width_px(self) -> int:
         """
         Get the sensor width in pixels.
 
@@ -307,7 +307,7 @@ class Camera(BaseCamera):
         return self.max_width_px
 
     @property
-    def sensor_height_px(self):
+    def sensor_height_px(self) -> int:
         """
         Get the sensor height in pixels.
 
@@ -317,7 +317,7 @@ class Camera(BaseCamera):
         return self.max_height_px
 
     @property
-    def mainboard_temperature_c(self):
+    def mainboard_temperature_c(self) -> float:
         """
         Get the mainboard temperature in degrees Celsius.
 
@@ -328,7 +328,7 @@ class Camera(BaseCamera):
         return temperature
 
     @property
-    def sensor_temperature_c(self):
+    def sensor_temperature_c(self) -> float:
         """
         Get the sensor temperature in degrees Celsius.
 
@@ -339,7 +339,7 @@ class Camera(BaseCamera):
         return temperature
 
     @property
-    def readout_mode(self):
+    def readout_mode(self) -> str:
         """
         Get the readout mode.
 
@@ -361,7 +361,7 @@ class Camera(BaseCamera):
         return next(key for key, value in READOUT_OUTPUT.items() if value == readout_mode)
 
     @readout_mode.setter
-    def readout_mode(self, readout_mode: str):
+    def readout_mode(self, readout_mode: str) -> None:
         """
         Set the readout mode.
 
@@ -378,19 +378,21 @@ class Camera(BaseCamera):
         # refresh parameter values
         self._get_min_max_step_values()
 
-    def prepare(self):
+    def prepare(self) -> None:
         """
         Prepare the camera for acquisition.
         """
         # pco api prepares buffer and autostarts. api call is in start()
         # pco only 16-bit A/D
         bit_to_byte = 2
-        frame_size_mb = self.width_px * self.height_px / self.binning**2 * bit_to_byte / 1e6
+        frame_size_mb = self.width_px * self.height_px / self.binning**2 * bit_to_byte / 1024**2
         self.buffer_size_frames = round(BUFFER_SIZE_MB / frame_size_mb)
         self.log.info(f"buffer set to: {self.buffer_size_frames} frames")
         self.pco.record(number_of_images=self.buffer_size_frames, mode="fifo")
 
-    def start(self):
+    import numpy as np
+
+    def start(self) -> None:
         """
         Start the camera acquisition.
         """
@@ -398,19 +400,19 @@ class Camera(BaseCamera):
         self.pre_frame_count_px = 0
         self.pco.start()
 
-    def stop(self):
+    def stop(self) -> None:
         """
         Stop the camera acquisition.
         """
         self.pco.stop()
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the camera connection.
         """
         self.pco.close()
 
-    def grab_frame(self):
+    def grab_frame(self) -> np.ndarray:
         """
         Retrieve a frame as a 2D numpy array with shape (rows, cols).
 
@@ -426,7 +428,7 @@ class Camera(BaseCamera):
         return image
 
     @property
-    def latest_frame(self):
+    def latest_frame(self) -> np.ndarray:
         """
         Get the latest frame.
 
@@ -435,13 +437,13 @@ class Camera(BaseCamera):
         """
         return self._latest_frame
 
-    def signal_acquisition_state(self):
+    def signal_acquisition_state(self) -> None:
         """
         Signal the acquisition state.
         """
-        self.post_frame_time = time.time()
-        frame_index = self.pco.rec.get_status()["dwProcImgCount"]
         # TODO FINISH THIS
+        # self.post_frame_time = time.time()
+        # frame_index = self.pco.rec.get_status()["dwProcImgCount"]
         # out_buffer_size = frame_index - self.pre_frame_count_px
         # in_buffer_size = self.buffer_size_frames - out_buffer_size
         # dropped_frames = self.pco.rec.get_status()["bFIFOOverflow"]
@@ -465,7 +467,7 @@ class Camera(BaseCamera):
         # self.pre_frame_time = time.time()
         # return state
 
-    def log_metadata(self):
+    def log_metadata(self) -> None:
         """
         Log the camera metadata.
         """

@@ -1,13 +1,13 @@
 from abc import abstractmethod
 from typing import Optional
 
-from ..base import VoxelDevice
+from voxel.devices.base import VoxelDevice
 
 
 class BaseLaser(VoxelDevice):
     """Base class for all voxel laser devices."""
 
-    def __init__(self, id: str):
+    def __init__(self, id: str) -> None:
         """
         Initialize the BaseLaser object.
 
@@ -17,14 +17,14 @@ class BaseLaser(VoxelDevice):
         super().__init__(id)
 
     @abstractmethod
-    def enable(self):
+    def enable(self) -> None:
         """
         Turn on the laser.
         """
         pass
 
     @abstractmethod
-    def disable(self):
+    def disable(self) -> None:
         """
         Turn off the laser.
         """
@@ -32,7 +32,7 @@ class BaseLaser(VoxelDevice):
 
     @property
     @abstractmethod
-    def wavelength(self):
+    def wavelength(self) -> int:
         """
         Get the wavelength of the laser.
 

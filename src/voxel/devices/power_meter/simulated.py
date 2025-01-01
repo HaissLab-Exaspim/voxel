@@ -25,13 +25,13 @@ class SimulatedPowerMeter(BasePowerMeter):
         self._is_connected = False
         self._connect()
 
-    def _connect(self):
+    def _connect(self) -> None:
         """
         Connect to the simulated power meter.
         """
         self._is_connected = True
 
-    def _check_connection(self):
+    def _check_connection(self) -> None:
         """
         Check if the power meter is connected.
 

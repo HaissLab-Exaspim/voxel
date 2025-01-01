@@ -10,7 +10,7 @@ class CucimDownSample3D(BaseDownSample):
     Voxel 3D downsampling with cucim.
     """
 
-    def __init__(self, binning: int):
+    def __init__(self, binning: int) -> None:
         """
         Module for handling 3D downsampling processes.
 
@@ -18,10 +18,9 @@ class CucimDownSample3D(BaseDownSample):
         :type binning: int
         :raises ValueError: If the binning factor is not valid.
         """
-
         super().__init__(binning)
 
-    def run(self, image: numpy.array):
+    def run(self, image: numpy.array) -> numpy.ndarray:
         """
         Run function for image downsampling.
 
@@ -30,7 +29,6 @@ class CucimDownSample3D(BaseDownSample):
         :return: Downsampled image
         :rtype: numpy.array
         """
-
         # convert numpy to cupy array
         image = cupy.asarray(image)
         downsampled_image = downscale_local_mean(image, factors=(self._binning, self._binning, self._binning))

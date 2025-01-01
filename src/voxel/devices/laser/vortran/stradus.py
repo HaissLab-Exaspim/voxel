@@ -1,5 +1,6 @@
 from vortran_laser import BoolVal
 from vortran_laser import StradusLaser as StradusVortran
+from typing import Union, Dict
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.devices.laser.base import BaseLaser
@@ -16,7 +17,7 @@ class StradusLaser(BaseLaser):
     StradusLaser class for handling Vortran Stradus laser devices.
     """
 
-    def __init__(self, id: str, port: str, wavelength: int):
+    def __init__(self, id: str, port: str, wavelength: int) -> None:
         """
         Initialize the StradusLaser object.
 
@@ -31,26 +32,26 @@ class StradusLaser(BaseLaser):
         self._inst = StradusVortran(port)
         self._wavelength = wavelength
 
-    def enable(self):
+    def enable(self) -> None:
         """
         Enable the laser.
         """
         self._inst.enable()
 
-    def disable(self):
+    def disable(self) -> None:
         """
         Disable the laser.
         """
         self._inst.disable()
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the laser connection.
         """
         self._inst.close()
 
     @DeliminatedProperty(minimum=0, maximum=lambda self: self._inst.max_power)
-    def power_setpoint_mw(self):
+    def power_setpoint_mw(self) -> float:
         """
         Get the power setpoint in milliwatts.
 
@@ -60,7 +61,7 @@ class StradusLaser(BaseLaser):
         return self._inst.power_setpoint
 
     @power_setpoint_mw.setter
-    def power_setpoint_mw(self, value: float | int):
+    def power_setpoint_mw(self, value: Union[float, int]) -> None:
         """
         Set the power setpoint in milliwatts.
 
@@ -70,7 +71,7 @@ class StradusLaser(BaseLaser):
         self._inst.power_setpoint = value
 
     @property
-    def modulation_mode(self):
+    def modulation_mode(self) -> str:
         """
         Get the modulation mode.
 
@@ -85,7 +86,7 @@ class StradusLaser(BaseLaser):
             return "off"
 
     @modulation_mode.setter
-    def modulation_mode(self, value: str):
+    def modulation_mode(self, value: str) -> None:
         """
         Set the modulation mode.
 
@@ -129,7 +130,7 @@ class StradusLaser(BaseLaser):
         return self._inst.temperature
 
     @property
-    def status(self):
+    def status(self) -> Dict[str, Union[str, float]]:
         """
         Get the status of the laser.
 

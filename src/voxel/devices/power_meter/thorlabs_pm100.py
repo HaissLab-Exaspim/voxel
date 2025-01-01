@@ -2,7 +2,7 @@ from typing import Optional
 
 import pyvisa as visa
 
-from . import BasePowerMeter
+from voxel.devices.power_meter.base import BasePowerMeter
 
 
 class ThorlabsPowerMeter(BasePowerMeter):
@@ -24,7 +24,7 @@ class ThorlabsPowerMeter(BasePowerMeter):
         self._inst: Optional[visa.resources.Resource] = None
         self._connect()
 
-    def _connect(self):
+    def _connect(self) -> None:
         """
         Connect to the Thorlabs power meter.
         """
@@ -39,7 +39,7 @@ class ThorlabsPowerMeter(BasePowerMeter):
             self.log.error(f"Unknown error: {e}")
             raise
 
-    def _check_connection(self):
+    def _check_connection(self) -> None:
         """
         Check if the power meter is connected.
 

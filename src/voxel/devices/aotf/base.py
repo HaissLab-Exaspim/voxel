@@ -1,6 +1,7 @@
 from abc import abstractmethod
+from typing import Dict
 
-from ..base import VoxelDevice
+from voxel.devices.base import VoxelDevice
 
 
 class BaseAOTF(VoxelDevice):
@@ -9,14 +10,14 @@ class BaseAOTF(VoxelDevice):
     """
 
     @abstractmethod
-    def enable_all(self):
+    def enable_all(self) -> None:
         """
         Enable all channels of the AOTF.
         """
         pass
 
     @abstractmethod
-    def disable_all(self):
+    def disable_all(self) -> None:
         """
         Disable all channels of the AOTF.
         """
@@ -24,7 +25,7 @@ class BaseAOTF(VoxelDevice):
 
     @property
     @abstractmethod
-    def frequency_hz(self):
+    def frequency_hz(self) -> Dict[int, float]:
         """
         Get the frequency in Hz for the AOTF.
 
@@ -35,12 +36,10 @@ class BaseAOTF(VoxelDevice):
 
     @frequency_hz.setter
     @abstractmethod
-    def frequency_hz(self, channel: int, frequency_hz: dict):
+    def frequency_hz(self, frequency_hz: Dict[int, float]) -> None:
         """
         Set the frequency in Hz for a specific channel of the AOTF.
 
-        :param channel: The channel number.
-        :type channel: int
         :param frequency_hz: The frequency in Hz.
         :type frequency_hz: dict
         """
@@ -48,7 +47,7 @@ class BaseAOTF(VoxelDevice):
 
     @property
     @abstractmethod
-    def power_dbm(self):
+    def power_dbm(self) -> Dict[int, float]:
         """
         Get the power in dBm for the AOTF.
 
@@ -59,12 +58,10 @@ class BaseAOTF(VoxelDevice):
 
     @power_dbm.setter
     @abstractmethod
-    def power_dbm(self, channel: int, power_dbm: dict):
+    def power_dbm(self, power_dbm: Dict[int, float]) -> None:
         """
         Set the power in dBm for a specific channel of the AOTF.
 
-        :param channel: The channel number.
-        :type channel: int
         :param power_dbm: The power in dBm.
         :type power_dbm: dict
         """
@@ -72,7 +69,7 @@ class BaseAOTF(VoxelDevice):
 
     @property
     @abstractmethod
-    def blanking_mode(self):
+    def blanking_mode(self) -> str:
         """
         Get the blanking mode of the AOTF.
 
@@ -83,7 +80,7 @@ class BaseAOTF(VoxelDevice):
 
     @blanking_mode.setter
     @abstractmethod
-    def blanking_mode(self, mode: str):
+    def blanking_mode(self, mode: str) -> None:
         """
         Set the blanking mode of the AOTF.
 
@@ -94,7 +91,7 @@ class BaseAOTF(VoxelDevice):
 
     @property
     @abstractmethod
-    def input_mode(self):
+    def input_mode(self) -> Dict[int, str]:
         """
         Get the input mode of the AOTF.
 
@@ -105,7 +102,7 @@ class BaseAOTF(VoxelDevice):
 
     @input_mode.setter
     @abstractmethod
-    def input_mode(self, modes: dict):
+    def input_mode(self, modes: Dict[int, str]) -> None:
         """
         Set the input mode of the AOTF.
 

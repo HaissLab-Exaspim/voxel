@@ -1,5 +1,6 @@
 import sys
 from enum import Enum
+from typing import Dict, Union
 
 from pycobolt import CoboltLaser
 from sympy import Expr, solve, symbols
@@ -92,8 +93,8 @@ class SkyraLaser(BaseLaser):
         max_power_mw: float,
         min_current_ma: float,
         max_current_ma: float,
-        coefficients: dict,
-    ):
+        coefficients: Dict[str, float],
+    ) -> None:
         """
         Initialize the SkyraLaser object.
 
@@ -149,14 +150,14 @@ class SkyraLaser(BaseLaser):
             func = func + float(co) * x ** int(order)
         return func
 
-    def enable(self):
+    def enable(self) -> None:
         """
         Enable the laser.
         """
         self._inst.send_cmd(f"{self._prefix}Cmd.LaserEnable")
         self.log.info(f"laser {self._prefix} enabled")
 
-    def disable(self):
+    def disable(self) -> None:
         """
         Disable the laser.
         """
@@ -164,7 +165,7 @@ class SkyraLaser(BaseLaser):
         self.log.info(f"laser {self._prefix} disabled")
 
     @DeliminatedProperty(minimum=0, maximum=lambda self: self.max_power)
-    def power_setpoint_mw(self):
+    def power_setpoint_mw(self) -> float:
         """
         Get the power setpoint in milliwatts.
 
@@ -177,7 +178,7 @@ class SkyraLaser(BaseLaser):
             return self._inst.send_cmd(f"{self._prefix}Query.PowerSetpoint") * 1000
 
     @power_setpoint_mw.setter
-    def power_setpoint_mw(self, value: float or int):
+    def power_setpoint_mw(self, value: Union[float, int]) -> None:
         """
         Set the power setpoint in milliwatts.
 
@@ -203,7 +204,7 @@ class SkyraLaser(BaseLaser):
         self.log.info(f"laser {self._prefix} set to {value} mW")
 
     @property
-    def modulation_mode(self):
+    def modulation_mode(self) -> str:
         """
         Get the modulation mode.
 
@@ -219,7 +220,7 @@ class SkyraLaser(BaseLaser):
             return "digital"
 
     @modulation_mode.setter
-    def modulation_mode(self, value: str):
+    def modulation_mode(self, value: str) -> None:
         """
         Set the modulation mode.
 
@@ -237,7 +238,7 @@ class SkyraLaser(BaseLaser):
         self._inst.send_cmd(f"{self._prefix}{analog_modulation}")
         self.log.info(f"modulation mode set to {value}")
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the laser connection.
         """
@@ -257,7 +258,7 @@ class SkyraLaser(BaseLaser):
         return self._inst.get_power()
 
     @property
-    def temperature_c(self):
+    def temperature_c(self) -> Union[float, None]:
         """
         Get the temperature of the laser in Celsius.
 
@@ -267,7 +268,7 @@ class SkyraLaser(BaseLaser):
         return None
 
     @property
-    def max_power(self):
+    def max_power(self) -> float:
         """
         Get the maximum power in milliwatts.
 

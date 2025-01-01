@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Any, Dict
 
 import inflection
 
@@ -18,7 +19,7 @@ class MetadataClass(BaseMetadata):
     Metadata class for handling metadata properties and generating acquisition names.
     """
 
-    def __init__(self, metadata_dictionary: dict, date_format: str = "None", name_specs: dict = {}):
+    def __init__(self, metadata_dictionary: Dict[str, Any], date_format: str = "None", name_specs: Dict[str, Any] = {}):
         """
         Initialize the MetadataClass.
 
@@ -49,7 +50,7 @@ class MetadataClass(BaseMetadata):
         self.acquisition_name_format = name_specs.get("format", [])
         self._acquisition_name = self.generate_acquisition_name()
 
-    def set_class_attribute(self, value, name):
+    def set_class_attribute(self, value: Any, name: str) -> None:
         """
         Set the value of a class attribute.
 
@@ -68,7 +69,7 @@ class MetadataClass(BaseMetadata):
         else:
             setattr(self, f"_{name}", value)
 
-    def get_class_attribute(self, instance, name):
+    def get_class_attribute(self, instance: Any, name: str) -> Any:
         """
         Get the value of a class attribute.
 
@@ -87,7 +88,7 @@ class MetadataClass(BaseMetadata):
             return getattr(self, f"_{name}")
 
     @property
-    def date_format(self):
+    def date_format(self) -> str:
         """
         Get the date format.
 
@@ -97,7 +98,7 @@ class MetadataClass(BaseMetadata):
         return self._date_format
 
     @date_format.setter
-    def date_format(self, format):
+    def date_format(self, format: str) -> None:
         """
         Set the date format.
 
@@ -110,7 +111,7 @@ class MetadataClass(BaseMetadata):
         self._date_format = DATE_FORMATS[format]
 
     @property
-    def acquisition_name_format(self):
+    def acquisition_name_format(self) -> list:
         """
         Get the acquisition name format.
 
@@ -120,7 +121,7 @@ class MetadataClass(BaseMetadata):
         return self._acquisition_name_format
 
     @acquisition_name_format.setter
-    def acquisition_name_format(self, form: list):
+    def acquisition_name_format(self, form: list) -> None:
         """
         Set the acquisition name format.
 
@@ -136,7 +137,7 @@ class MetadataClass(BaseMetadata):
         self._acquisition_name_format = form
 
     @property
-    def delimiter(self):
+    def delimiter(self) -> str:
         """
         Get the delimiter for the acquisition name.
 
@@ -146,7 +147,7 @@ class MetadataClass(BaseMetadata):
         return self._delimiter
 
     @delimiter.setter
-    def delimiter(self, delimiter: str):
+    def delimiter(self, delimiter: str) -> None:
         """
         Set the delimiter for the acquisition name.
 
@@ -156,7 +157,7 @@ class MetadataClass(BaseMetadata):
         self._delimiter = delimiter
 
     @property
-    def acquisition_name(self):
+    def acquisition_name(self) -> str:
         """
         Get the acquisition name.
 
@@ -165,7 +166,7 @@ class MetadataClass(BaseMetadata):
         """
         return self.generate_acquisition_name()
 
-    def generate_acquisition_name(self):
+    def generate_acquisition_name(self) -> str:
         """
         Generate the acquisition name based on the format and delimiter.
 

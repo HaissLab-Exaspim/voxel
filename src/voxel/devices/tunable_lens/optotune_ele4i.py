@@ -1,5 +1,6 @@
 import logging
 import struct
+from typing import Optional, Tuple, Union
 
 import serial
 
@@ -13,7 +14,7 @@ MODES = {
 }
 
 
-def crc_16(s):
+def crc_16(s: bytes) -> int:
     """
     Calculate the CRC-16 checksum.
 
@@ -36,7 +37,7 @@ class TunableLens(BaseTunableLens):
     TunableLens class for handling Optotune EL-E-4i tunable lens devices.
     """
 
-    def __init__(self, port: str):
+    def __init__(self, port: str) -> None:
         """
         Initialize the TunableLens object.
 
@@ -52,7 +53,7 @@ class TunableLens(BaseTunableLens):
         self.id = self.send_command("X", ">x8s")[0].decode("ascii")
 
     @property
-    def mode(self):
+    def mode(self) -> str:
         """
         Get the mode of the tunable lens.
 
@@ -65,9 +66,10 @@ class TunableLens(BaseTunableLens):
             return "internal"
         if mode == 5:
             return "external"
+        return ""
 
     @mode.setter
-    def mode(self, mode: str):
+    def mode(self, mode: str) -> None:
         """
         Set the mode of the tunable lens.
 
@@ -82,7 +84,7 @@ class TunableLens(BaseTunableLens):
         self.send_command(mode_list[0], mode_list[1])
 
     @property
-    def signal_temperature_c(self):
+    def signal_temperature_c(self) -> float:
         """
         Get the temperature of the tunable lens in Celsius.
 
@@ -91,9 +93,9 @@ class TunableLens(BaseTunableLens):
         """
         state = {}
         state["Temperature [C]"] = self.send_command(b"TCA", ">xxxh")[0] * 0.0625
-        return state
+        return state["Temperature [C]"]
 
-    def send_command(self, command, reply_fmt=None):
+    def send_command(self, command: Union[str, bytes], reply_fmt: Optional[str] = None) -> Tuple:
         """
         Send a command to the tunable lens.
 
@@ -129,8 +131,9 @@ class TunableLens(BaseTunableLens):
                 raise Exception("Response CRC not correct")
 
             return struct.unpack(reply_fmt, data)
+        return ()
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the tunable lens device.
         """

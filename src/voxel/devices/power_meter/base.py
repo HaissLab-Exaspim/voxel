@@ -1,6 +1,6 @@
 from abc import abstractmethod
 
-from ..base import VoxelDevice
+from voxel.devices.base import VoxelDevice
 
 
 class BasePowerMeter(VoxelDevice):
@@ -40,7 +40,7 @@ class BasePowerMeter(VoxelDevice):
 
     @wavelength_nm.setter
     @abstractmethod
-    def wavelength_nm(self, wavelength: float):
+    def wavelength_nm(self, wavelength: float) -> None:
         """
         Set the wavelength in nanometers.
 

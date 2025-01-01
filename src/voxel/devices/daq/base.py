@@ -1,13 +1,14 @@
 from abc import abstractmethod
+from typing import Optional
 
-from ..base import VoxelDevice
+from voxel.devices.base import VoxelDevice
 
 
 class BaseDAQ(VoxelDevice):
     """Base class for DAQ devices."""
 
     @abstractmethod
-    def add_task(self, task_type: str, pulse_count=None):
+    def add_task(self, task_type: str, pulse_count: Optional[int] = None) -> None:
         """
         Add a task to the DAQ.
 
@@ -19,7 +20,7 @@ class BaseDAQ(VoxelDevice):
         pass
 
     @abstractmethod
-    def timing_checks(self, task_type: str):
+    def timing_checks(self, task_type: str) -> None:
         """
         Perform timing checks for the task.
 
@@ -29,7 +30,7 @@ class BaseDAQ(VoxelDevice):
         pass
 
     @abstractmethod
-    def generate_waveforms(self, task_type: str, wavelength: str):
+    def generate_waveforms(self, task_type: str, wavelength: str) -> None:
         """
         Generate waveforms for the task.
 
@@ -41,56 +42,56 @@ class BaseDAQ(VoxelDevice):
         pass
 
     @abstractmethod
-    def write_ao_waveforms(self):
+    def write_ao_waveforms(self) -> None:
         """
         Write analog output waveforms to the DAQ.
         """
         pass
 
     @abstractmethod
-    def write_do_waveforms(self):
+    def write_do_waveforms(self) -> None:
         """
         Write digital output waveforms to the DAQ.
         """
         pass
 
     @abstractmethod
-    def plot_waveforms_to_pdf(self):
+    def plot_waveforms_to_pdf(self) -> None:
         """
         Plot waveforms and optionally save to a PDF.
         """
         pass
 
     @abstractmethod
-    def start(self):
+    def start(self) -> None:
         """
         Start all tasks.
         """
         pass
 
     @abstractmethod
-    def stop(self):
+    def stop(self) -> None:
         """
         Stop all tasks.
         """
         pass
 
     @abstractmethod
-    def close(self):
+    def close(self) -> None:
         """
         Close all tasks.
         """
         pass
 
     @abstractmethod
-    def restart(self):
+    def restart(self) -> None:
         """
         Restart all tasks.
         """
         pass
 
     @abstractmethod
-    def wait_until_done_all(self, timeout=1.0):
+    def wait_until_done_all(self, timeout: float = 1.0) -> None:
         """
         Wait until all tasks are done.
 
@@ -100,7 +101,7 @@ class BaseDAQ(VoxelDevice):
         pass
 
     @abstractmethod
-    def is_finished_all(self):
+    def is_finished_all(self) -> bool:
         """
         Check if all tasks are finished.
 

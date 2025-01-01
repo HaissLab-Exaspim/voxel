@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 class VoxelDevice(ABC):
     """Base class for all voxel devices."""
 
-    def __init__(self, id: str):
+    def __init__(self, id: str) -> None:
         """
         Initialize the VoxelDevice object.
 
@@ -18,13 +18,13 @@ class VoxelDevice(ABC):
         self.log = logging.getLogger(f"{self.__class__.__name__}[{self.id}]")
 
     @abstractmethod
-    def close(self):
+    def close(self) -> None:
         """
         Close the device.
         """
         pass
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return a string representation of the device.
 
@@ -33,7 +33,7 @@ class VoxelDevice(ABC):
         """
         return f"{self.__class__.__name__}[{self.id}]"
 
-    def __del__(self):
+    def __del__(self) -> None:
         """
         Close the device when the object is deleted.
         """

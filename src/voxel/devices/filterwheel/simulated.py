@@ -1,5 +1,6 @@
 import logging
 import time
+from typing import Dict
 
 from voxel.devices.filterwheel.base import BaseFilterWheel
 
@@ -11,7 +12,7 @@ class FilterWheel(BaseFilterWheel):
     FilterWheel class for handling simulated filter wheel devices.
     """
 
-    def __init__(self, id: str, filters: dict):
+    def __init__(self, id: str, filters: Dict[str, int]) -> None:
         """
         Initialize the FilterWheel object.
 
@@ -29,7 +30,7 @@ class FilterWheel(BaseFilterWheel):
         self._filter = 0
 
     @property
-    def filter(self):
+    def filter(self) -> str:
         """
         Get the current filter.
 
@@ -39,7 +40,7 @@ class FilterWheel(BaseFilterWheel):
         return next(key for key, value in self.filters.items() if value == self._filter)
 
     @filter.setter
-    def filter(self, filter_name: str):
+    def filter(self, filter_name: str) -> None:
         """
         Set the current filter.
 

@@ -174,7 +174,7 @@ class Acquisition:
         """
         Creates necessary directories for acquisition.
         """
-        self.log.info("verifying local and external directories")
+        self.log.info("creating local and external directories")
 
         # check if local directories exist and create if not
         for writer_dictionary in self.writers.values():
@@ -207,7 +207,7 @@ class Acquisition:
 
         :raises ValueError: If any configuration issues are found.
         """
-        self.log.info(f"verifying acquisition configuration")
+        self.log.info("verifying acquisition configuration")
 
         # check that there is an associated writer for each camera
         for camera_id, camera in self.instrument.cameras.items():
@@ -235,7 +235,7 @@ class Acquisition:
         for tile in self.config["acquisition"]["tiles"]:
             position_axes = list(tile["position_mm"].keys())
             if position_axes.sort() != self.instrument.stage_axes.sort():
-                raise ValueError(f"not all stage axes are defined for tile positions")
+                raise ValueError("not all stage axes are defined for tile positions")
             tile_channel = tile["channel"]
             if tile_channel not in self.instrument.channels:
                 raise ValueError(f"channel {tile_channel} is not in {self.instrument.channels}")
@@ -282,7 +282,7 @@ class Acquisition:
         :return: The compression ratio.
         :rtype: float
         """
-        self.log.info(f"estimating acquisition compression ratio")
+        self.log.info("estimating acquisition compression ratio")
         # get the correct camera and writer
         camera = self.instrument.cameras[camera_id]
         writer = self.writers[camera_id][writer_id]
@@ -362,7 +362,7 @@ class Acquisition:
 
         :raises ValueError: If there is not enough disk space.
         """
-        self.log.info(f"checking total local storage directory space")
+        self.log.info("checking total local storage directory space")
         drives = dict()
         for camera_id, camera in self.instrument.cameras.items():
             data_size_gb = 0
@@ -372,8 +372,7 @@ class Acquisition:
                     local_drive = os.path.splitdrive(writer.path)[0]
                 # if unix
                 else:
-                    abs_path = os.path.abspath(writer.path)
-                    # TODO FIX THIS, SYNTAX FOR UNIX DRIVES?
+                    # not completed, needs to be fixed
                     local_drive = "/"
                 for tile in self.config["acquisition"]["tiles"]:
                     frame_size_mb = self._frame_size_mb(camera_id, writer_id)
@@ -397,7 +396,7 @@ class Acquisition:
 
         :raises ValueError: If there is not enough disk space or no transfers are configured.
         """
-        self.log.info(f"checking total external storage directory space")
+        self.log.info("checking total external storage directory space")
         if self.transfers:
             drives = dict()
             for camera_id, camera in self.instrument.cameras.items():
@@ -409,8 +408,7 @@ class Acquisition:
                             external_drive = os.path.splitdrive(transfer.external_path)[0]
                         # if unix
                         else:
-                            abs_path = os.path.abspath(transfer.external_path)
-                            # TODO FIX THIS, SYNTAX FOR UNIX DRIVES?
+                            # not completed, needs to be fixed
                             external_drive = "/"
                         for tile in self.config["acquisition"]["tiles"]:
                             frame_size_mb = self._frame_size_mb(camera_id, writer_id)
@@ -427,7 +425,7 @@ class Acquisition:
                 else:
                     self.log.info(f"available disk space = {free_size_gb:.1f} [GB] on drive {drive}")
         else:
-            raise ValueError(f"no transfers configured. check yaml files.")
+            raise ValueError("no transfers configured. check yaml files.")
 
     def check_local_tile_disk_space(self, tile: dict) -> bool:
         """
@@ -438,7 +436,7 @@ class Acquisition:
         :return: True if there is enough disk space, False otherwise.
         :rtype: bool
         """
-        self.log.info(f"checking local storage directory space for next tile")
+        self.log.info("checking local storage directory space for next tile")
         drives = dict()
         data_size_gb = 0
         for camera_id, camera in self.instrument.cameras.items():
@@ -448,7 +446,7 @@ class Acquisition:
                     local_drive = os.path.splitdrive(writer.path)[0]
                 # if unix
                 else:
-                    abs_path = os.path.abspath(writer.path)
+                    # not completed, needs to be fixed
                     local_drive = "/"
 
                 frame_size_mb = self._frame_size_mb(camera_id, writer_id)

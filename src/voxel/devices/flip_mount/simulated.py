@@ -1,11 +1,11 @@
 from time import sleep
-from typing import Literal
+from typing import Literal, Dict
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.devices.flip_mount.base import BaseFlipMount
 
 VALID_POSITIONS = [0, 1]
-FLIP_TIME_RANGE_MS: tuple[float, float] = (500.0, 2800.0, 100.0)  # min, max, step
+FLIP_TIME_RANGE_MS = (500.0, 2800.0, 100.0)  # min, max, step
 POSITIONS = dict()
 
 
@@ -14,7 +14,7 @@ class SimulatedFlipMount(BaseFlipMount):
     SimulatedFlipMount class for handling simulated flip mount devices.
     """
 
-    def __init__(self, id, conn, positions):
+    def __init__(self, id: str, conn: object, positions: Dict[str, int]) -> None:
         """
         Initialize the SimulatedFlipMount object.
 
@@ -39,26 +39,26 @@ class SimulatedFlipMount(BaseFlipMount):
             POSITIONS[key] = value
         self._connect()
 
-    def _connect(self):
+    def _connect(self) -> None:
         """
         Connect to the flip mount.
         """
         self.position = next(iter(self._positions))  # set to first position
         self.flip_time_ms: float = FLIP_TIME_RANGE_MS[0]  # min flip time
 
-    def close(self):
+    def close(self) -> None:
         """
         Close the flip mount connection.
         """
         self._inst = None
 
-    def wait(self):
+    def wait(self) -> None:
         """
         Wait for the flip mount to finish flipping.
         """
         sleep(self.flip_time_ms * 1e-3)
 
-    def toggle(self, wait=False):
+    def toggle(self, wait: bool = False) -> None:
         """
         Toggle the flip mount position.
 
@@ -81,7 +81,7 @@ class SimulatedFlipMount(BaseFlipMount):
         return next((key for key, value in self._positions.items() if value == self._inst), "Unknown")
 
     @position.setter
-    def position(self, new_position):
+    def position(self, new_position: str) -> None:
         """
         Set the flip mount to a specific position.
 
@@ -108,7 +108,7 @@ class SimulatedFlipMount(BaseFlipMount):
         return self._flip_time_ms
 
     @flip_time_ms.setter
-    def flip_time_ms(self, time_ms: float):
+    def flip_time_ms(self, time_ms: float) -> None:
         """
         Set the time it takes to flip the mount in milliseconds.
 
