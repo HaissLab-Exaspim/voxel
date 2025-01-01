@@ -54,8 +54,8 @@ class Stage(BaseStage):
         self,
         hardware_axis: str,
         instrument_axis: str,
-        tigerbox: Optional[TigerController] = None,
-        port: Optional[str] = None,
+        tigerbox: TigerController = None,
+        port: str = None,
         log_level: str = "INFO",
     ) -> None:
         """
@@ -82,10 +82,10 @@ class Stage(BaseStage):
         self.tigerbox = TigerControllerSingleton(com_port=port) if tigerbox is None else tigerbox
         self.tigerbox.log.setLevel(log_level)
 
-        self._hardware_axis = hardware_axis.upper()
-        self._instrument_axis = instrument_axis.lower()
-        # TODO change this, but self.id for consistency in lookup
-        self.id = self.instrument_axis
+        self.hardware_axis = hardware_axis.upper()
+        self.instrument_axis = instrument_axis.lower()
+        self.id = instrument_axis.lower()  # for base device lookup
+
         # axis_map: dictionary representing the mapping from sample pose to tigerbox axis.
         # i.e: `axis_map[<sample_frame_axis>] = <tiger_frame_axis>`.
         axis_map = {self.instrument_axis: self.hardware_axis}
@@ -439,7 +439,7 @@ class Stage(BaseStage):
         """
         card_address = self.tigerbox.axis_to_card[self.hardware_axis][0]
         ttl_reply = self.tigerbox.get_ttl_pin_modes(card_address)  # note this does not return ENUM values
-        mode = int(ttl_reply[str.find(ttl_reply, "X") + 2:str.find(ttl_reply, "Y") - 1])  # strip the X= response
+        mode = int(ttl_reply[str.find(ttl_reply, "X") + 2 : str.find(ttl_reply, "Y") - 1])  # strip the X= response
         converted_mode = next(key for key, enum in MODES.items() if enum.value == mode)
         return converted_mode
 

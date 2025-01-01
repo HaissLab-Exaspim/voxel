@@ -430,6 +430,16 @@ class FrameGenerator:
         """
         return self._dropped_frames.value
 
+    @property
+    def readout_mode(self) -> str:
+        """
+        Get the readout mode.
+
+        :return: The readout mode.
+        :rtype: str
+        """
+        return "rolling shutter"
+
     def get_latest_frame(self) -> numpy.ndarray:
         """Get the latest frame from the buffer.
 

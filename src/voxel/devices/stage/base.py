@@ -9,30 +9,6 @@ class BaseStage(VoxelDevice):
     Base class for stage devices.
     """
 
-    @property
-    @abstractmethod
-    def hardware_axis(self) -> str:
-        """
-        Get the hardware axis.
-
-        :raises ValueError: If the hardware axis is not set
-        :return: Hardware axis
-        :rtype: str
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def instrument_axis(self) -> str:
-        """
-        Get the instrument axis.
-
-        :raises ValueError: If the instrument axis is not set
-        :return: Instrument axis
-        :rtype: str
-        """
-        pass
-
     @abstractmethod
     def move_relative_mm(self, position: float, wait: bool = True) -> None:
         """
@@ -141,8 +117,8 @@ class BaseStage(VoxelDevice):
         """
         pass
 
-    @abstractmethod
     @backlash_mm.setter
+    @abstractmethod
     def backlash_mm(self, backlash: float) -> None:
         """
         Set the backlash of the stage in millimeters.
@@ -163,8 +139,8 @@ class BaseStage(VoxelDevice):
         """
         pass
 
-    @abstractmethod
     @speed_mm_s.setter
+    @abstractmethod
     def speed_mm_s(self, speed: float) -> None:
         """
         Set the speed of the stage in millimeters per second.
@@ -174,8 +150,8 @@ class BaseStage(VoxelDevice):
         """
         pass
 
-    @abstractmethod
     @property
+    @abstractmethod
     def acceleration_ms(self) -> float:
         """
         Get the acceleration of the stage in millimeters per second squared.
@@ -185,8 +161,8 @@ class BaseStage(VoxelDevice):
         """
         pass
 
-    @abstractmethod
     @acceleration_ms.setter
+    @abstractmethod
     def acceleration_ms(self, acceleration: float) -> None:
         """
         Set the acceleration of the stage in millimeters per second squared.
@@ -207,72 +183,14 @@ class BaseStage(VoxelDevice):
         """
         pass
 
-    @abstractmethod
     @mode.setter
+    @abstractmethod
     def mode(self, mode: int) -> None:
         """
         Set the mode of the stage.
 
         :param mode: Mode of the stage
         :type mode: int
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def joystick_mapping(self) -> str:
-        """
-        Get the joystick mapping.
-
-        :return: Joystick mapping
-        :rtype: str
-        """
-        pass
-
-    @abstractmethod
-    @joystick_mapping.setter
-    def joystick_mapping(self, mapping: str) -> None:
-        """
-        Set the joystick mapping.
-
-        :param mapping: Joystick mapping
-        :type mapping: str
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def joystick_polarity(self) -> str:
-        """
-        Get the joystick polarity.
-
-        :return: Joystick polarity
-        :rtype: str
-        """
-        pass
-
-    @abstractmethod
-    @joystick_polarity.setter
-    def joystick_polarity(self, polarity: str) -> None:
-        """
-        Set the joystick polarity.
-
-        :param polarity: Joystick polarity
-        :type polarity: str
-        """
-        pass
-
-    @abstractmethod
-    def lock_external_user_input(self) -> None:
-        """
-        Lock external user input.
-        """
-        pass
-
-    @abstractmethod
-    def unlock_external_user_input(self) -> None:
-        """
-        Unlock external user input.
         """
         pass
 
@@ -297,13 +215,6 @@ class BaseStage(VoxelDevice):
     def log_metadata(self) -> None:
         """
         Log metadata.
-        """
-        pass
-
-    @abstractmethod
-    def halts(self) -> None:
-        """
-        Halt the stage.
         """
         pass
 

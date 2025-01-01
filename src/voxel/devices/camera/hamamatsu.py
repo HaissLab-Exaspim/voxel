@@ -429,29 +429,29 @@ class Camera(BaseCamera):
         return temperature
 
     @property
-    def sensor_mode(self) -> str:
-        """Get the sensor mode.
+    def readout_mode(self) -> str:
+        """Get the readout mode.
 
-        :return: Sensor mode
+        :return: Readout mode
         :rtype: str
         """
-        sensor_mode = self.dcam.prop_getvalue(PROPERTIES["sensor_mode"])
-        return next(key for key, value in SENSOR_MODES.items() if value == sensor_mode)
+        readout_mode = self.dcam.prop_getvalue(PROPERTIES["sensor_mode"])
+        return next(key for key, value in SENSOR_MODES.items() if value == readout_mode)
 
-    @sensor_mode.setter
-    def sensor_mode(self, sensor_mode: str) -> None:
-        """Set the sensor mode.
+    @readout_mode.setter
+    def readout_mode(self, readout_mode: str) -> None:
+        """Set the readout mode.
 
-        :param sensor_mode: Sensor mode
-        :type sensor_mode: str
-        :raises ValueError: If sensor mode is not valid
+        :param readout_mode: Readout mode
+        :type readout_mode: str
+        :raises ValueError: If readout mode is not valid
         """
         valid_mode = list(SENSOR_MODES.keys())
-        if sensor_mode not in valid_mode:
-            raise ValueError("sensor_mode must be one of %r." % valid_mode)
+        if readout_mode not in valid_mode:
+            raise ValueError("readout_mode must be one of %r." % valid_mode)
         else:
-            self.dcam.prop_setvalue(PROPERTIES["sensor_mode"], SENSOR_MODES[sensor_mode])
-        self.log.info(f"sensor mode set to: {sensor_mode}")
+            self.dcam.prop_setvalue(PROPERTIES["sensor_mode"], SENSOR_MODES[readout_mode])
+        self.log.info(f"sensor mode set to: {readout_mode}")
         # refresh parameter values
         self._update_parameters()
 

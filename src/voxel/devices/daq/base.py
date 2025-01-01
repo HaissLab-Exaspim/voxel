@@ -20,16 +20,6 @@ class BaseDAQ(VoxelDevice):
         pass
 
     @abstractmethod
-    def timing_checks(self, task_type: str) -> None:
-        """
-        Perform timing checks for the task.
-
-        :param task_type: Type of the task ('ao', 'co', 'do')
-        :type task_type: str
-        """
-        pass
-
-    @abstractmethod
     def generate_waveforms(self, task_type: str, wavelength: str) -> None:
         """
         Generate waveforms for the task.

@@ -3,14 +3,17 @@ import re
 
 import numpy as np
 from ximea import xiapi
-from ximea.xidefs import (XI_BIT_DEPTH, XI_DOWNSAMPLING_VALUE,
-                          XI_OUTPUT_DATA_PACKING_TYPE, XI_TRG_SELECTOR,
-                          XI_TRG_SOURCE)
+from ximea.xidefs import (
+    XI_BIT_DEPTH,
+    XI_DOWNSAMPLING_VALUE,
+    XI_OUTPUT_DATA_PACKING_TYPE,
+    XI_TRG_SELECTOR,
+    XI_TRG_SOURCE,
+)
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.devices.camera.base import BaseCamera
-from voxel.processes.downsample.gpu.gputools.downsample_2d import \
-    GPUToolsDownSample2D
+from voxel.processes.downsample.gpu.gputools.downsample_2d import GPUToolsDownSample2D
 
 BUFFER_SIZE_MB = 2400
 
@@ -184,10 +187,10 @@ class Camera(BaseCamera):
         self.camera.set_output_bit_depth(pixel_type_bits.upper())
         self.camera.set_sensor_bit_depth(pixel_type_bits.upper())
         # change ximea output image format
-        if pixel_type_bits.upper() == 'XI_BPP_8':
-            self.camera.set_imgdataformat('MONO8')
+        if pixel_type_bits.upper() == "XI_BPP_8":
+            self.camera.set_imgdataformat("MONO8")
         else:
-            self.camera.set_imgdataformat('MONO16')
+            self.camera.set_imgdataformat("MONO16")
         self.log.info(f"pixel type set to: {pixel_type_bits}")
         # refresh parameter values
         self._update_parameters()
@@ -332,6 +335,16 @@ class Camera(BaseCamera):
             self.gpu_binning = GPUToolsDownSample2D(binning=int(self._binning))
         # refresh parameter values
         self._get_min_max_step_values()
+
+    @property
+    def readout_mode(self) -> str:
+        """
+        Get the readout mode.
+
+        :return: The readout mode.
+        :rtype: str
+        """
+        return "rolling shutter"
 
     @property
     def sensor_width_px(self) -> int:
@@ -621,7 +634,7 @@ class Camera(BaseCamera):
             try:
                 self.camera.set_downsampling(binning)
                 # generate integer key, xapi format is XI_DWN_1x1, XI_DWN_2x2, etc.
-                matches = re.split('x', binning)
+                matches = re.split("x", binning)
                 key = matches[-1]
                 BINNINGS[int(key)] = binning
             except Exception:
@@ -629,7 +642,7 @@ class Camera(BaseCamera):
                 # only implement software binning for even numbers
                 if int(binning[-1]) % 2 == 0:
                     self.log.debug(f"{binning} will be implemented through software")
-                    matches = re.split('x', binning)
+                    matches = re.split("x", binning)
                     key = matches[-1]
                     BINNINGS[int(key)] = int(key)
         # reset to initial value
@@ -683,7 +696,7 @@ class Camera(BaseCamera):
             # check max acquisition rate, used to determine line interval
             frame_rate = self.camera.get_framerate()
             # need to check for unused rows for specific ximea camera
-            line_interval_s = (1 / frame_rate / (self.sensor_height_px))
+            line_interval_s = 1 / frame_rate / (self.sensor_height_px)
             # conver from s to us and store
             LINE_INTERVALS_US[key] = line_interval_s * 1e6
 

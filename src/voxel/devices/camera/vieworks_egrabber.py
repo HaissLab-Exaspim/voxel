@@ -391,6 +391,16 @@ class Camera(BaseCamera):
         self._get_min_max_step_values()
 
     @property
+    def readout_mode(self) -> str:
+        """
+        Get the readout mode.
+
+        :return: The readout mode.
+        :rtype: str
+        """
+        return "rolling shutter"
+
+    @property
     def sensor_width_px(self) -> int:
         """Get the sensor width in pixels.
 

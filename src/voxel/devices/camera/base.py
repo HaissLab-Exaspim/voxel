@@ -219,6 +219,17 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
+    def readout_mode(self) -> str:
+        """
+        Get the readout mode.
+
+        :return: The readout mode.
+        :rtype: str
+        """
+        pass
+
+    @property
+    @abstractmethod
     def sensor_width_px(self) -> int:
         """
         Get the sensor width in pixels.
@@ -274,17 +285,6 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def readout_mode(self) -> str:
-        """
-        Get the readout mode.
-
-        :return: The readout mode.
-        :rtype: str
-        """
-        pass
-
-    @property
-    @abstractmethod
     def latest_frame(self) -> np.ndarray:
         """
         Get the latest frame.
@@ -295,7 +295,6 @@ class BaseCamera(VoxelDevice):
         pass
 
     @property
-    @abstractmethod
     def image_width_px(self) -> int:
         """
         Get the image width in pixels.
@@ -306,7 +305,6 @@ class BaseCamera(VoxelDevice):
         return self.width_px // self.binning
 
     @property
-    @abstractmethod
     def image_height_px(self) -> int:
         """
         Get the image height in pixels.
@@ -317,7 +315,6 @@ class BaseCamera(VoxelDevice):
         return self.height_px // self.binning
 
     @property
-    @abstractmethod
     def um_px(self) -> float:
         """
         Get the sampling in micrometers per pixel.
@@ -327,8 +324,7 @@ class BaseCamera(VoxelDevice):
         """
         return self._um_px
 
-    @abstractmethod
-    @ um_px.setter
+    @um_px.setter
     def um_px(self, value: float) -> None:
         """
         Set the sampling in micrometers per pixel.
@@ -339,7 +335,6 @@ class BaseCamera(VoxelDevice):
         self._um_px = value
 
     @property
-    @abstractmethod
     def sampling_um_px(self) -> float:
         """
         Get the sampling in micrometers per pixel.

@@ -238,7 +238,7 @@ def for_all_methods(lock: Lock, cls: Type) -> Type:
     return cls
 
 
-def lock_methods(fn: Callable, lock: Lock) -> Callable:
+def lock_methods(fn: callable, lock: Lock) -> callable:
     """
     Apply a lock to a method to make it thread-safe.
 
