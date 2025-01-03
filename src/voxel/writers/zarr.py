@@ -46,6 +46,7 @@ class ZarrWriter(BaseWriter):
         :type path: str
         """
         super().__init__(path)
+        self._compression = aqz.CompressionCodec.NONE  # initialize as no compression
 
     @property
     def chunk_size_x_px(self) -> int:

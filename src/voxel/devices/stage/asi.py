@@ -13,7 +13,7 @@ from voxel.devices.utils.singleton import Singleton
 STEPS_PER_UM = 10
 
 MODES = {
-    "step shoot": TTLIn0Mode.REPEAT_LAST_REL_MOVE,
+    "step shoot": TTLIn0Mode.MOVE_TO_NEXT_REL_POSITION,
     "off": TTLIn0Mode.OFF,
     "stage scan": TTLIn0Mode.MOVE_TO_NEXT_ABS_POSITION,
 }

@@ -52,6 +52,7 @@ class Camera(BaseCamera):
         :param id: Camera ID
         :type id: str
         """
+        super().__init__()
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.id = id
         # note self.id here is the interface, not a unique camera id

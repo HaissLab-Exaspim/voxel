@@ -67,6 +67,7 @@ class ImarisWriter(BaseWriter):
         :type path: str
         """
         super().__init__(path)
+        self._compression = pw.eCompressionAlgorithmNone  # initialize as no compression
         self._color = "#ffffff"  # initialize as white
         # Internal flow control attributes to monitor compression progress
         self.callback_class = ImarisProgressChecker()
@@ -109,6 +110,8 @@ class ImarisWriter(BaseWriter):
         :return: Compression codec
         :rtype: str
         """
+        print(self._compression)
+        print(COMPRESSIONS.items())
         return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
 
     @compression.setter

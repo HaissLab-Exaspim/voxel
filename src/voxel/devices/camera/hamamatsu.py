@@ -139,6 +139,7 @@ class Camera(BaseCamera):
         :type id: str
         :raises ValueError: If no camera is found for the given ID
         """
+        super().__init__()
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.id = str(id)  # convert to string in case serial # is entered as int
 

@@ -16,7 +16,7 @@ from voxel.writers.base import BaseWriter
 
 CHUNK_COUNT_PX = 64
 
-COMPRESSIONS = {"none": "none"}
+COMPRESSIONS = {"none": None}
 
 
 class TiffWriter(BaseWriter):
@@ -34,6 +34,7 @@ class TiffWriter(BaseWriter):
         :type path: str
         """
         super().__init__(path)
+        self._compression = None  # initialize as no compression
 
     @property
     def frame_count_px(self) -> int:

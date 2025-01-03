@@ -8,6 +8,9 @@ class BaseCamera(VoxelDevice):
     Base class for camera devices.
     """
 
+    def __init__(self):
+        self._um_px = None
+
     @property
     @abstractmethod
     def exposure_time_ms(self) -> int:
@@ -332,6 +335,7 @@ class BaseCamera(VoxelDevice):
         :param value: The sampling in micrometers per pixel.
         :type value: float
         """
+        self.log.info(f"setting [um/px] = {value}")
         self._um_px = value
 
     @property

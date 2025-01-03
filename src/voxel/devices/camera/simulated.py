@@ -58,6 +58,7 @@ class Camera(BaseCamera):
         :param id: Identifier for the camera
         :type id: str
         """
+        super().__init__()
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.id = id
         self.terminate_frame_grab = Event()

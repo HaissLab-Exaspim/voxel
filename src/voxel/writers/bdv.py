@@ -45,6 +45,7 @@ class BDVWriter(BaseWriter):
         :type path: str
         """
         super().__init__(path)
+        self._compression = None  # initialize as no compression
         self.compression_opts: Optional[Tuple[int, int, int, int, int]] = None
         # Lists for storing all datasets in a single BDV file
         self.current_tile_num: int = 0

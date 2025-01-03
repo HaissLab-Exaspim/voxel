@@ -173,10 +173,10 @@ class Instrument:
         self.log.info(f"setting up {device}")
         # successively iterate through properties keys and if there is setter, set
         for key, value in properties.items():
-            try:
+            if hasattr(device, key):
                 setattr(device, key, value)
-            except (TypeError, AttributeError):
-                self.log.info(f"{device} property {key} has no setter")
+            else:
+                raise ValueError(f"{device} property {key} has no setter")
 
     def update_current_state_config(self) -> None:
         """
