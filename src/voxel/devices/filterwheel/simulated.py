@@ -7,7 +7,7 @@ from voxel.devices.filterwheel.base import BaseFilterWheel
 SWITCH_TIME_S = 0.1  # estimated timing
 
 
-class FilterWheel(BaseFilterWheel):
+class SimulatedFilterWheel(BaseFilterWheel):
     """
     FilterWheel class for handling simulated filter wheel devices.
     """

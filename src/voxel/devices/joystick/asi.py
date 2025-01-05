@@ -22,7 +22,7 @@ POLARITIES = {
 INSTRUMENT_AXES = list()
 
 
-class Joystick(BaseJoystick):
+class ASIJoystick(BaseJoystick):
     """
     Joystick class for handling ASI joystick devices.
     """

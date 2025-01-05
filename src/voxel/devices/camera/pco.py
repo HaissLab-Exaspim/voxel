@@ -37,7 +37,7 @@ class pcoSingleton(pco, metaclass=Singleton):
         super(pcoSingleton, self).__init__()
 
 
-class Camera(BaseCamera):
+class PCOCamera(BaseCamera):
     """
     Camera class for handling PCO camera operations.
 

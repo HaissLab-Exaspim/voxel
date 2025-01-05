@@ -85,7 +85,7 @@ def get_egentl_singleton() -> EGenTL:
     return EGenTL()
 
 
-class Camera(BaseCamera):
+class VieworksCamera(BaseCamera):
     """Camera class for handling Vieworks eGrabber operations."""
 
     def __init__(self, id: str) -> None:

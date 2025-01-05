@@ -62,7 +62,7 @@ DO_WAVEFORMS = ["square wave"]
 AO_WAVEFORMS = ["square wave", "sawtooth", "triangle wave"]
 
 
-class DAQ(BaseDAQ):
+class SimulatedDAQ(BaseDAQ):
     """DAQ class for handling simulated DAQ devices."""
 
     def __init__(self, dev: str) -> None:

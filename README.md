@@ -164,38 +164,38 @@ camera.close()
 instrument:
     devices:
         vp-151mx camera:
-        type: camera
-        driver: voxel.devices.camera.simulated
-        module: SimulatedCamera
-        init:
-            id: 123456
-        properties:
-            exposure_time_ms: 10.0
-            pixel_type: mono16
-            height_offest_px: 0
-            height_px: 2048
-            width_offset_px: 0
-            width_px: 2048
-            trigger:
-                mode: off
-                polarity: rising
-                source: external
+            type: camera
+            driver: voxel.devices.camera.simulated
+            module: SimulatedCamera
+            init:
+                id: 123456
+            properties:
+                exposure_time_ms: 10.0
+                pixel_type: mono16
+                height_offest_px: 0
+                height_px: 2048
+                width_offset_px: 0
+                width_px: 2048
+                trigger:
+                    mode: off
+                    polarity: rising
+                    source: external
         488 nm laser:
-        type: laser
-        driver: voxel.devices.laser.simulated
-        module: SimulatedLaser
-        init:
-            id: COM1
-            wavelength_nm: 488
+            type: laser
+            driver: voxel.devices.laser.simulated
+            module: SimulatedLaser
+            init:
+                id: COM1
+                wavelength_nm: 488
         x axis stage:
-        type: scanning_stage
-        driver: voxel.devices.stage.simulated
-        module: Stage
-        init:
-            hardware_axis: x
-            instrument_axis: z
-        properties:
-            speed_mm_s: 1.0
+            type: scanning_stage
+            driver: voxel.devices.stage.simulated
+            module: SimulatedStage
+            init:
+                hardware_axis: x
+                instrument_axis: z
+            properties:
+                speed_mm_s: 1.0
 ```
 
 An instrument can be invoked by loading the YAML file with and the loaded devices
@@ -231,13 +231,13 @@ Currently supported device types and models are listed below.
 
 | Manufacturer | Model            | Class           | Module                           | Tested |
 | ------------ | ---------------- | --------------- | -------------------------------- | ------ |
-| Simulated    | MockCamera       | Camera | `voxel.devices.camera.simulated` | ✅      |
-| Vieworks     | VP-151MX         | Camera  | `voxel.devices.camera.vieworks_egrabber`  | ✅      |
-| Vieworks     | VNP-604MX        | Camera  | `voxel.devices.camera.vieworks_egrabber`  | ✅      |
-| Ximea     | MX2457MR-SY-X4G3-FF | Camera  | `voxel.devices.camera.ximea`  | ✅      |
-| Hamamatsu    | ORCA-Flash4.0 V3 | Camera | `voxel.devices.camera.hamamatsu` | ✅      |
-| Hamamatsu    | ORCA-Fusion BT   | Camera | `voxel.devices.camera.hamamatsu` | ✅      |
-| PCO          | ----             | Camera       | `voxel.devices.camera.pco`       | ❌      |
+| Simulated    | MockCamera       | SimulatedCamera | `voxel.devices.camera.simulated` | ✅      |
+| Vieworks     | VP-151MX         | VieworksCamera  | `voxel.devices.camera.vieworks_egrabber`  | ✅      |
+| Vieworks     | VNP-604MX        | VieworksCamera  | `voxel.devices.camera.vieworks_egrabber`  | ✅      |
+| Ximea     | MX2457MR-SY-X4G3-FF | XimeaCamera  | `voxel.devices.camera.ximea`  | ✅      |
+| Hamamatsu    | ORCA-Flash4.0 V3 | HamamatsuCamera | `voxel.devices.camera.hamamatsu` | ✅      |
+| Hamamatsu    | ORCA-Fusion BT   | HamamatsuCamera | `voxel.devices.camera.hamamatsu` | ✅      |
+| PCO          | ----             | PCOCamera       | `voxel.devices.camera.pco`       | ❌      |
 
 #### Lasers
 
@@ -263,8 +263,8 @@ Currently supported device types and models are listed below.
 
 | Manufacturer | Model  | Class       | Module                                   | Tested |
 | ------------ | ------ | ----------- | ---------------------------------------- | ------ |
-| Simulated    | MockRM | SimulatedRM | `voxel.devices.rotation_mount.simulated` | ✅      |
-| Thorlabs     | K10CR1 | ThorlabsRM  | `voxel.devices.rotation_mount.thorlabs_k10cr1`  | ✅      |
+| Simulated    | MockRM | SimulatedRotationMount | `voxel.devices.rotation_mount.simulated` | ✅      |
+| Thorlabs     | K10CR1 | ThorlabsRotationMount  | `voxel.devices.rotation_mount.thorlabs_k10cr1`  | ✅      |
 
 #### AOTF
 
@@ -291,17 +291,17 @@ Currently supported device types and models are listed below.
 
 | Manufacturer | Model  | Class       | Module                                | Tested |
 | ------------ | ------ | ----------- | ------------------------------------- | ------ |
-| Simulated    | MockPM | SimulatedPM | `voxel.devices.power_meter.simulated` | ✅      |
-| Thorlabs     | PM100D | ThorlabsPM  | `voxel.devices.power_meter.thorlabs_pm100`  | ✅      |
+| Simulated    | MockPM | SimulatedPowerMeter | `voxel.devices.power_meter.simulated` | ✅      |
+| Thorlabs     | PM100D | ThorlabsPowerMeter  | `voxel.devices.power_meter.thorlabs_pm100`  | ✅      |
 
 #### Tunable lens
 
 | Manufacturer | Model        | Class          | Module                                 | Tested |
 | ------------ | ------------ | -------------- | -------------------------------------- | ------ |
-| Simulated    | MockTL       | SimulatedTL    | `voxel.devices.tunable_lens.simulated` | ✅      |
+| Simulated    | MockTL       | SimulatedTunableLens    | `voxel.devices.tunable_lens.simulated` | ✅      |
 | ASI          | TGTLC        | ASITunableLens | `voxel.devices.tunable_lens.asi`       | ✅      |
-| Optotune     | ELE41 | OptotuneTL     | `voxel.devices.tunable_lens.optotune_ele4i`  | ✅  |
-| Optotune     | ICC4C | OptotuneTL     | `voxel.devices.tunable_lens.optotune_icc4c`  | ✅  |
+| Optotune     | ELE4i | ELE4iTunableLens     | `voxel.devices.tunable_lens.optotune_ele4i`  | ✅  |
+| Optotune     | ICC4C | ICC4CTunableLens     | `voxel.devices.tunable_lens.optotune_icc4c`  | ✅  |
 
 ### Writers
 

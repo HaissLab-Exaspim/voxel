@@ -33,7 +33,7 @@ class MPDSSingleton(MPDS, metaclass=Singleton):
         super(MPDSSingleton, self).__init__(com_port)
 
 
-class AOTF(BaseAOTF):
+class AAOptoAOTF(BaseAOTF):
     """
     Class for controlling an Acousto-Optic Tunable Filter (AOTF).
     """

@@ -11,7 +11,7 @@ MIN_SPEED_DEG_S = 0.005
 MAX_SPEED_DEG_S = 10
 
 
-class RotationMount(BaseRotationMount):
+class ThorlabsRotationMount(BaseRotationMount):
     """
     RotationMount class for handling Thorlabs K10CR1 rotation mount devices.
     """

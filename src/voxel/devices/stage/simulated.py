@@ -5,7 +5,7 @@ from typing import Tuple
 from voxel.devices.stage.base import BaseStage
 
 
-class Stage(BaseStage):
+class SimulatedStage(BaseStage):
     """
     Simulated stage class for handling simulated stage devices.
     """

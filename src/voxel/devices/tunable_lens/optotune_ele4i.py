@@ -32,7 +32,7 @@ def crc_16(s: bytes) -> int:
     return crc
 
 
-class TunableLens(BaseTunableLens):
+class ELE4iTunableLens(BaseTunableLens):
     """
     TunableLens class for handling Optotune EL-E-4i tunable lens devices.
     """

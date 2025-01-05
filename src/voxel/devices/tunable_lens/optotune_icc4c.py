@@ -35,7 +35,7 @@ UNITS = {
 MODES = ["internal", "external"]  # static input mode  # analog input mode
 
 
-class TunableLens(BaseTunableLens):
+class ICC4CTunableLens(BaseTunableLens):
     """
     TunableLens class for handling Optotune ICC-4C tunable lens devices.
     """

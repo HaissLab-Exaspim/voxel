@@ -29,7 +29,7 @@ TRIGGER_EDGE = {
 RETRIGGERABLE = {"on": True, "off": False}
 
 
-class DAQ(BaseDAQ):
+class NIDAQ(BaseDAQ):
     """DAQ class for handling NI DAQ devices."""
 
     def __init__(self, dev: str) -> None:

@@ -35,7 +35,7 @@ SOURCES = list()
 POLARITIES = list()
 
 
-class Camera(BaseCamera):
+class XimeaCamera(BaseCamera):
     """
     Camera class for handling Ximea camera devices.
     """

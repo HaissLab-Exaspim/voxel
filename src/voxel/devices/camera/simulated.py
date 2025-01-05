@@ -42,7 +42,7 @@ POLARITIES = {
 }
 
 
-class Camera(BaseCamera):
+class SimulatedCamera(BaseCamera):
     """Camera class for simulating camera operations.
 
     :param BaseCamera: Base class for camera
