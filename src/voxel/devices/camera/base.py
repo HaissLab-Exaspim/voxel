@@ -394,9 +394,9 @@ class BaseCamera(VoxelDevice):
         pass
 
     @abstractmethod
-    def signal_acquisition_state(self) -> None:
+    def acquisition_state(self) -> None:
         """
-        Signal the acquisition state of the camera.
+        Return the acquisition state of the camera.
         """
         pass
 

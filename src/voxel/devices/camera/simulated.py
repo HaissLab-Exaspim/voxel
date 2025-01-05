@@ -353,8 +353,8 @@ class Camera(BaseCamera):
         # return latest frame from internal queue buffer
         return self._latest_frame
 
-    def signal_acquisition_state(self) -> Dict[str, Any]:
-        """Signal the acquisition state of the camera.
+    def acquisition_state(self) -> Dict[str, Any]:
+        """Return the acquisition state of the camera.
 
         :return: Acquisition state
         :rtype: dict
@@ -483,10 +483,12 @@ class FrameGenerator:
 
     def start(self) -> None:
         """Start the frame generator process."""
+        self.log.info(f"starting camera")
         self._process.start()
 
     def stop(self) -> None:
         """Stop the frame generator process."""
+        self.log.info(f"stopping camera")
         self._process.join()
 
     def _run(

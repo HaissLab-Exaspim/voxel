@@ -406,12 +406,14 @@ class Camera(BaseCamera):
         :param frame_count: Number of frames to acquire, defaults to None
         :type frame_count: int, optional
         """
+        self.log.info(f"starting camera")
         self.camera.start_acquisition()
 
     def stop(self) -> None:
         """
         Stop the camera acquisition.
         """
+        self.log.info(f"stopping camera")
         self.camera.stop_acquisition()
 
     def abort(self) -> None:
@@ -424,12 +426,14 @@ class Camera(BaseCamera):
         """
         Close the camera connection.
         """
+        self.log.info(f"closing camera")
         self.camera.close_device()
 
     def reset(self) -> None:
         """
         Reset the camera.
         """
+        self.log.info(f"resetting camera")
         self.camera.set_device_reset()
 
     def grab_frame(self) -> np.ndarray:
@@ -457,9 +461,9 @@ class Camera(BaseCamera):
         """
         return self._latest_frame
 
-    def signal_acquisition_state(self) -> dict:
+    def acquisition_state(self) -> dict:
         """
-        Signal the acquisition state.
+        Return the acquisition state.
 
         :return: Acquisition state
         :rtype: dict

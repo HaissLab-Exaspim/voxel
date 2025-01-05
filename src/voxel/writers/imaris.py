@@ -110,8 +110,6 @@ class ImarisWriter(BaseWriter):
         :return: Compression codec
         :rtype: str
         """
-        print(self._compression)
-        print(COMPRESSIONS.items())
         return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
 
     @compression.setter

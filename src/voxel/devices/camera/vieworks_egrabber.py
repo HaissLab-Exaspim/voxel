@@ -445,6 +445,7 @@ class Camera(BaseCamera):
 
     def prepare(self) -> None:
         """Prepare the camera for acquisition."""
+        self.log.info(f"preparing camera")
         # determine bits to bytes
         if self.pixel_type == "mono8":
             bit_to_byte = 1
@@ -463,13 +464,16 @@ class Camera(BaseCamera):
         :param frame_count: Number of frames to acquire, defaults to GENTL_INFINITE
         :type frame_count: int, optional
         """
+        self.log.info(f"starting camera")
         if frame_count == float("inf"):
             frame_count = GENTL_INFINITE
         self.grabber.start(frame_count=frame_count)
 
     def stop(self) -> None:
         """Stop the camera acquisition."""
+        self.log.info(f"stopping camera")
         self.grabber.stop()
+        self.grabber.stream.execute("StreamReset")
 
     def abort(self) -> None:
         """Abort the camera acquisition."""
@@ -481,6 +485,7 @@ class Camera(BaseCamera):
 
     def reset(self) -> None:
         """Reset the camera instance."""
+        self.log.info(f"resetting camera")
         del self.grabber
         self.grabber = EGrabber(
             self.gentl,
@@ -525,7 +530,7 @@ class Camera(BaseCamera):
         """
         return self._latest_frame
 
-    def signal_acquisition_state(self) -> Dict[str, Any]:
+    def acquisition_state(self) -> Dict[str, Any]:
         """Return a dict with the state of the acquisition buffers.
 
         :return: State of the acquisition buffers

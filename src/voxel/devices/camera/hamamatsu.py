@@ -485,6 +485,7 @@ class Camera(BaseCamera):
 
     def prepare(self) -> None:
         """Prepare the camera for acquisition."""
+        self.log.info(f"preparing camera")
         # determine bits to bytes
         if self.pixel_type == "mono8":
             bit_to_byte = 1
@@ -499,6 +500,7 @@ class Camera(BaseCamera):
     def start(self) -> None:
         """Start the camera acquisition."""
         # initialize variables for acquisition run
+        self.log.info(f"starting camera")
         self.dropped_frames = 0
         self.pre_frame_time = 0
         self.pre_frame_count_px = 0
@@ -510,17 +512,20 @@ class Camera(BaseCamera):
 
     def stop(self) -> None:
         """Stop the camera acquisition."""
+        self.log.info(f"stopping camera")
         self.dcam.buf_release()
         self.dcam.cap_stop()
 
     def close(self) -> None:
         """Close the camera connection."""
+        self.log.info(f"closing camera")
         if self.dcam.is_opened():
             self.dcam.dev_close()
             DcamapiSingleton.uninit()
 
     def reset(self) -> None:
         """Reset the camera instance."""
+        self.log.info(f"resetting camera")
         if self.dcam.is_opened():
             self.dcam.dev_close()
             DcamapiSingleton.uninit()
@@ -549,7 +554,7 @@ class Camera(BaseCamera):
         """
         return self._latest_frame
 
-    def signal_acquisition_state(self) -> Dict[str, Any]:
+    def acquisition_state(self) -> Dict[str, Any]:
         """Return a dict with the state of the acquisition buffers.
 
         :return: State of the acquisition buffers

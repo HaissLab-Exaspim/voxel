@@ -454,9 +454,6 @@ class BaseWriter:
         :return: Frame size in MB
         :rtype: float
         """
-        self.log.info(self.row_count_px)
-        self.log.info(self.column_count_px)
-        self.log.info(self.data_type)
         return self.row_count_px * self.column_count_px * numpy.dtype(self.data_type).itemsize / 1024**2
 
     def get_stack_size_mb(self) -> float:
