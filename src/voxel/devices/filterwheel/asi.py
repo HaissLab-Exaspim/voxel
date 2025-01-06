@@ -11,21 +11,41 @@ from voxel.devices.utils.singleton import Singleton
 SWITCH_TIME_S = 0.1  # estimated timing
 
 
-# TODO: I can't get this working?
-# singleton wrapper around TigerController
 class TigerControllerSingleton(TigerController, metaclass=Singleton):
-    def __init__(self, com_port):
+    """
+    Singleton class for TigerController.
+
+    :param TigerController: Base class for TigerController
+    :type TigerController: class
+    :param metaclass: Singleton metaclass
+    :type metaclass: type
+    """
+
+    def __init__(self, com_port: str) -> None:
+        """
+        Initialize the TigerControllerSingleton object.
+
+        :param com_port: COM port for the controller
+        :type com_port: str
+        """
         super(TigerControllerSingleton, self).__init__(com_port)
 
 
-class FilterWheel(BaseFilterWheel):
-    """Filter Wheel Abstraction from an ASI Tiger Controller."""
+class ASIFilterWheel(BaseFilterWheel):
+    """
+    FilterWheel class for handling ASI filter wheel devices.
+    """
 
-    def __init__(self, tigerbox: TigerController, id, filters: dict):
-        """Connect to hardware.
+    def __init__(self, tigerbox: TigerController, id: str, filters: dict) -> None:
+        """
+        Initialize the FilterWheel object.
 
-        :param filterwheel_cfg: cfg for filterwheel
-        :param tigerbox: TigerController instance.
+        :param tigerbox: TigerController object
+        :type tigerbox: TigerController
+        :param id: Filter wheel ID
+        :type id: str
+        :param filters: Dictionary of filters
+        :type filters: dict
         """
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
         self.tigerbox = tigerbox
@@ -37,12 +57,23 @@ class FilterWheel(BaseFilterWheel):
         self._filter = 0
 
     @property
-    def filter(self):
+    def filter(self) -> str:
+        """
+        Get the current filter.
+
+        :return: Current filter name
+        :rtype: str
+        """
         return self._filter
 
     @filter.setter
-    def filter(self, filter_name: str):
-        """Set the filterwheel index."""
+    def filter(self, filter_name: str) -> None:
+        """
+        Set the current filter.
+
+        :param filter_name: Filter name
+        :type filter_name: str
+        """
         self._filter = filter_name
         cmd_str = f"MP {self.filters[filter_name]}\r\n"
         self.log.info(f"setting filter to {filter_name}")
@@ -52,5 +83,8 @@ class FilterWheel(BaseFilterWheel):
         # TODO: add "busy" check because tigerbox.is_moving() doesn't apply to filter wheels.
         time.sleep(SWITCH_TIME_S)
 
-    def close(self):
+    def close(self) -> None:
+        """
+        Close the filter wheel device.
+        """
         self.tigerbox.ser.close()

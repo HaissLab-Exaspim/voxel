@@ -1,4 +1,5 @@
 import logging
+from typing import Dict, Optional
 
 from tigerasi.device_codes import *
 from tigerasi.tiger_controller import TigerController
@@ -20,9 +21,29 @@ POLARITIES = {
 
 INSTRUMENT_AXES = list()
 
-class Joystick(BaseJoystick):
 
-    def __init__(self, tigerbox: TigerController, axis_mapping: dict, joystick_mapping: dict = None):
+class ASIJoystick(BaseJoystick):
+    """
+    Joystick class for handling ASI joystick devices.
+    """
+
+    def __init__(
+        self,
+        tigerbox: TigerController,
+        axis_mapping: Dict[str, str],
+        joystick_mapping: Optional[Dict[str, Dict[str, str]]] = None,
+    ) -> None:
+        """
+        Initialize the Joystick object.
+
+        :param tigerbox: TigerController object
+        :type tigerbox: TigerController
+        :param axis_mapping: Axis mapping dictionary
+        :type axis_mapping: dict
+        :param joystick_mapping: Joystick mapping dictionary, defaults to None
+        :type joystick_mapping: dict, optional
+        :raises ValueError: If an invalid joystick ID or polarity is provided
+        """
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
 
         self.tigerbox = tigerbox
@@ -40,7 +61,9 @@ class Joystick(BaseJoystick):
         for key, value in self.axis_mapping.items():
             INSTRUMENT_AXES.append(key)
         self._stage_axes = {
-            v: k for k, v in self.axis_mapping.items() if k.upper() in self.tigerbox.axes and v.upper() in self.tigerbox.axes
+            v: k
+            for k, v in self.axis_mapping.items()
+            if k.upper() in self.tigerbox.axes and v.upper() in self.tigerbox.axes
         }
         for axis in self.tigerbox.axes:
             if axis.lower() not in self._stage_axes.keys():
@@ -51,7 +74,7 @@ class Joystick(BaseJoystick):
             # check that the joystick ids are valid
             if joystick_id not in JOYSTICK_AXES.keys():
                 raise ValueError(f"{joystick_id} must be in {JOYSTICK_AXES.keys()}")
-            # check that ther polarities are valid
+            # check that the polarities are valid
             joystick_polarity = joystick_dict["polarity"]
             if joystick_polarity not in POLARITIES.keys():
                 raise ValueError(f"{joystick_polarity} must be in {POLARITIES.keys()}")
@@ -63,22 +86,40 @@ class Joystick(BaseJoystick):
                     f"instrument axis = {instrument_axis}, hardware_axis = {hardware_axis} is not a valid axis."
                 )
 
-    # @property
-    # def stage_axes(self):
-    #     return self._stage_axes
+    @property
+    def stage_axes(self) -> Dict[str, str]:
+        """
+        Get the stage axes controlled by the joystick.
+
+        :return: Stage axes
+        :rtype: dict
+        """
+        return self._stage_axes
 
     @property
-    def joystick_mapping(self):
+    def joystick_mapping(self) -> Dict[str, Dict[str, str]]:
+        """
+        Get the joystick mapping.
+
+        :return: Joystick mapping
+        :rtype: dict
+        """
         return self._joystick_mapping
 
     @joystick_mapping.setter
-    def joystick_mapping(self, joystick_mapping):
+    def joystick_mapping(self, joystick_mapping: Dict[str, Dict[str, str]]) -> None:
+        """
+        Set the joystick mapping.
 
+        :param joystick_mapping: Joystick mapping dictionary
+        :type joystick_mapping: dict
+        :raises ValueError: If an invalid joystick ID or polarity is provided
+        """
         for joystick_id, joystick_dict in joystick_mapping.items():
             # check that the joystick ids are valid
             if joystick_id not in JOYSTICK_AXES.keys():
                 raise ValueError(f"{joystick_id} must be in {JOYSTICK_AXES.keys()}")
-            # check that ther polarities are valid
+            # check that the polarities are valid
             joystick_polarity = joystick_dict["polarity"]
             if joystick_polarity not in POLARITIES.keys():
                 raise ValueError(f"{joystick_polarity} must be in {POLARITIES.keys()}")
@@ -91,3 +132,9 @@ class Joystick(BaseJoystick):
                     f"instrument axis = {instrument_axis}, hardware_axis = {hardware_axis} is not a valid axis."
                 )
         self._joystick_mapping = joystick_mapping
+
+    def close(self) -> None:
+        """
+        Close the joystick device.
+        """
+        self.tigerbox.close()

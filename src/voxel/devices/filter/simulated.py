@@ -5,15 +5,30 @@ from voxel.devices.filterwheel.simulated import FilterWheel
 
 
 class Filter(BaseFilter):
+    """
+    Filter class for handling simulated filter devices.
+    """
+    def __init__(self, wheel: FilterWheel, id: str) -> None:
+        """
+        Initialize the Filter object.
 
-    def __init__(self, wheel: FilterWheel, id: str):
+        :param wheel: Filter wheel object
+        :type wheel: FilterWheel
+        :param id: Filter ID
+        :type id: str
+        """      
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
         self.id = id
         self.wheel = wheel
 
-    def enable(self):
-        """Set parent filter wheel to filter"""
+    def enable(self) -> None:
+        """
+        Enable the filter device.
+        """    
         self.wheel.filter = self.id
 
-    def close(self):
+    def close(self) -> None:
+        """
+        Close the filter device.
+        """   
         self.wheel.close()

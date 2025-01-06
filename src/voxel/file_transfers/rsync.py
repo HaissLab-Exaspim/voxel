@@ -18,14 +18,17 @@ class RsyncFileTransfer(BaseFileTransfer):
 
     From -> \\\\local_path\\\\acquisition_name\\\\filename*
     To -> \\\\external_path\\\\acquisition_name\\\\filename*
-
-    :param external_path: External path of files to be transferred
-    :param local_path: Local path of files to be transferred
-    :type external_path: str
-    :type local_path: str
     """
 
     def __init__(self, external_path: str, local_path: str):
+        """
+        Initialize the RsyncFileTransfer class.
+
+        :param external_path: The external path of files to be transferred.
+        :type external_path: str
+        :param local_path: The local path of files to be transferred.
+        :type local_path: str
+        """
         super().__init__(external_path, local_path)
         self._protocol = "rsync"
         # print progress, delete files after transfer
@@ -39,11 +42,12 @@ class RsyncFileTransfer(BaseFileTransfer):
         # --info=progress2 outputs % progress for all files not sequentially for each file
         self._flags = ["--progress", "--recursive", "--info=progress2"]
 
-    def _run(self):
+    def _run(self) -> None:
         """
-        Internal function that runs the transfer process.
-        """
+        Run the file transfer process.
 
+        :raises ValueError: If the local file path is not a file or directory.
+        """
         start_time = time.time()
         local_directory = Path(self._local_path, self._acquisition_name)
         external_directory = Path(self._external_path, self._acquisition_name)
@@ -53,7 +57,7 @@ class RsyncFileTransfer(BaseFileTransfer):
         # loop over number of attempts in the event that a file transfer fails
         while transfer_complete is False and retry_num <= self._max_retry - 1:
             # generate a list of subdirs and files in the parent local dir to delete at the end
-            delete_list = []
+            delete_list: List[str] = []
             for name in os.listdir(local_directory.absolute()):
                 if self.filename in name:
                     delete_list.append(name)
@@ -61,7 +65,7 @@ class RsyncFileTransfer(BaseFileTransfer):
             # path is the entire experiment path
             # subdirs is any tile specific subdir i.e. zarr store
             # files are any tile specific files
-            file_list = dict()
+            file_list: Dict[str, float] = {}
             for path, subdirs, files in os.walk(local_directory.absolute()):
                 for name in files:
                     # check and only add if filename matches tranfer's filename
@@ -172,6 +176,7 @@ class RsyncFileTransfer(BaseFileTransfer):
                             f.close()
                             # pause for 10 sec
                             time.sleep(10.0)
+                        subprocess.wait()
                     else:
                         subprocess.wait()
                         self.progress = (total_transferred_mb + file_size_mb) / total_size_mb * 100
@@ -223,8 +228,13 @@ class RsyncFileTransfer(BaseFileTransfer):
                 retry_num += 1
 
     def _flatten(self, lst: List[Any]) -> Iterable[Any]:
-        """Flatten a list using generators comprehensions.
-        Returns a flattened version of list lst.
+        """
+        Flatten a list using generators comprehensions.
+
+        :param lst: The list to flatten.
+        :type lst: List[Any]
+        :return: A flattened version of list lst.
+        :rtype: Iterable[Any]
         """
         for sublist in lst:
             if isinstance(sublist, list):

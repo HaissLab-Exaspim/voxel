@@ -8,11 +8,11 @@ from multiprocessing import Array, Process
 from multiprocessing.shared_memory import SharedMemory
 from pathlib import Path
 from time import perf_counter, sleep
+from typing import List
 
 import numpy as np
 import acquire_zarr as aqz
 
-from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.writers.base import BaseWriter
 
 CHUNK_COUNT_PX = 64
@@ -24,15 +24,9 @@ COMPRESSIONS = {
     "none": aqz.CompressionCodec.NONE,
 }
 
-DATA_TYPES = {
-    "unit8": aqz.DataType.UINT16,
-    "uint16": aqz.DataType.UINT16
-}
+DATA_TYPES = {"unit8": aqz.DataType.UINT16, "uint16": aqz.DataType.UINT16}
 
-VERSIONS = {
-    "v2": aqz.ZarrVersion.V2,
-    "v3": aqz.ZarrVersion.V3
-}
+VERSIONS = {"v2": aqz.ZarrVersion.V2, "v3": aqz.ZarrVersion.V3}
 
 
 class ZarrWriter(BaseWriter):
@@ -42,95 +36,91 @@ class ZarrWriter(BaseWriter):
     Writer will save data to the following location
 
     path\\acquisition_name\\filename.zarr
-
-    :param path: Path for the data writer
-    :type path: str
     """
 
-    def __init__(self, path: str):
+    def __init__(self, path: str) -> None:
+        """
+        Module for handling Zarr data writing processes.
+
+        :param path: The path for the data writer.
+        :type path: str
+        """
         super().__init__(path)
+        self._compression = aqz.CompressionCodec.NONE  # initialize as no compression
 
     @property
-    def chunk_size_x_px(self):
+    def chunk_size_x_px(self) -> int:
         """Get the chunk size x of the writer.
 
         :return: Chunk size in x in pixels
         :rtype: int
         """
-
         return self._chunk_size_x_px
 
     @chunk_size_x_px.setter
-    def chunk_size_x_px(self, chunk_size_x_px: int):
+    def chunk_size_x_px(self, chunk_size_x_px: int) -> None:
         """Set the chunk size in x of the writer.
 
-        :param value: Chynk size in x in pixels
+        :param value: Chunk size in x in pixels
         :type value: int
         """
-
         self.log.info(f"setting chunk size in x to: {chunk_size_x_px} [px]")
         self._chunk_size_x_px = chunk_size_x_px
 
     @property
-    def chunk_size_y_px(self):
+    def chunk_size_y_px(self) -> int:
         """Get the chunk size y of the writer.
 
         :return: Chunk size in y in pixels
         :rtype: int
         """
-
         return self._chunk_size_y_px
 
     @chunk_size_y_px.setter
-    def chunk_size_y_px(self, chunk_size_y_px: int):
+    def chunk_size_y_px(self, chunk_size_y_px: int) -> None:
         """Set the chunk size in y of the writer.
 
-        :param value: Chynk size in y in pixels
+        :param value: Chunk size in y in pixels
         :type value: int
         """
-
         self.log.info(f"setting chunk size in y to: {chunk_size_y_px} [px]")
         self._chunk_size_y_px = chunk_size_y_px
 
     @property
-    def chunk_size_z_px(self):
+    def chunk_size_z_px(self) -> int:
         """Get the chunk size z of the writer.
 
         :return: Chunk size in z in pixels
         :rtype: int
         """
-
         return self._chunk_size_z_px
 
     @chunk_size_z_px.setter
-    def chunk_size_z_px(self, chunk_size_z_px: int):
+    def chunk_size_z_px(self, chunk_size_z_px: int) -> None:
         """Set the chunk size in z of the writer.
 
-        :param value: Chynk size in z in pixels
+        :param value: Chunk size in z in pixels
         :type value: int
         """
-
         self.log.info(f"setting chunk size in z to: {chunk_size_z_px} [px]")
         self._chunk_size_z_px = chunk_size_z_px
 
     @property
-    def frame_count_px(self):
+    def frame_count_px(self) -> int:
         """Get the number of frames in the writer.
 
         :return: Frame number in pixels
         :rtype: int
         """
-
         return self._frame_count_px
 
     @frame_count_px.setter
-    def frame_count_px(self, frame_count_px: int):
+    def frame_count_px(self, frame_count_px: int) -> None:
         """Set the number of frames in the writer.
 
         :param value: Frame number in pixels
         :type value: int
         """
-
         self.log.info(f"setting frame count to: {frame_count_px} [px]")
         if frame_count_px % DIVISIBLE_FRAME_COUNT_PX != 0:
             frame_count_px = ceil(frame_count_px / DIVISIBLE_FRAME_COUNT_PX) * DIVISIBLE_FRAME_COUNT_PX
@@ -138,50 +128,46 @@ class ZarrWriter(BaseWriter):
         self._frame_count_px = frame_count_px
 
     @property
-    def chunk_count_px(self):
+    def chunk_count_px(self) -> int:
         """Get the chunk count in pixels
 
         :return: Chunk count in pixels
         :rtype: int
         """
-
         return CHUNK_COUNT_PX
 
     @property
-    def multiscale(self):
+    def multiscale(self) -> bool:
         """Get the multiscale setting of the zarr writer.
 
         :return: Multiscale setting
         :rtype: bool
         """
-
-        return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
+        return self._multiscale
 
     @multiscale.setter
-    def multiscale(self, multiscale: bool):
+    def multiscale(self, multiscale: bool) -> None:
         """Set the multiscale setting of the zarr writer.
 
         :param value: Multiscale setting
         :type value: bool
         """
-
         if type(multiscale) is not bool:
-            raise ValueError('multiscale setting must be true or false')
+            raise ValueError("multiscale setting must be true or false")
         self.log.info(f"setting multiscale setting to: {multiscale}")
         self._multiscale = multiscale
 
     @property
-    def version(self):
+    def version(self) -> str:
         """Get the version of the zarr writer.
 
         :return: Zarr version
         :rtype: str
         """
-
-        return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
+        return next(key for key, value in VERSIONS.items() if value == self._version)
 
     @version.setter
-    def version(self, version: str):
+    def version(self, version: str) -> None:
         """Set the version of the zarr writer.
 
         :param value: Zarr version
@@ -189,7 +175,6 @@ class ZarrWriter(BaseWriter):
         * **v3**
         :type value: str
         """
-
         valid = list(VERSIONS.keys())
         if version not in valid:
             raise ValueError("version must be one of %r." % valid)
@@ -197,17 +182,16 @@ class ZarrWriter(BaseWriter):
         self._version = VERSIONS[version]
 
     @property
-    def compression(self):
+    def compression(self) -> str:
         """Get the compression codec of the writer.
 
         :return: Compression codec
         :rtype: str
         """
-
         return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
 
     @compression.setter
-    def compression(self, compression: str):
+    def compression(self, compression: str) -> None:
         """Set the compression codec of the writer.
 
         :param value: Compression codec
@@ -216,7 +200,6 @@ class ZarrWriter(BaseWriter):
         * **none**
         :type value: str
         """
-
         valid = list(COMPRESSIONS.keys())
         if compression not in valid:
             raise ValueError("compression type must be one of %r." % valid)
@@ -224,40 +207,33 @@ class ZarrWriter(BaseWriter):
         self._compression = COMPRESSIONS[compression]
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         """
         The base filename of file writer.
 
         :return: The base filename
         :rtype: str
         """
-
         return self._filename
 
     @filename.setter
-    def filename(self, filename: str):
+    def filename(self, filename: str) -> None:
         """
         The base filename of file writer.
 
         :param value: The base filename
         :type value: str
         """
-
         self._filename = filename if filename.endswith(".zarr") else f"{filename}.zarr"
         self.log.info(f"setting filename to: {filename}")
 
-    def delete_files(self):
-        """
-        Delete all files generated by the writer.
-        """
+    def delete_files(self) -> None:
+        """Delete all files generated by the writer."""
         filepath = Path(self._path, self._acquisition_name, self._filename).absolute()
         os.remove(filepath)
 
-    def prepare(self):
-        """
-        Prepare the writer.
-        """
-
+    def prepare(self) -> None:
+        """Prepare the writer."""
         self.log.info(f"{self._filename}: intializing writer.")
         # Specs for reconstructing the shared memory object.
         self._shm_name = Array(c_wchar, 32)  # hidden and exposed via property.
@@ -285,11 +261,11 @@ class ZarrWriter(BaseWriter):
 
     def _run(
         self,
-        shm_shape: list,
+        shm_shape: List[int],
         shm_nbytes: int,
         shared_progress: multiprocessing.Value,
         shared_log_queue: multiprocessing.Queue,
-    ):
+    ) -> None:
         """
         Main run function of the Zarr writer.
 
@@ -302,7 +278,6 @@ class ZarrWriter(BaseWriter):
         :param shared_log_queue: Shared queue for passing log statements
         :type shared_log_queue: multiprocessing.Queue
         """
-
         # internal logger for process
         logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         fmt = "%(asctime)s.%(msecs)03d %(levelname)s %(name)s: %(message)s"
@@ -319,35 +294,34 @@ class ZarrWriter(BaseWriter):
         y_array_size = y_shards * self._chunk_size_y_px
 
         settings = aqz.StreamSettings(
-            store_path=str(filepath),
-            data_type=DATA_TYPES[self._data_type],
-            version=self._version,
-            multiscale=True
+            store_path=str(filepath), data_type=DATA_TYPES[self._data_type], version=self._version, multiscale=True
         )
 
-        settings.dimensions.extend([
-            aqz.Dimension(
-                name="z",
-                type=aqz.DimensionType.SPACE,
-                array_size_px=self.frame_count_px,
-                chunk_size_px=self.chunk_count_px,
-                shard_size_chunks=1 # hardcode shard to 1 in z
-            ),
-            aqz.Dimension(
-                name="y",
-                type=aqz.DimensionType.SPACE,
-                array_size_px=y_array_size,
-                chunk_size_px=self._chunk_size_y_px,
-                shard_size_chunks=y_shards
-            ),
-            aqz.Dimension(
-                name="x",
-                type=aqz.DimensionType.SPACE,
-                array_size_px=x_array_size,
-                chunk_size_px=self._chunk_size_x_px,
-                shard_size_chunks=x_shards
-            )
-        ])
+        settings.dimensions.extend(
+            [
+                aqz.Dimension(
+                    name="z",
+                    type=aqz.DimensionType.SPACE,
+                    array_size_px=self.frame_count_px,
+                    chunk_size_px=self.chunk_count_px,
+                    shard_size_chunks=1,  # hardcode shard to 1 in z
+                ),
+                aqz.Dimension(
+                    name="y",
+                    type=aqz.DimensionType.SPACE,
+                    array_size_px=y_array_size,
+                    chunk_size_px=self._chunk_size_y_px,
+                    shard_size_chunks=y_shards,
+                ),
+                aqz.Dimension(
+                    name="x",
+                    type=aqz.DimensionType.SPACE,
+                    array_size_px=x_array_size,
+                    chunk_size_px=self._chunk_size_x_px,
+                    shard_size_chunks=x_shards,
+                ),
+            ]
+        )
 
         stream = aqz.ZarrStream(settings)
 

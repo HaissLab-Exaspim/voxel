@@ -1,25 +1,32 @@
 from time import sleep
-from typing import Optional
+from typing import Dict, Optional
 
 from pylablib.devices import Thorlabs
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
-
-from . import BaseFlipMount
+from voxel.devices.flip_mount.base import BaseFlipMount
 
 VALID_POSITIONS = [0, 1]
-POSITIONS = dict()
 FLIP_TIME_RANGE_MS = (500, 2800, 100)
+POSITIONS = dict()
 
 
 class ThorlabsFlipMount(BaseFlipMount):
-    def __init__(self, id, conn, positions):
-        """
-        Initialize the Thorlabs flip mount. \n
+    """
+    ThorlabsFlipMount class for handling Thorlabs flip mount devices.
+    """
 
-        @param id: Provide a unique device id
-        @param conn: Connection string - serial no.
-        @param positions: Dictionary of positions and their corresponding index
+    def __init__(self, id: str, conn: object, positions: Dict[str, int]) -> None:
+        """
+        Initialize the ThorlabsFlipMount object.
+
+        :param id: Flip mount ID
+        :type id: str
+        :param conn: Connection object
+        :type conn: object
+        :param positions: Dictionary of positions
+        :type positions: dict
+        :raises ValueError: If an invalid position is provided
         """
         super().__init__(id)
         self._conn = conn
@@ -33,7 +40,12 @@ class ThorlabsFlipMount(BaseFlipMount):
                 )
             POSITIONS[key] = value
 
-    def _connect(self):
+    def _connect(self) -> None:
+        """
+        Connect to the flip mount.
+
+        :raises Exception: If connection to the flip mount fails
+        """
         try:
             self._inst = Thorlabs.MFF(conn=self._conn)
             self.flip_time_ms = FLIP_TIME_RANGE_MS[0]  # min flip time
@@ -41,16 +53,29 @@ class ThorlabsFlipMount(BaseFlipMount):
             self.log.error(f"Could not connect to flip mount {self.id}: {e}")
             raise e
 
-    def _disconnect(self):
+    def _disconnect(self) -> None:
+        """
+        Disconnect the flip mount.
+        """
         if self._inst is not None:
             self._inst.close()
             self._inst = None
             self.log.info(f"Flip mount {self.id} disconnected")
 
-    def wait(self):
+    def wait(self) -> None:
+        """
+        Wait for the flip mount to finish flipping.
+        """
         sleep(self.flip_time_ms * 1e-3)  # type: ignore
 
-    def toggle(self, wait=False):
+    def toggle(self, wait: bool = False) -> None:
+        """
+        Toggle the flip mount position.
+
+        :param wait: Whether to wait for the flip mount to finish moving, defaults to False
+        :type wait: bool, optional
+        :raises ValueError: If the flip mount is not connected
+        """
         if self._inst is None:
             raise ValueError("Flip mount not connected")
         new_pos = 0 if self._inst.get_state() == 1 else 1
@@ -59,14 +84,28 @@ class ThorlabsFlipMount(BaseFlipMount):
             self.wait()
 
     @property
-    def position(self) -> str | None:
+    def position(self) -> Optional[str]:
+        """
+        Get the current position of the flip mount.
+
+        :raises ValueError: If the flip mount is not connected
+        :return: Current position of the flip mount
+        :rtype: str | None
+        """
         if self._inst is None:
             raise ValueError(f"Position not found for {self.id} Flip mount not connected")
         pos_idx = self._inst.get_state()
         return next((key for key, value in POSITIONS.items() if value == pos_idx), "Unknown")
 
     @position.setter
-    def position(self, position_name: str):
+    def position(self, position_name: str) -> None:
+        """
+        Set the flip mount to a specific position.
+
+        :param position_name: Position name
+        :type position_name: str
+        :raises ValueError: If the flip mount is not connected or if an invalid position is provided
+        """
         if self._inst is None:
             raise ValueError("Flip mount not connected")
         if position_name not in POSITIONS:
@@ -76,18 +115,31 @@ class ThorlabsFlipMount(BaseFlipMount):
 
     @DeliminatedProperty(minimum=FLIP_TIME_RANGE_MS[0], maximum=FLIP_TIME_RANGE_MS[1], step=FLIP_TIME_RANGE_MS[2])
     def flip_time_ms(self) -> int:
+        """
+        Get the time it takes to flip the mount in milliseconds.
+
+        :raises ValueError: If the flip mount is not connected or if the flip time cannot be retrieved
+        :return: Flip time in milliseconds
+        :rtype: int
+        """
         if self._inst is None:
             raise ValueError("Flip mount not connected")
         try:
             parameters = self._inst.get_flipper_parameters()
             flip_time_ms: int = int((parameters.transit_time) * 1e3)
         except Exception:
-            # flip_time_ms = float((FLIP_TIME_RANGE_MS[0] + FLIP_TIME_RANGE_MS[1]) / 2) # sets to mid value
             raise ValueError("Could not get flip time")
         return flip_time_ms
 
     @flip_time_ms.setter
-    def flip_time_ms(self, time_ms: float):
+    def flip_time_ms(self, time_ms: float) -> None:
+        """
+        Set the time it takes to flip the mount in milliseconds.
+
+        :param time_ms: Flip time in milliseconds
+        :type time_ms: float
+        :raises ValueError: If the flip mount is not connected or if an invalid flip time is provided
+        """
         if self._inst is None:
             raise ValueError("Flip mount not connected")
         if not isinstance(time_ms, (int, float)) or time_ms <= 0:
@@ -99,6 +151,7 @@ class ThorlabsFlipMount(BaseFlipMount):
         except Exception as e:
             raise ValueError(f"Could not set flip time: {e}")
 
-    def close(self):
+    def close(self) -> None:
+        """Close the flip mount connection."""
         self._disconnect()
         self.log.info(f"Flip mount {self.id} shutdown")

@@ -1,11 +1,22 @@
-import inspect
+from abc import abstractmethod
+
+from voxel.devices.base import VoxelDevice
 
 
-class BaseFilter:
-
-    def enable(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+class BaseFilter(VoxelDevice):
+    """
+    Base class for filter devices.
+    """
+    @abstractmethod
+    def enable(self) -> None:
+        """
+        Enable the filter device.
+        """
         pass
 
-    def close(self):
+    @abstractmethod
+    def close(self) -> None:
+        """
+        Close the filter device.
+        """
         pass

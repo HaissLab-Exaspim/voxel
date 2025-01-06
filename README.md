@@ -44,7 +44,7 @@ Checkout an example [instrument configuration yaml](#2-instrument-yaml-configura
 ### Acquisition
 
 The `Acquisition` class focuses on the execution of an imaging experiment. It is responsible for coordinating the devices in the instrument to capture and process data. The `Acquisition` class is primarily set up as an abstract class that can be subclassed to implement specific acquisition protocols. It provides several methods that are useful in the implementation of an acquisition protocol. A run method is defined that should be overridden by the subclass in order to define a specific protocol for a given microscope design.
-For an example of an acquisition protocol, check out the [ExaSpim Acquisiton Class](https://github.com/AllenNeuralDynamics/exaspim-control/blob/main/exaspim_control/exa_spim_acquisition.py)
+For an example of an acquisition protocol, check out the [ExaSpim Acquisiton Class](https://github.com/AllenNeuralDynamics/exaspim-control)
 
 ### Utilities
 
@@ -164,37 +164,38 @@ camera.close()
 instrument:
     devices:
         vp-151mx camera:
-        type: camera
-        driver: voxel.devices.camera.simulated
-        module: SimulatedCamera
-        init:
-            id: 123456
-        settings:
-            exposure_time_ms: 10.0
-            pixel_type: mono16
-            height_offest_px: 0
-            height_px: 2048
-            width_offset_px: 0
-            width_px: 2048
-            trigger:
-            mode: off
-            polarity: rising
-            source: external
+            type: camera
+            driver: voxel.devices.camera.simulated
+            module: SimulatedCamera
+            init:
+                id: 123456
+            properties:
+                exposure_time_ms: 10.0
+                pixel_type: mono16
+                height_offest_px: 0
+                height_px: 2048
+                width_offset_px: 0
+                width_px: 2048
+                trigger:
+                    mode: off
+                    polarity: rising
+                    source: external
         488 nm laser:
-        type: laser
-        driver: voxel.devices.lasers.simulated
-        module: SimulatedLaser
-        init:
-            id: COM1
+            type: laser
+            driver: voxel.devices.laser.simulated
+            module: SimulatedLaser
+            init:
+                id: COM1
+                wavelength_nm: 488
         x axis stage:
-        type: scanning_stage
-        driver: voxel.devices.stage.simulated
-        module: Stage
-        init:
-            hardware_axis: x
-            instrument_axis: z
-        settings:
-            speed_mm_s: 1.0
+            type: scanning_stage
+            driver: voxel.devices.stage.simulated
+            module: SimulatedStage
+            init:
+                hardware_axis: x
+                instrument_axis: z
+            properties:
+                speed_mm_s: 1.0
 ```
 
 An instrument can be invoked by loading the YAML file with and the loaded devices
@@ -223,7 +224,7 @@ Currently supported device types and models are listed below.
 
 | Manufacturer         | Model     | Class        | Module                        | Tested |
 | -------------------- | --------- | ------------ | ----------------------------- | ------ |
-| National Instruments | PCIe-6738 | NIDaq        | `voxel.devices.daq.ni`        | ✅      |
+| National Instruments | PCIe-6738 | NIDAQ        | `voxel.devices.daq.ni`        | ✅      |
 | Simulated            | MockDAQ   | SimulatedDAQ | `voxel.devices.daq.simulated` | ✅      |
 
 #### Cameras
@@ -231,8 +232,9 @@ Currently supported device types and models are listed below.
 | Manufacturer | Model            | Class           | Module                           | Tested |
 | ------------ | ---------------- | --------------- | -------------------------------- | ------ |
 | Simulated    | MockCamera       | SimulatedCamera | `voxel.devices.camera.simulated` | ✅      |
-| Vieworks     | VP-151MX         | VieworksCamera  | `voxel.devices.camera.vieworks`  | ✅      |
-| Vieworks     | VNP-604MX        | VieworksCamera  | `voxel.devices.camera.vieworks`  | ✅      |
+| Vieworks     | VP-151MX         | VieworksCamera  | `voxel.devices.camera.vieworks_egrabber`  | ✅      |
+| Vieworks     | VNP-604MX        | VieworksCamera  | `voxel.devices.camera.vieworks_egrabber`  | ✅      |
+| Ximea     | MX2457MR-SY-X4G3-FF | XimeaCamera  | `voxel.devices.camera.ximea`  | ✅      |
 | Hamamatsu    | ORCA-Flash4.0 V3 | HamamatsuCamera | `voxel.devices.camera.hamamatsu` | ✅      |
 | Hamamatsu    | ORCA-Fusion BT   | HamamatsuCamera | `voxel.devices.camera.hamamatsu` | ✅      |
 | PCO          | ----             | PCOCamera       | `voxel.devices.camera.pco`       | ❌      |
@@ -242,13 +244,13 @@ Currently supported device types and models are listed below.
 | Manufacturer | Model     | Class          | Module                                     | Tested |
 | ------------ | --------- | -------------- | ------------------------------------------ | ------ |
 | Simulated    | MockLaser | SimulatedLaser | `voxel.devices.laser.simulated`            | ✅      |
-| Coherent     | OBISLX    | ObixLXLaser    | `voxel.devices.laser.coherent`             | ✅      |
-| Coherent     | OBISLS    | ObixLSLaser    | `voxel.devices.laser.coherent`             | ✅      |
-| Coherent     | GenesisMX | GenesisMXVoxel | `coherent_lasers.genesis_mx.voxel_adapter` | ✅      |
-| Vortran      | Stradus   | StradusLaser   | `voxel.devices.laser.vortran`              | ❌      |
-| Oxxius       | LBX       | OxxiusLBXLaser | `voxel.devices.laser.oxxius`               | ❌      |
-| Oxxius       | LCX       | OxxiusLCXLaser | `voxel.devices.laser.oxxius`               | ❌      |
-| Cobolt       | Skyra     | CoboltLaser    | `voxel.devices.laser.cobolt`               | ❌      |
+| Coherent     | OBISLX    | ObixLXLaser    | `voxel.devices.laser.coherent.obis_lx`             | ✅      |
+| Coherent     | OBISLS    | ObixLSLaser    | `voxel.devices.laser.coherent.obis_ls`             | ✅      |
+| Coherent     | GenesisMX | GenesisMXVoxel | `voxel.devices.laser.coherent.genesis_mx` | ✅      |
+| Vortran      | Stradus   | StradusLaser   | `voxel.devices.laser.vortran.stradus`              | ❌      |
+| Oxxius       | LBX       | OxxiusLBXLaser | `voxel.devices.laser.oxxius.lbx`               | ❌      |
+| Oxxius       | LCX       | OxxiusLCXLaser | `voxel.devices.laser.oxxius.lcx`               | ❌      |
+| Cobolt       | Skyra     | CoboltLaser    | `voxel.devices.laser.cobolt.skyra`               | ❌      |
 
 #### Stages
 
@@ -261,8 +263,8 @@ Currently supported device types and models are listed below.
 
 | Manufacturer | Model  | Class       | Module                                   | Tested |
 | ------------ | ------ | ----------- | ---------------------------------------- | ------ |
-| Simulated    | MockRM | SimulatedRM | `voxel.devices.rotation_mount.simulated` | ✅      |
-| Thorlabs     | K10CR1 | ThorlabsRM  | `voxel.devices.rotation_mount.thorlabs`  | ✅      |
+| Simulated    | MockRM | SimulatedRotationMount | `voxel.devices.rotation_mount.simulated` | ✅      |
+| Thorlabs     | K10CR1 | ThorlabsRotationMount  | `voxel.devices.rotation_mount.thorlabs_k10cr1`  | ✅      |
 
 #### AOTF
 
@@ -283,31 +285,32 @@ Currently supported device types and models are listed below.
 | Manufacturer | Model  | Class       | Module                               | Tested |
 | ------------ | ------ | ----------- | ------------------------------------ | ------ |
 | Simulated    | MockFM | SimulatedFM | `voxel.devices.flip_mount.simulated` | ✅      |
-| Thorlabs     | MFF101 | ThorlabsFM  | `voxel.devices.flip_mount.thorlabs`  | ✅      |
+| Thorlabs     | MFF101 | ThorlabsFM  | `voxel.devices.flip_mount.thorlabs_mff101`  | ✅      |
 
 #### Power meter
 
 | Manufacturer | Model  | Class       | Module                                | Tested |
 | ------------ | ------ | ----------- | ------------------------------------- | ------ |
-| Simulated    | MockPM | SimulatedPM | `voxel.devices.power_meter.simulated` | ✅      |
-| Thorlabs     | PM100D | ThorlabsPM  | `voxel.devices.power_meter.thorlabs`  | ✅      |
+| Simulated    | MockPM | SimulatedPowerMeter | `voxel.devices.power_meter.simulated` | ✅      |
+| Thorlabs     | PM100D | ThorlabsPowerMeter  | `voxel.devices.power_meter.thorlabs_pm100`  | ✅      |
 
 #### Tunable lens
 
 | Manufacturer | Model        | Class          | Module                                 | Tested |
 | ------------ | ------------ | -------------- | -------------------------------------- | ------ |
-| Simulated    | MockTL       | SimulatedTL    | `voxel.devices.tunable_lens.simulated` | ✅      |
+| Simulated    | MockTL       | SimulatedTunableLens    | `voxel.devices.tunable_lens.simulated` | ✅      |
 | ASI          | TGTLC        | ASITunableLens | `voxel.devices.tunable_lens.asi`       | ✅      |
-| Optotune     | ELE41, ICC4C | OptotuneTL     | `voxel.devices.tunable_lens.optotune`  | ✅ , ✅  |
+| Optotune     | ELE4i | ELE4iTunableLens     | `voxel.devices.tunable_lens.optotune_ele4i`  | ✅  |
+| Optotune     | ICC4C | ICC4CTunableLens     | `voxel.devices.tunable_lens.optotune_icc4c`  | ✅  |
 
 ### Writers
 
-| Writer  | File Format   | Class         | Module                         | Tested |
-| ------- | ------------- | ------------- | ------------------------------ | ------ |
-| Imaris  | `.ims`        | ImarisWriter  | `voxel.writers.imaris_writer`  | ✅      |
-| TIFF    | `.tiff`       | TIFFWriter    | `voxel.writers.tiff_writer`    | ✅      |
-| BDV     | `.h5/.xml`    | BDVWriter     | `voxel.writers.bdv_writer`     | ✅      |
-| ACQUIRE | `.zarr V2/V3` | ACQUIREWriter | `voxel.writers.acquire_writer` | ✅      |
+| Writer  | File Format   | Class         | Module                  | Tested |
+| ------- | ------------- | ------------- | ------------------------| ------ |
+| Imaris  | `.ims`        | ImarisWriter  | `voxel.writers.imaris`  | ✅      |
+| TIFF    | `.tiff`       | TIFFWriter    | `voxel.writers.tiff`    | ✅      |
+| BDV     | `.h5/.xml`    | BDVWriter     | `voxel.writers.bdv`     | ✅      |
+| ACQUIRE | `.zarr V2/V3` | ZarrWriter    | `voxel.writers.zarr`    | ✅      |
 
 ### File Transfers
 

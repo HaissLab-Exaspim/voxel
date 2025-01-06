@@ -1,52 +1,101 @@
-import inspect
+from abc import abstractmethod
+from typing import Optional
+
+from voxel.devices.base import VoxelDevice
 
 
-class BaseDAQ:
+class BaseDAQ(VoxelDevice):
+    """Base class for DAQ devices."""
 
-    def add_task(self, task_type: str, pulse_count=None):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def add_task(self, task_type: str, pulse_count: Optional[int] = None) -> None:
+        """
+        Add a task to the DAQ.
+
+        :param task_type: Type of the task ('ao', 'co', 'do')
+        :type task_type: str
+        :param pulse_count: Number of pulses for the task, defaults to None
+        :type pulse_count: int, optional
+        """
         pass
 
-    def timing_checks(self, task_type: str):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def generate_waveforms(self, task_type: str, wavelength: str) -> None:
+        """
+        Generate waveforms for the task.
+
+        :param task_type: Type of the task ('ao', 'do')
+        :type task_type: str
+        :param wavelength: Wavelength for the waveform
+        :type wavelength: str
+        """
         pass
 
-    def generate_waveforms(self, task_type: str, wavelength: str):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def write_ao_waveforms(self) -> None:
+        """
+        Write analog output waveforms to the DAQ.
+        """
         pass
 
-    def write_ao_waveforms(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def write_do_waveforms(self) -> None:
+        """
+        Write digital output waveforms to the DAQ.
+        """
         pass
 
-    def write_do_waveforms(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def plot_waveforms_to_pdf(self) -> None:
+        """
+        Plot waveforms and optionally save to a PDF.
+        """
         pass
 
-    def plot_waveforms_to_pdf(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def start(self) -> None:
+        """
+        Start all tasks.
+        """
         pass
 
-    def start(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def stop(self) -> None:
+        """
+        Stop all tasks.
+        """
         pass
 
-    def stop(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def close(self) -> None:
+        """
+        Close all tasks.
+        """
         pass
 
-    def close(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def restart(self) -> None:
+        """
+        Restart all tasks.
+        """
         pass
 
-    def restart(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def wait_until_done_all(self, timeout: float = 1.0) -> None:
+        """
+        Wait until all tasks are done.
+
+        :param timeout: Timeout in seconds, defaults to 1.0
+        :type timeout: float, optional
+        """
         pass
 
-    def wait_until_done_all(self, timeout=1.0):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
-        pass
+    @abstractmethod
+    def is_finished_all(self) -> bool:
+        """
+        Check if all tasks are finished.
 
-    def is_finished_all(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+        :return: True if all tasks are finished, False otherwise
+        :rtype: bool
+        """
         pass

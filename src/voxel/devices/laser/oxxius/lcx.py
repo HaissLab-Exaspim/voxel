@@ -1,47 +1,33 @@
-from obis_laser import ObisLS
+from oxxius_laser import LCX
 from serial import Serial
 from typing import Union, Dict
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
-
-from ..base import BaseLaser
-from .obis_lx import obis_modulation_getter, obis_modulation_setter
-
-MODULATION_MODES = {"off": "CWP", "analog": "ANALOG", "digital": "DIGITAL", "mixed": "MIXED"}
+from voxel.devices.laser.base import BaseLaser
 
 
-class ObisLSLaser(BaseLaser):
+class OxxiusLCXLaser(BaseLaser):
     """
-    ObisLSLaser class for handling Coherent Obis LS laser devices.
+    OxxiusLCXLaser class for handling Oxxius LCX laser devices.
     """
 
-    def __init__(self, id: str, wavelength: int, port: Union[Serial, str], prefix: str = None) -> None:
+    def __init__(self, id: str, wavelength: int, port: Union[Serial, str], prefix: str) -> None:
         """
-        Initialize the ObisLSLaser object.
+        Initialize the OxxiusLCXLaser object.
 
         :param id: Laser ID
         :type id: str
         :param wavelength: Wavelength in nanometers
         :type wavelength: int
         :param port: Serial port for the laser
-        :type port: Serial | str
-        :param prefix: Command prefix for the laser, defaults to None
-        :type prefix: str, optional
+        :type port: Serial or str
+        :param prefix: Command prefix for the laser
+        :type prefix: str
         """
         super().__init__(id)
-        self.prefix = prefix
+        self._prefix = prefix
+        self._inst = LCX(port, self._prefix)
         self._wavelength = wavelength
-        self._inst = ObisLS(port, self.prefix)
-
-    @property
-    def wavelength(self) -> int:
-        """
-        Get the wavelength of the laser.
-
-        :return: Wavelength in nanometers
-        :rtype: int
-        """
-        return self._wavelength
 
     def enable(self) -> None:
         """
@@ -55,11 +41,15 @@ class ObisLSLaser(BaseLaser):
         """
         self._inst.disable()
 
-    def close(self) -> None:
+    @property
+    def wavelength(self) -> int:
         """
-        Close the laser connection.
+        Get the wavelength of the laser.
+
+        :return: Wavelength in nanometers
+        :rtype: int
         """
-        self._inst.close()
+        return self._wavelength
 
     @DeliminatedProperty(minimum=0, maximum=lambda self: self._inst.max_power)
     def power_setpoint_mw(self) -> float:
@@ -69,7 +59,7 @@ class ObisLSLaser(BaseLaser):
         :return: Power setpoint in milliwatts
         :rtype: float
         """
-        return self._inst.power_setpoint
+        return float(self._inst.power_setpoint)
 
     @power_setpoint_mw.setter
     def power_setpoint_mw(self, value: Union[float, int]) -> None:
@@ -82,26 +72,6 @@ class ObisLSLaser(BaseLaser):
         self._inst.power_setpoint = value
 
     @property
-    def modulation_mode(self) -> str:
-        """
-        Get the modulation mode.
-
-        :return: Modulation mode
-        :rtype: str
-        """
-        return obis_modulation_getter(self._inst, self.log, modes=MODULATION_MODES)
-
-    @modulation_mode.setter
-    def modulation_mode(self, mode: str) -> None:
-        """
-        Set the modulation mode.
-
-        :param mode: Modulation mode
-        :type mode: str
-        """
-        obis_modulation_setter(self._inst, mode, modes=MODULATION_MODES)
-
-    @property
     def power_mw(self) -> float:
         """
         Get the current power in milliwatts.
@@ -109,7 +79,7 @@ class ObisLSLaser(BaseLaser):
         :return: Current power in milliwatts
         :rtype: float
         """
-        return self._inst.power_setpoint
+        return self._inst.power
 
     @property
     def temperature_c(self) -> float:
@@ -121,7 +91,6 @@ class ObisLSLaser(BaseLaser):
         """
         return self._inst.temperature
 
-    @property
     def status(self) -> Dict[str, Union[str, float]]:
         """
         Get the status of the laser.
@@ -130,3 +99,11 @@ class ObisLSLaser(BaseLaser):
         :rtype: dict
         """
         return self._inst.get_system_status()
+
+    def close(self) -> None:
+        """
+        Close the laser connection.
+        """
+        self.disable()
+        if self._inst.ser.is_open:
+            self._inst.ser.close()

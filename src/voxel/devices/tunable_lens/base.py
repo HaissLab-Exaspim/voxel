@@ -1,27 +1,56 @@
-import inspect
+from abc import abstractmethod
+
+from voxel.devices.base import VoxelDevice
 
 
-class BaseTunableLens:
+class BaseTunableLens(VoxelDevice):
+    """
+    Base class for tunable lens devices.
+    """
 
     @property
-    def mode(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def mode(self) -> str:
+        """
+        Get the mode of the tunable lens.
+
+        :return: Mode of the tunable lens
+        :rtype: str
+        """
         pass
 
     @mode.setter
-    def mode(self, mode: str):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def mode(self, mode: str) -> None:
+        """
+        Set the mode of the tunable lens.
+
+        :param mode: Mode of the tunable lens
+        :type mode: str
+        """
         pass
 
     @property
-    def temperature_c(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def temperature_c(self) -> float:
+        """
+        Get the temperature of the tunable lens in Celsius.
+
+        :return: Temperature in Celsius
+        :rtype: float
+        """
         pass
 
-    def log_metadata(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def log_metadata(self) -> None:
+        """
+        Log metadata for the tunable lens.
+        """
         pass
 
-    def close(self):
-        self.log.warning(f"WARNING: {inspect.stack()[0][3]} not implemented")
+    @abstractmethod
+    def close(self) -> None:
+        """
+        Close the tunable lens device.
+        """
         pass
