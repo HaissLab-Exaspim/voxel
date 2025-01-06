@@ -67,6 +67,9 @@ Checkout the [Writers](#writers) and [File Transfers](#file-transfers) for a lis
     - DCAM (Windows only)
   - Lasers:
     - [Coherent HOPS](https://github.com/AllenNeuralDynamics/coherent_lasers) (Windows only)
+  - [Tunable Lenses](./src/voxel//devices//tunable_lens/README.md):
+    - [optoICC](https://www.optotune.com/software-center)
+    - [optooptoKummenberg](https://www.optotune.com/software-center)
 
 ### Installation
 
