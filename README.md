@@ -322,8 +322,11 @@ Currently supported device types and models are listed below.
 
 | Transfer Method | Class    | Module                         | Tested |
 | --------------- | -------- | ------------------------------ | ------ |
-| Robocopy        | Robocopy | `voxel.file_transfer.robocopy` | ✅      |
-| Rsync           | Rsync    | `voxel.file_transfer.rsync`    | ✅      |
+| Robocopy        | RobocopyFileTransfer | `voxel.file_transfer.robocopy` | ✅      |
+| Rsync           | RsyncFileTransfer    | `voxel.file_transfer.rsync`    | ✅      |
+
+> [!NOTE]
+> On Windows, we suggest using Robocopy for transferring files. On Unix, we suggest using Rsync. Rsync is availble on windows and can be installed from a number of sources. For example [cwRsync](https://itefix.net/cwrsync).
 
 ### Processes
 
