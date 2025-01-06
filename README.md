@@ -62,11 +62,14 @@ Checkout the [Writers](#writers) and [File Transfers](#file-transfers) for a lis
   - [venv](https://docs.python.org/3.11/library/venv.html)
   - Conda: [Anaconda](https://www.anaconda.com/products/individual) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html))
 - For control of some specific devices, you will need the appropriate SDK installed:
-  - [Cameras](./voxel/devices/camera/README.md):
+  - [Cameras](./src/voxel/devices/camera/README.md):
     - eGrabber (Windows and Linux)
     - DCAM (Windows only)
-  - [Lasers]:
+  - Lasers:
     - [Coherent HOPS](https://github.com/AllenNeuralDynamics/coherent_lasers) (Windows only)
+  - [Tunable Lenses](./src/voxel//devices//tunable_lens/README.md):
+    - [optoICC](https://www.optotune.com/software-center)
+    - [optooptoKummenberg](https://www.optotune.com/software-center)
 
 ### Installation
 
@@ -232,12 +235,12 @@ Currently supported device types and models are listed below.
 | Manufacturer | Model            | Class           | Module                           | Tested |
 | ------------ | ---------------- | --------------- | -------------------------------- | ------ |
 | Simulated    | MockCamera       | SimulatedCamera | `voxel.devices.camera.simulated` | ✅      |
-| Vieworks     | VP-151MX         | VieworksCamera  | `voxel.devices.camera.vieworks_egrabber`  | ✅      |
-| Vieworks     | VNP-604MX        | VieworksCamera  | `voxel.devices.camera.vieworks_egrabber`  | ✅      |
-| Ximea     | MX2457MR-SY-X4G3-FF | XimeaCamera  | `voxel.devices.camera.ximea`  | ✅      |
-| Hamamatsu    | ORCA-Flash4.0 V3 | HamamatsuCamera | `voxel.devices.camera.hamamatsu` | ✅      |
-| Hamamatsu    | ORCA-Fusion BT   | HamamatsuCamera | `voxel.devices.camera.hamamatsu` | ✅      |
-| PCO          | ----             | PCOCamera       | `voxel.devices.camera.pco`       | ❌      |
+| Vieworks     | VP-151MX         | VieworksCamera  | `voxel.devices.camera.vieworks.egrabber`  | ✅      |
+| Vieworks     | VNP-604MX        | VieworksCamera  | `voxel.devices.camera.vieworks.egrabber`  | ✅      |
+| Ximea     | MX2457MR-SY-X4G3-FF | XIAPICamera  | `voxel.devices.camera.ximea.xiapi`  | ✅      |
+| Hamamatsu    | ORCA-Flash4.0 V3 | DCAMCamera | `voxel.devices.camera.hamamatsu.dcam` | ✅      |
+| Hamamatsu    | ORCA-Fusion BT   | DCAMCamera | `voxel.devices.camera.hamamatsu.dcam` | ✅      |
+| PCO          | ----             | PCOCamera       | `voxel.devices.camera.pco.pco`       | ❌      |
 
 #### Lasers
 
@@ -257,51 +260,51 @@ Currently supported device types and models are listed below.
 | Manufacturer | Model     | Class          | Module                          | Tested |
 | ------------ | --------- | -------------- | ------------------------------- | ------ |
 | Simulated    | MockStage | SimulatedStage | `voxel.devices.stage.simulated` | ✅      |
-| ASI          | Tiger     | ASIStage       | `voxel.devices.stage.asi`       | ✅      |
+| ASI          | Tiger     | TigerStage       | `voxel.devices.stage.asi.tiger`       | ✅      |
 
 #### Rotation mounts
 
 | Manufacturer | Model  | Class       | Module                                   | Tested |
 | ------------ | ------ | ----------- | ---------------------------------------- | ------ |
 | Simulated    | MockRM | SimulatedRotationMount | `voxel.devices.rotation_mount.simulated` | ✅      |
-| Thorlabs     | K10CR1 | ThorlabsRotationMount  | `voxel.devices.rotation_mount.thorlabs_k10cr1`  | ✅      |
+| Thorlabs     | K10CR1 | K10CR1Mount  | `voxel.devices.rotation_mount.thorlabs.k10cr1`  | ✅      |
 
 #### AOTF
 
 | Manufacturer | Model    | Class         | Module                         | Tested |
 | ------------ | -------- | ------------- | ------------------------------ | ------ |
 | Simulated    | MockAOTF | SimulatedAOTF | `voxel.devices.aotf.simulated` | ✅      |
-| AAOpto       | MPDSxx   | AAOptoAOTF    | `voxel.devices.aotf.aaopto`    | ❌      |
+| AAOpto       | MPDSxx   | AAOptoAOTF    | `voxel.devices.aotf.aaopto.aotfnc`    | ❌      |
 
 #### Filterwheel
 
 | Manufacturer | Model   | Class          | Module                                | Tested |
 | ------------ | ------- | -------------- | ------------------------------------- | ------ |
-| Simulated    | MockFW  | SimulatedFW    | `voxel.devices.filterwheel.simulated` | ✅      |
-| ASI          | FW-1000 | ASIFilterWheel | `voxel.devices.filterwheel.asi`       | ✅      |
+| Simulated    | MockFW  | SimulatedFilteWheel    | `voxel.devices.filterwheel.simulated` | ✅      |
+| ASI          | FW-1000 | FW1000FilterWheel | `voxel.devices.filterwheel.asi.fw1000`       | ✅      |
 
 #### Flip mount
 
 | Manufacturer | Model  | Class       | Module                               | Tested |
 | ------------ | ------ | ----------- | ------------------------------------ | ------ |
-| Simulated    | MockFM | SimulatedFM | `voxel.devices.flip_mount.simulated` | ✅      |
-| Thorlabs     | MFF101 | ThorlabsFM  | `voxel.devices.flip_mount.thorlabs_mff101`  | ✅      |
+| Simulated    | MockFM | SimulatedFlipMount | `voxel.devices.flip_mount.simulated` | ✅      |
+| Thorlabs     | MFF101 | MFF101FlipMount  | `voxel.devices.flip_mount.thorlabs.mff101`  | ✅      |
 
 #### Power meter
 
 | Manufacturer | Model  | Class       | Module                                | Tested |
 | ------------ | ------ | ----------- | ------------------------------------- | ------ |
 | Simulated    | MockPM | SimulatedPowerMeter | `voxel.devices.power_meter.simulated` | ✅      |
-| Thorlabs     | PM100D | ThorlabsPowerMeter  | `voxel.devices.power_meter.thorlabs_pm100`  | ✅      |
+| Thorlabs     | PM100D | PM100PowerMeter  | `voxel.devices.power_meter.thorlabs.pm100`  | ✅      |
 
 #### Tunable lens
 
 | Manufacturer | Model        | Class          | Module                                 | Tested |
 | ------------ | ------------ | -------------- | -------------------------------------- | ------ |
 | Simulated    | MockTL       | SimulatedTunableLens    | `voxel.devices.tunable_lens.simulated` | ✅      |
-| ASI          | TGTLC        | ASITunableLens | `voxel.devices.tunable_lens.asi`       | ✅      |
-| Optotune     | ELE4i | ELE4iTunableLens     | `voxel.devices.tunable_lens.optotune_ele4i`  | ✅  |
-| Optotune     | ICC4C | ICC4CTunableLens     | `voxel.devices.tunable_lens.optotune_icc4c`  | ✅  |
+| ASI          | TGTLC        | TGTLCTunableLens | `voxel.devices.tunable_lens.asi.tgtlc`       | ✅      |
+| Optotune     | ELE4i | ELE4ITunableLens     | `voxel.devices.tunable_lens.optotune.ele4i`  | ✅  |
+| Optotune     | ICC4C | ICC4CTunableLens     | `voxel.devices.tunable_lens.optotune.icc4c`  | ✅  |
 
 ### Writers
 

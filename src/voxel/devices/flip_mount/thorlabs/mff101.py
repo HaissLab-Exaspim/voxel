@@ -11,7 +11,7 @@ FLIP_TIME_RANGE_MS = (500, 2800, 100)
 POSITIONS = dict()
 
 
-class ThorlabsFlipMount(BaseFlipMount):
+class MFF101FlipMount(BaseFlipMount):
     """
     ThorlabsFlipMount class for handling Thorlabs flip mount devices.
     """

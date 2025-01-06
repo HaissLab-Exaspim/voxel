@@ -31,7 +31,7 @@ class TigerControllerSingleton(TigerController, metaclass=Singleton):
         super(TigerControllerSingleton, self).__init__(com_port)
 
 
-class ASIFilterWheel(BaseFilterWheel):
+class FW1000FilterWheel(BaseFilterWheel):
     """
     FilterWheel class for handling ASI filter wheel devices.
     """
