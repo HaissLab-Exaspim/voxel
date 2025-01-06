@@ -315,8 +315,8 @@ Currently supported device types and models are listed below.
 | BDV     | `.h5/.xml`    | BDVWriter     | `voxel.writers.bdv`     | ✅      |
 | [ACQUIRE](https://pypi.org/project/acquire-zarr/) | `.zarr V2/V3` | ZarrWriter    | `voxel.writers.zarr`    | ✅      |
 
-> [!NOTE]
-> Acquire-Zarr is still actively being developed. This writer class is in developement. Although this beta version works, it still needs more thorough testing.
+> [!WARNING]
+> [Acquire-Zarr](https://pypi.org/project/acquire-zarr/) is a Python API into a video streaming Zarr V2/V3 writer from the [Acquire Project](https://github.com/acquire-project). It is still actively being developed. This writer class is in developement. Although this beta version works, it still needs more thorough testing.
 
 ### File Transfers
 
