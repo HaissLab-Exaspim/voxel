@@ -35,7 +35,7 @@ class TigerControllerSingleton(TigerController, metaclass=Singleton):
         super(TigerControllerSingleton, self).__init__(com_port)
 
 
-class ASITunableLens(BaseTunableLens):
+class TGTLCTunableLens(BaseTunableLens):
     """
     TunableLens class for handling ASI tunable lens devices.
     """

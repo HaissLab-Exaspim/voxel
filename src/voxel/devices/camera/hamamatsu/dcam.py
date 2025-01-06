@@ -129,7 +129,7 @@ class DcamapiSingleton(Dcamapi, metaclass=Singleton):
         super(DcamapiSingleton, self).__init__()
 
 
-class HamamatsuCamera(BaseCamera):
+class DCAMCamera(BaseCamera):
     """Camera class for handling Hamamatsu DCAM operations."""
 
     def __init__(self, id: str) -> None:

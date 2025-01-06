@@ -45,7 +45,7 @@ class TigerControllerSingleton(TigerController, metaclass=Singleton):
         super(TigerControllerSingleton, self).__init__(com_port)
 
 
-class ASIStage(BaseStage):
+class TigerStage(BaseStage):
     """
     Stage class for handling ASI stage devices.
     """
