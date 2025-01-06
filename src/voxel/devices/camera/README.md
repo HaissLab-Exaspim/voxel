@@ -38,7 +38,7 @@ Install the Ximea module by copying the whole folder \XIMEA\API\Python\v{x}\xime
 
 > [!NOTE]
 > For Python 2.x copy ximea folder placed in \XIMEA\API\Python\v2\
-> For Python 3.x copy ximea folder placed in \XIMEA\API\Python\v3\
+> For Python 3.x copy ximea folder placed in \XIMEA\API\Python\v3
 
 For Linux, for the instructions[https://www.ximea.com/support/wiki/apis/XIMEA_Linux_Software_Package#Installation] appropriately for your architecture.
 

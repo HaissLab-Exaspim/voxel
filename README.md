@@ -44,7 +44,7 @@ Checkout an example [instrument configuration yaml](#2-instrument-yaml-configura
 ### Acquisition
 
 The `Acquisition` class focuses on the execution of an imaging experiment. It is responsible for coordinating the devices in the instrument to capture and process data. The `Acquisition` class is primarily set up as an abstract class that can be subclassed to implement specific acquisition protocols. It provides several methods that are useful in the implementation of an acquisition protocol. A run method is defined that should be overridden by the subclass in order to define a specific protocol for a given microscope design.
-For an example of an acquisition protocol, check out the [ExaSpim Acquisiton Class](https://github.com/AllenNeuralDynamics/exaspim-control)
+For an example of an acquisition protocol, check out the [ExA-SPIM Control](https://github.com/AllenNeuralDynamics/exaspim-control) repository.
 
 ### Utilities
 
