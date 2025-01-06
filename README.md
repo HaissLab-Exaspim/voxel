@@ -62,7 +62,7 @@ Checkout the [Writers](#writers) and [File Transfers](#file-transfers) for a lis
   - [venv](https://docs.python.org/3.11/library/venv.html)
   - Conda: [Anaconda](https://www.anaconda.com/products/individual) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html))
 - For control of some specific devices, you will need the appropriate SDK installed:
-  - [Cameras](./voxel/devices/camera/README.md):
+  - [Cameras](./src/voxel/devices/camera/README.md):
     - eGrabber (Windows and Linux)
     - DCAM (Windows only)
   - Lasers:
