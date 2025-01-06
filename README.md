@@ -313,7 +313,10 @@ Currently supported device types and models are listed below.
 | Imaris  | `.ims`        | ImarisWriter  | `voxel.writers.imaris`  | ✅      |
 | TIFF    | `.tiff`       | TIFFWriter    | `voxel.writers.tiff`    | ✅      |
 | BDV     | `.h5/.xml`    | BDVWriter     | `voxel.writers.bdv`     | ✅      |
-| ACQUIRE | `.zarr V2/V3` | ZarrWriter    | `voxel.writers.zarr`    | ✅      |
+| [ACQUIRE](https://pypi.org/project/acquire-zarr/) | `.zarr V2/V3` | ZarrWriter    | `voxel.writers.zarr`    | ✅      |
+
+> [!NOTE]
+> Acquire-Zarr is still actively being developed. This writer class is in developement. Although this beta version works, it still needs more thorough testing.
 
 ### File Transfers
 
