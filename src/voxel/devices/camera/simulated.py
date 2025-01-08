@@ -24,7 +24,7 @@ BINNINGS = {1: 1, 2: 2, 4: 4}
 
 PIXEL_TYPES = {"mono8": "uint8", "mono16": "uint16"}
 
-LINE_INTERVALS_US = {"mono8": 10.00, "mono16": 45.44}
+LINE_INTERVALS_US = {"mono8": 500.00, "mono16": 500.0}
 
 MODES = {
     "on": "On",
@@ -76,6 +76,7 @@ class SimulatedCamera(BaseCamera):
         self._frame = Value("i", 0)
         self._frame_rate = Value("d", 0.0)
         self._dropped_frames = Value("d", 0.0)
+        self._buffer_index = Value("i", 0)
         self._buffer = Queue()
 
     @DeliminatedProperty(minimum=MIN_EXPOSURE_TIME_MS, maximum=MAX_EXPOSURE_TIME_MS, step=0.001)
@@ -254,25 +255,24 @@ class SimulatedCamera(BaseCamera):
         :return: Pixel type
         :rtype: str
         """
-        pixel_type = self._pixel_type
         # invert the dictionary and find the abstracted key to output
-        return next(key for key, value in PIXEL_TYPES.items() if value == pixel_type)
+        return self._pixel_type
 
     @pixel_type.setter
-    def pixel_type(self, pixel_type_bits: str) -> None:
+    def pixel_type(self, pixel_type: str) -> None:
         """Set the pixel type.
 
-        :param pixel_type_bits: Pixel type bits
-        :type pixel_type_bits: str
+        :param pixel_type: Pixel type
+        :type pixel_type: str
         :raises ValueError: If invalid pixel type is set
         """
         valid = list(PIXEL_TYPES.keys())
-        if pixel_type_bits not in valid:
-            raise ValueError("pixel_type_bits must be one of %r." % valid)
+        if pixel_type not in valid:
+            raise ValueError("pixel_type must be one of %r." % valid)
 
-        self._pixel_type = PIXEL_TYPES[pixel_type_bits]
-        self._line_interval_us = LINE_INTERVALS_US[pixel_type_bits]
-        self.log.info(f"pixel type set_to: {pixel_type_bits}")
+        self._pixel_type = pixel_type
+        self._line_interval_us = LINE_INTERVALS_US[pixel_type]
+        self.log.info(f"pixel type set_to: {pixel_type}")
 
     @property
     def line_interval_us(self) -> float:
@@ -310,7 +310,7 @@ class SimulatedCamera(BaseCamera):
         """
         return self._height_px * self._line_interval_us / 1000 + self._exposure_time_ms
 
-    def prepare(self, frame_count: int) -> None:
+    def prepare(self, frame_count=float("inf")) -> None:
         """Prepare the camera for capturing frames.
 
         :param frame_count: Number of frames to capture
@@ -319,17 +319,63 @@ class SimulatedCamera(BaseCamera):
         self.log.info("simulated camera preparing...")
         self._frame_generator = FrameGenerator()
         self._frame_generator.prepare(
-            frame_count, self._width_px, self._height_px, self._pixel_type, self.frame_time_ms
+            frame_count, self._width_px, self._height_px, PIXEL_TYPES[self._pixel_type], self.frame_time_ms
         )
 
-    def start(self) -> None:
-        """Start capturing frames."""
+    @property
+    def mainboard_temperature_c(self) -> float:
+        """
+        Get the mainboard temperature in Celsius.
+
+        :return: The mainboard temperature in Celsius.
+        :rtype: float
+        """
+        return 40.0 + numpy.random.randn()
+
+    @property
+    def sensor_temperature_c(self) -> float:
+        """
+        Get the sensor temperature in Celsius.
+
+        :return: The sensor temperature in Celsius.
+        :rtype: float
+        """
+        return 4.0 + numpy.random.randn()
+
+    @property
+    def readout_mode(self) -> str:
+        """
+        Get the readout mode.
+
+        :return: The readout mode.
+        :rtype: str
+        """
+        return "rolling shutter"
+
+    def start(self, frames=float("inf")) -> None:
+        """Start camera."""
+        self.log.info("simulated camera starting...")
         self._frame_generator.start()
 
     def stop(self) -> None:
-        """Stop capturing frames."""
+        """Stop camera,."""
         self.log.info("simulated camera stopping...")
         self._frame_generator.stop()
+
+    def abort(self) -> None:
+        """Abort camera."""
+        self.log.info("simulated camera stopping...")
+        self.stop()
+
+    def reset(self) -> None:
+        """Reset camera."""
+        self.log.info("simulated camera resetting...")
+        pass
+
+    def close(self) -> None:
+        """Close camera."""
+        self.log.info("simulated camera closing...")
+        pass
 
     def grab_frame(self) -> numpy.ndarray:
         """Grab the latest frame.
@@ -338,6 +384,11 @@ class SimulatedCamera(BaseCamera):
         :rtype: numpy.ndarray
         """
         image = self._frame_generator.get_latest_frame()
+        # image = numpy.random.randint(
+        #     low=128, high=256, size=(self.image_height_px, self.image_width_px), dtype=PIXEL_TYPES[self._pixel_type]
+        # )
+        # self.log.info(self._buffer_index.value)
+        # self._buffer_index.value -= 1
         if self._binning > 1:
             return self.gpu_binning.run(image)
         else:
@@ -402,6 +453,7 @@ class FrameGenerator:
         self._frame = Value("i", 0)
         self._frame_rate = Value("d", 0.0)
         self._dropped_frames = Value("d", 0.0)
+        self._buffer_index = Value("i", 0)
         self._buffer = Queue()
 
     @property
@@ -430,16 +482,6 @@ class FrameGenerator:
         :rtype: int
         """
         return self._dropped_frames.value
-
-    @property
-    def readout_mode(self) -> str:
-        """
-        Get the readout mode.
-
-        :return: The readout mode.
-        :rtype: str
-        """
-        return "rolling shutter"
 
     def get_latest_frame(self) -> numpy.ndarray:
         """Get the latest frame from the buffer.
@@ -478,6 +520,7 @@ class FrameGenerator:
                 self._frame,
                 self._frame_rate,
                 self._dropped_frames,
+                self._buffer_index,
             ),
         )
 
@@ -489,7 +532,7 @@ class FrameGenerator:
     def stop(self) -> None:
         """Stop the frame generator process."""
         self.log.info(f"stopping camera")
-        self._process.join()
+        self._process.kill()
 
     def _run(
         self,
@@ -502,6 +545,7 @@ class FrameGenerator:
         frame: multiprocessing.Value,
         frame_rate: multiprocessing.Value,
         dropped_frames: multiprocessing.Value,
+        buffer_index: multiprocessing.Value,
     ) -> None:
         """Run the frame generator process.
 
@@ -531,7 +575,11 @@ class FrameGenerator:
             image = numpy.random.randint(low=128, high=256, size=(height_px, width_px), dtype=pixel_type)
             while (time.time() - start_time) < frame_time_ms / 1000:
                 time.sleep(0.01)
-            if buffer.qsize() < BUFFER_SIZE_FRAMES:
+            self.log.warning("test.")
+            if buffer_index.value < BUFFER_SIZE_FRAMES:
+                self.log.warning("test.")
+                self.log.warning(buffer_index.value)
+                buffer_index.value += 1
                 buffer.put(image)
             else:
                 dropped_frames.value += 1
@@ -540,3 +588,4 @@ class FrameGenerator:
             i = i if frame_count is None else i + 1
             end_time = time.time()
             frame_rate.value = 1 / (end_time - start_time)
+            self.log.warning(frame_rate.value)

@@ -34,50 +34,6 @@ class BaseStage(VoxelDevice):
         pass
 
     @abstractmethod
-    def setup_step_shoot_scan(self, step_size_um: float) -> None:
-        """
-        Setup a step shoot scan.
-
-        :param step_size_um: Step size in micrometers
-        :type step_size_um: float
-        """
-        pass
-
-    @abstractmethod
-    def setup_stage_scan(
-        self,
-        fast_axis_start_position: float,
-        slow_axis_start_position: float,
-        slow_axis_stop_position: float,
-        frame_count: int,
-        frame_interval_um: float,
-        strip_count: int,
-        pattern: str,
-        retrace_speed_percent: int,
-    ) -> None:
-        """
-        Setup a stage scan.
-
-        :param fast_axis_start_position: Fast axis start position
-        :type fast_axis_start_position: float
-        :param slow_axis_start_position: Slow axis start position
-        :type slow_axis_start_position: float
-        :param slow_axis_stop_position: Slow axis stop position
-        :type slow_axis_stop_position: float
-        :param frame_count: Frame count
-        :type frame_count: int
-        :param frame_interval_um: Frame interval in micrometers
-        :type frame_interval_um: float
-        :param strip_count: Strip count
-        :type strip_count: int
-        :param pattern: Scan pattern
-        :type pattern: str
-        :param retrace_speed_percent: Retrace speed percent
-        :type retrace_speed_percent: int
-        """
-        pass
-
-    @abstractmethod
     def start(self) -> None:
         """
         Start the stage.
@@ -174,7 +130,7 @@ class BaseStage(VoxelDevice):
 
     @property
     @abstractmethod
-    def mode(self) -> int:
+    def mode(self) -> str | int:
         """
         Get the mode of the stage.
 
@@ -185,7 +141,7 @@ class BaseStage(VoxelDevice):
 
     @mode.setter
     @abstractmethod
-    def mode(self, mode: int) -> None:
+    def mode(self, mode: str | int) -> None:
         """
         Set the mode of the stage.
 
@@ -208,13 +164,6 @@ class BaseStage(VoxelDevice):
     def zero_in_place(self) -> None:
         """
         Zero the stage in place.
-        """
-        pass
-
-    @abstractmethod
-    def log_metadata(self) -> None:
-        """
-        Log metadata.
         """
         pass
 

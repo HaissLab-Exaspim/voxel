@@ -47,6 +47,11 @@ class ZarrWriter(BaseWriter):
         """
         super().__init__(path)
         self._compression = aqz.CompressionCodec.NONE  # initialize as no compression
+        self._chunk_size_x_px = None
+        self._chunk_size_y_px = None
+        self._chunk_size_z_px = None
+        self._version = None
+        self._multiscale = None
 
     @property
     def chunk_size_x_px(self) -> int:
@@ -164,7 +169,7 @@ class ZarrWriter(BaseWriter):
         :return: Zarr version
         :rtype: str
         """
-        return next(key for key, value in VERSIONS.items() if value == self._version)
+        return self._version
 
     @version.setter
     def version(self, version: str) -> None:
@@ -179,7 +184,7 @@ class ZarrWriter(BaseWriter):
         if version not in valid:
             raise ValueError("version must be one of %r." % valid)
         self.log.info(f"setting zarr version to: {version}")
-        self._version = VERSIONS[version]
+        self._version = version
 
     @property
     def compression(self) -> str:
@@ -294,7 +299,10 @@ class ZarrWriter(BaseWriter):
         y_array_size = y_shards * self._chunk_size_y_px
 
         settings = aqz.StreamSettings(
-            store_path=str(filepath), data_type=DATA_TYPES[self._data_type], version=self._version, multiscale=True
+            store_path=str(filepath),
+            data_type=DATA_TYPES[self._data_type],
+            version=VERSIONS[self._version],
+            multiscale=self._multiscale,
         )
 
         settings.dimensions.extend(

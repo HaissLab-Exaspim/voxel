@@ -38,6 +38,9 @@ class Acquisition:
         self.config = self.yaml.load(Path(self.config_path))
 
         self.instrument = instrument
+        self.file_transfers = dict()  # initialize file_transfers attribute
+        self.processes = dict()  # initialize processes attribute
+        self.routines = dict()  # initialize routines attribute
 
         # initialize metadata attribute. NOT a dictionary since only one metadata class can exist in acquisition
         # TODO: Validation of config should check that metadata exists and only one

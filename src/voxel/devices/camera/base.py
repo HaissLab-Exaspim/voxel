@@ -145,34 +145,34 @@ class BaseCamera(VoxelDevice):
 
     @property
     @abstractmethod
-    def bit_packing_mode(self) -> str:
-        """
-        Get the bit packing mode.
-
-        :return: The bit packing mode.
-        :rtype: str
-        """
-        pass
-
-    @bit_packing_mode.setter
-    @abstractmethod
-    def bit_packing_mode(self, value: str) -> None:
-        """
-        Set the bit packing mode.
-
-        :param value: The bit packing mode.
-        :type value: str
-        """
-        pass
-
-    @property
-    @abstractmethod
     def line_interval_us(self) -> int:
         """
         Get the line interval in microseconds.
 
         :return: The line interval in microseconds.
         :rtype: int
+        """
+        pass
+
+    @property
+    @abstractmethod
+    def readout_mode(self) -> str:
+        """
+        Get the readout mode.
+
+        :return: The readout mode.
+        :rtype: str
+        """
+        pass
+
+    @property
+    @readout_mode.setter
+    def readout_mode(self, value) -> None:
+        """
+        Set the readout mode.
+
+        :param value: The readout mode.
+        :type value: str
         """
         pass
 
@@ -217,17 +217,6 @@ class BaseCamera(VoxelDevice):
 
         :param value: The binning mode.
         :type value: str
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def readout_mode(self) -> str:
-        """
-        Get the readout mode.
-
-        :return: The readout mode.
-        :rtype: str
         """
         pass
 
@@ -397,13 +386,6 @@ class BaseCamera(VoxelDevice):
     def acquisition_state(self) -> None:
         """
         Return the acquisition state of the camera.
-        """
-        pass
-
-    @abstractmethod
-    def log_metadata(self) -> None:
-        """
-        Log the metadata of the camera.
         """
         pass
 

@@ -184,6 +184,9 @@ class SimulatedDAQ(BaseDAQ):
 
             # store the total task time
             self.task_time_s[task["name"]] = 1 / timing["frequency_hz"]
+            setattr(self, f"{task_type}_frequency_hz", timing["frequency_hz"])
+
+        setattr(self, f"{task_type}_task", SimulatedTask())  # set task attribute
 
     def _timing_checks(self, task_type: str) -> None:
         """
@@ -603,3 +606,31 @@ class SimulatedDAQ(BaseDAQ):
             else:
                 pass
         return True
+
+
+class SimulatedTask:
+
+    def start(self) -> None:
+        """
+        Start the task.
+        """
+        pass
+
+    def stop(self) -> None:
+        """
+        Stop the task.
+        """
+        pass
+
+    def close(self) -> None:
+        """
+        Close the task.
+        """
+        pass
+
+    def restart(self) -> None:
+        """
+        Restart the task.
+        """
+        self.stop()
+        self.start()

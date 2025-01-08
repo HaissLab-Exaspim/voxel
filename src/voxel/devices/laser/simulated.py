@@ -1,6 +1,7 @@
 import logging
 import random
 
+import numpy
 from serial import Serial
 from typing import Dict, List
 
@@ -21,7 +22,7 @@ class SimulatedLaser(BaseLaser):
     SimulatedLaser class for handling simulated laser devices.
     """
 
-    def __init__(self, id: str, wavelength: int, prefix: str = "", coefficients: Dict[str, float] = {}) -> None:
+    def __init__(self, id: str, wavelength: int, prefix: str = "", maximum_power_mw: float = 100) -> None:
         """
         Initialize the SimulatedLaser object.
 
@@ -31,8 +32,8 @@ class SimulatedLaser(BaseLaser):
         :type wavelength: int
         :param prefix: Prefix for the laser
         :type prefix: str, optional
-        :param coefficients: Coefficients for the laser
-        :type coefficients: dict, optional
+        :param maximum_power_mw: Maximum power for the laser in mW
+        :type maximum_power_mw: float, optional
         """
         super().__init__(id)
         self.log = logging.getLogger(__name__ + "." + self.__class__.__name__)
@@ -41,7 +42,7 @@ class SimulatedLaser(BaseLaser):
         self.ser = Serial
         self._wavelength = wavelength
         self._simulated_power_setpoint_mw = 10.0
-        self._max_power_mw = 100.0
+        self._max_power_mw = maximum_power_mw
         self._modulation_mode = "digital"
         self._temperature = 20.0
         self._cdrh = "ON"
@@ -122,7 +123,7 @@ class SimulatedLaser(BaseLaser):
         :return: Temperature in Celsius
         :rtype: float
         """
-        return self._temperature
+        return self._temperature + numpy.random.normal(0, 1)
 
     def status(self) -> List[str]:
         """
