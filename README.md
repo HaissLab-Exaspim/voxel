@@ -310,7 +310,7 @@ Currently supported device types and models are listed below.
 
 | Manufacturer | Model        | Class          | Module                                 | Tested |
 | ------------ | ------------ | -------------- | -------------------------------------- | ------ |
-| Simulated    | Mock      | TSP0B1TemperatureSensor    | `voxel.devices.temperature_sensor.tsp0b1` | ✅ |
+| Simulated    | Mock      | SimulatedTemperatureSensor    | `voxel.devices.temperature_sensor.tsp0b1` | ✅ |
 | Thorlabs    | TSP0B1       | TSP0B1TemperatureSensor    | `voxel.devices.temperature_sensor.tsp0b1` | ✅ |
 
 ### Writers
