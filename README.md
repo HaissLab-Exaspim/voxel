@@ -227,14 +227,14 @@ Currently supported device types and models are listed below.
 
 | Manufacturer         | Model     | Class        | Module                        | Tested |
 | -------------------- | --------- | ------------ | ----------------------------- | ------ |
+| Simulated            | Mock   | SimulatedDAQ | `voxel.devices.daq.simulated` | ✅      |
 | National Instruments | PCIe-6738 | NIDAQ        | `voxel.devices.daq.ni`        | ✅      |
-| Simulated            | MockDAQ   | SimulatedDAQ | `voxel.devices.daq.simulated` | ✅      |
 
 #### Cameras
 
 | Manufacturer | Model            | Class           | Module                           | Tested |
 | ------------ | ---------------- | --------------- | -------------------------------- | ------ |
-| Simulated    | MockCamera       | SimulatedCamera | `voxel.devices.camera.simulated` | ✅      |
+| Simulated    | Mock       | SimulatedCamera | `voxel.devices.camera.simulated` | ✅      |
 | Vieworks     | VP-151MX         | VieworksCamera  | `voxel.devices.camera.vieworks.egrabber`  | ✅      |
 | Vieworks     | VNP-604MX        | VieworksCamera  | `voxel.devices.camera.vieworks.egrabber`  | ✅      |
 | Ximea     | MX2457MR-SY-X4G3-FF | XIAPICamera  | `voxel.devices.camera.ximea.xiapi`  | ✅      |
@@ -246,7 +246,7 @@ Currently supported device types and models are listed below.
 
 | Manufacturer | Model     | Class          | Module                                     | Tested |
 | ------------ | --------- | -------------- | ------------------------------------------ | ------ |
-| Simulated    | MockLaser | SimulatedLaser | `voxel.devices.laser.simulated`            | ✅      |
+| Simulated    | Mock | SimulatedLaser | `voxel.devices.laser.simulated`            | ✅      |
 | Coherent     | OBISLX    | ObixLXLaser    | `voxel.devices.laser.coherent.obis_lx`             | ✅      |
 | Coherent     | OBISLS    | ObixLSLaser    | `voxel.devices.laser.coherent.obis_ls`             | ✅      |
 | Coherent     | GenesisMX | GenesisMXVoxel | `voxel.devices.laser.coherent.genesis_mx` | ✅      |
@@ -259,52 +259,59 @@ Currently supported device types and models are listed below.
 
 | Manufacturer | Model     | Class          | Module                          | Tested |
 | ------------ | --------- | -------------- | ------------------------------- | ------ |
-| Simulated    | MockStage | SimulatedStage | `voxel.devices.stage.simulated` | ✅      |
+| Simulated    | Mock | SimulatedStage | `voxel.devices.stage.simulated` | ✅      |
 | ASI          | Tiger     | TigerStage       | `voxel.devices.stage.asi.tiger`       | ✅      |
 
 #### Rotation mounts
 
 | Manufacturer | Model  | Class       | Module                                   | Tested |
 | ------------ | ------ | ----------- | ---------------------------------------- | ------ |
-| Simulated    | MockRM | SimulatedRotationMount | `voxel.devices.rotation_mount.simulated` | ✅      |
+| Simulated    | Mock | SimulatedRotationMount | `voxel.devices.rotation_mount.simulated` | ✅      |
 | Thorlabs     | K10CR1 | K10CR1Mount  | `voxel.devices.rotation_mount.thorlabs.k10cr1`  | ✅      |
 
 #### AOTF
 
 | Manufacturer | Model    | Class         | Module                         | Tested |
 | ------------ | -------- | ------------- | ------------------------------ | ------ |
-| Simulated    | MockAOTF | SimulatedAOTF | `voxel.devices.aotf.simulated` | ✅      |
+| Simulated    | Mock | SimulatedAOTF | `voxel.devices.aotf.simulated` | ✅      |
 | AAOpto       | MPDSxx   | AAOptoAOTF    | `voxel.devices.aotf.aaopto.aotfnc`    | ❌      |
 
 #### Filterwheel
 
 | Manufacturer | Model   | Class          | Module                                | Tested |
 | ------------ | ------- | -------------- | ------------------------------------- | ------ |
-| Simulated    | MockFW  | SimulatedFilteWheel    | `voxel.devices.filterwheel.simulated` | ✅      |
+| Simulated    | Mock  | SimulatedFilteWheel    | `voxel.devices.filterwheel.simulated` | ✅      |
 | ASI          | FW-1000 | FW1000FilterWheel | `voxel.devices.filterwheel.asi.fw1000`       | ✅      |
 
 #### Flip mount
 
 | Manufacturer | Model  | Class       | Module                               | Tested |
 | ------------ | ------ | ----------- | ------------------------------------ | ------ |
-| Simulated    | MockFM | SimulatedFlipMount | `voxel.devices.flip_mount.simulated` | ✅      |
+| Simulated    | Mock | SimulatedFlipMount | `voxel.devices.flip_mount.simulated` | ✅      |
 | Thorlabs     | MFF101 | MFF101FlipMount  | `voxel.devices.flip_mount.thorlabs.mff101`  | ✅      |
 
 #### Power meter
 
 | Manufacturer | Model  | Class       | Module                                | Tested |
 | ------------ | ------ | ----------- | ------------------------------------- | ------ |
-| Simulated    | MockPM | SimulatedPowerMeter | `voxel.devices.power_meter.simulated` | ✅      |
+| Simulated    | Mock | SimulatedPowerMeter | `voxel.devices.power_meter.simulated` | ✅      |
 | Thorlabs     | PM100D | PM100PowerMeter  | `voxel.devices.power_meter.thorlabs.pm100`  | ✅      |
 
 #### Tunable lens
 
 | Manufacturer | Model        | Class          | Module                                 | Tested |
 | ------------ | ------------ | -------------- | -------------------------------------- | ------ |
-| Simulated    | MockTL       | SimulatedTunableLens    | `voxel.devices.tunable_lens.simulated` | ✅      |
+| Simulated    | Mock       | SimulatedTunableLens    | `voxel.devices.tunable_lens.simulated` | ✅      |
 | ASI          | TGTLC        | TGTLCTunableLens | `voxel.devices.tunable_lens.asi.tgtlc`       | ✅      |
 | Optotune     | ELE4i | ELE4ITunableLens     | `voxel.devices.tunable_lens.optotune.ele4i`  | ✅  |
 | Optotune     | ICC4C | ICC4CTunableLens     | `voxel.devices.tunable_lens.optotune.icc4c`  | ✅  |
+
+#### Temperature / humidity sensor
+
+| Manufacturer | Model        | Class          | Module                                 | Tested |
+| ------------ | ------------ | -------------- | -------------------------------------- | ------ |
+| Simulated    | Mock      | TSP0B1TemperatureSensor    | `voxel.devices.temperature_sensor.tsp0b1` | ✅ |
+| Thorlabs    | TSP0B1       | TSP0B1TemperatureSensor    | `voxel.devices.temperature_sensor.tsp0b1` | ✅ |
 
 ### Writers
 

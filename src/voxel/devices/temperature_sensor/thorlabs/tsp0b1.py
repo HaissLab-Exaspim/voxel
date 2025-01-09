@@ -2,10 +2,12 @@ import ctypes as C
 import logging
 import os
 
+from voxel.devices.temperature_sensor.base import BaseTemperatureSensor
+
 CHANNELS = {"Main": 11, "TH1": 12, "TH2": 13}
 
 
-class TSP01BTemperatureSensor:
+class TSP01BTemperatureSensor(BaseTemperatureSensor):
     """
     Basic device adaptor for Thorlabs TSP01B USB Temperature and Humidity Data
     Logger, Including External Temperature Probes, -15 °C to 200 °C. Many more
@@ -14,7 +16,7 @@ class TSP01BTemperatureSensor:
     - original driver written by Alfred Millet-Sikking (https://github.com/amsikking/thorlabs_TSP01B)
     """
 
-    def __init__(self, id: str):
+    def __init__(self, id: str, channel: str):
         """
         Initialize the TSP01BTemperatureSensor object.
 
@@ -23,6 +25,7 @@ class TSP01BTemperatureSensor:
         """
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.id = id
+        self.channel = channel
         self._load_dll()
         device_count = C.c_uint32()
         self.dll.get_device_count(0, device_count)
