@@ -22,6 +22,8 @@ class TSP01BTemperatureSensor(BaseTemperatureSensor):
 
         :param id: Serial number of the device
         :type id: str
+        :param channel: Initial channel to set
+        :type channel: str
         """
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.id = id
@@ -49,7 +51,7 @@ class TSP01BTemperatureSensor(BaseTemperatureSensor):
         self.log.info("reseting temperature sensor")
         self.dll.reset(self.device_handle)
 
-    def get_device_info(self, device: int, device_handle: C.c_uint32):
+    def get_device_info(self, device: int, device_handle: C.c_uint32) -> tuple:
         """
         Get device information.
 
