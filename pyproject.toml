@@ -58,6 +58,7 @@ dependencies = [
 "imaris" = ["PyImarisWriter>=0.7.0"]
 "tifffile" = ["tifffile>=2024.1.30"]
 "pycobolt" = ["pycobolt @ git+https://github.com/cobolt-lasers/pycobolt.git"]
+"acquire-zarr" = ["acquire-zarr>=0.0.5"]
 "dev" = [
     "pytest>=8.2.1",
     "black",
@@ -72,6 +73,7 @@ dependencies = [
     "voxel[imaris]",
     "voxel[tifffile]",
     "voxel[pycobolt]",
+    "voxel[acquire-zarr]",
     "voxel[dev]",
 ]
 
