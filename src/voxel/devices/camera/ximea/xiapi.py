@@ -9,6 +9,7 @@ from ximea.xidefs import (
     XI_OUTPUT_DATA_PACKING_TYPE,
     XI_TRG_SELECTOR,
     XI_TRG_SOURCE,
+    XI_SWITCH,
 )
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
@@ -22,9 +23,6 @@ BINNINGS = dict()
 
 # generate valid pixel types by querying xiapi
 PIXEL_TYPES = list()
-
-# generate line intervals by querying xiapi
-LINE_INTERVALS_US = dict()
 
 # generate bit packing modes by querying xiapi
 BIT_PACKING_MODES = list()
@@ -58,6 +56,8 @@ class XIAPICamera(BaseCamera):
         self._binning = 1
         # initialize parameter values
         self._update_parameters()
+        # disable BW limit so that it does not influence the sensor line period
+        self.camera.set_param("XI_PRM_LIMIT_BANDWIDTH_MODE", XI_SWITCH["XI_OFF"])
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
     def exposure_time_ms(self) -> float:
@@ -232,9 +232,19 @@ class XIAPICamera(BaseCamera):
         :return: Line interval in microseconds
         :rtype: float
         """
-        pixel_type = self.pixel_type
-        return LINE_INTERVALS_US[pixel_type]
+        line_interval_us = self.camera.get_sensor_line_period()
+        return line_interval_us
 
+    @line_interval_us.setter
+    def line_interval_us(self, line_interval_us: float) -> None:
+        """
+        Set the line interval in microseconds.
+
+        :param line_interval_us: Line interval in us
+        :type line_interval_us: float
+        """
+        line_interval_us = self.camera.set_sensor_line_period(line_interval_us)
+    
     @property
     def frame_time_ms(self) -> float:
         """
@@ -406,14 +416,14 @@ class XIAPICamera(BaseCamera):
         :param frame_count: Number of frames to acquire, defaults to None
         :type frame_count: int, optional
         """
-        self.log.info(f"starting camera")
+        self.log.info("starting camera")
         self.camera.start_acquisition()
 
     def stop(self) -> None:
         """
         Stop the camera acquisition.
         """
-        self.log.info(f"stopping camera")
+        self.log.info("stopping camera")
         self.camera.stop_acquisition()
 
     def abort(self) -> None:
@@ -426,14 +436,14 @@ class XIAPICamera(BaseCamera):
         """
         Close the camera connection.
         """
-        self.log.info(f"closing camera")
+        self.log.info("closing camera")
         self.camera.close_device()
 
     def reset(self) -> None:
         """
         Reset the camera.
         """
-        self.log.info(f"resetting camera")
+        self.log.info("resetting camera")
         self.camera.set_device_reset()
 
     def grab_frame(self) -> np.ndarray:
@@ -570,24 +580,28 @@ class XIAPICamera(BaseCamera):
         # minimum offset x
         try:
             self.min_offset_x_px = self.camera.get_offsetX_minimum()
+            type(self).offset_x_px.minimum = self.min_offset_x_px
             self.log.debug(f"min offset x is: {self.min_offset_x_px} px")
         except Exception:
             self.log.debug(f"min offset x not available for camera {self.id}")
         # maximum offset x
         try:
             self.max_offset_x_px = self.camera.get_offsetX_maximum()
+            type(self).offset_x_px.maximum = self.max_offset_x_px
             self.log.debug(f"max offset x is: {self.max_offset_x_px} px")
         except Exception:
             self.log.debug(f"max offset x not available for camera {self.id}")
         # minimum offset y
         try:
             self.min_offset_y_px = self.camera.get_offsetX_minimum()
+            type(self).offset_y_px.minimum = self.min_offset_y_px
             self.log.debug(f"min offset y is: {self.min_offset_y_px} px")
         except Exception:
             self.log.debug(f"min offset y not available for camera {self.id}")
         # maximum offset y
         try:
             self.max_offset_y_px = self.camera.get_offsetX_maximum()
+            type(self).offset_y_px.maximum = self.max_offset_y_px
             self.log.debug(f"max offset y is: {self.max_offset_y_px} px")
         except Exception:
             self.log.debug(f"max offset y not available for camera {self.id}")
@@ -616,15 +630,38 @@ class XIAPICamera(BaseCamera):
         # step offset x
         try:
             self.step_offset_x_px = self.camera.get_offsetX_increment()
+            type(self).offset_x_px.step = self.step_offset_x_px
             self.log.debug(f"step offset x is: {self.step_offset_x_px} px")
         except Exception:
             self.log.debug(f"step offset x not available for camera {self.id}")
         # step offset y
         try:
             self.step_offset_y_px = self.camera.get_offsetY_increment()
+            type(self).offset_y_px.step = self.step_offset_y_px
             self.log.debug(f"step offset y is: {self.step_offset_y_px} px")
         except Exception:
             self.log.debug(f"step offset y not available for camera {self.id}")
+        # minimum line interval
+        try:
+            self.min_line_interval_us = self.camera.get_sensor_line_period_minimum()
+            type(self).line_interval_us.minimum = self.min_line_interval_us
+            self.log.debug(f"min line interval is: {self.min_line_interval_us} [us]")
+        except Exception:
+            self.log.debug(f"min line interval is not available for camera {self.id}")
+        # maximum line interval
+        try:
+            self.max_line_interval_us = self.camera.get_sensor_line_period_maximum()
+            type(self).line_interval_us.maximum = self.max_line_interval_us
+            self.log.debug(f"max line interval is: {self.max_line_interval_us} [us]")
+        except Exception:
+            self.log.debug(f"max line interval is not available for camera {self.id}")
+        # step line interval
+        try:
+            self.step_line_interval_us = self.camera.get_sensor_line_period_increment()
+            type(self).line_interval_us.step = self.step_line_interval_us
+            self.log.debug(f"step line interval is: {self.step_line_interval_us} [us]")
+        except Exception:
+            self.log.debug(f"step line interval is not available for camera {self.id}")
 
     def _query_binning(self) -> None:
         """
@@ -688,21 +725,6 @@ class XIAPICamera(BaseCamera):
                 self.log.debug(f"{bit_packing} not avaiable on this camera")
         # reset to initial value
         self.camera.set_output_bit_packing_type(init_bit_packing)
-
-    def _query_line_intervals(self) -> None:
-        """
-        Query the line intervals for the camera.
-        """
-        # based on framerate and number of sensor rows
-        for key in PIXEL_TYPES:
-            # set pixel type
-            self.camera.set_output_bit_depth(key.upper())
-            # check max acquisition rate, used to determine line interval
-            frame_rate = self.camera.get_framerate()
-            # need to check for unused rows for specific ximea camera
-            line_interval_s = 1 / frame_rate / (self.sensor_height_px)
-            # conver from s to us and store
-            LINE_INTERVALS_US[key] = line_interval_s * 1e6
 
     def _query_trigger_modes(self) -> None:
         """

@@ -710,24 +710,28 @@ class VieworksCamera(BaseCamera):
         # minimum offset x
         try:
             self.min_offset_x_px = self.grabber.remote.get("OffsetX.Min")
+            type(self).offset_x_px.minimum = self.min_offset_x_px
             self.log.debug(f"min offset x is: {self.min_offset_x_px} px")
         except Exception:
             self.log.debug(f"min offset x not available for camera {self.id}")
         # maximum offset x
         try:
             self.max_offset_x_px = self.grabber.remote.get("OffsetX.Max")
+            type(self).offset_x_px.maximum = self.max_offset_x_px
             self.log.debug(f"max offset x is: {self.max_offset_x_px} px")
         except Exception:
             self.log.debug(f"max offset x not available for camera {self.id}")
         # minimum offset y
         try:
             self.min_offset_y_px = self.grabber.remote.get("OffsetY.Min")
+            type(self).offset_y_px.minimum = self.min_offset_y_px
             self.log.debug(f"min offset y is: {self.min_offset_y_px} px")
         except Exception:
             self.log.debug(f"min offset y not available for camera {self.id}")
         # maximum offset y
         try:
             self.max_offset_y_px = self.grabber.remote.get("OffsetY.Max")
+            type(self).offset_y_px.maximum = self.max_offset_y_px
             self.log.debug(f"max offset y is: {self.max_offset_y_px} px")
         except Exception:
             self.log.debug(f"max offset y not available for camera {self.id}")
@@ -756,12 +760,14 @@ class VieworksCamera(BaseCamera):
         # step offset x
         try:
             self.step_offset_x_px = self.grabber.remote.get("OffsetX.Inc")
+            type(self).offset_x_px.step = self.step_offset_x_px
             self.log.debug(f"step offset x is: {self.step_offset_x_px} px")
         except Exception:
             self.log.debug(f"step offset x not available for camera {self.id}")
         # step offset y
         try:
             self.step_offset_y_px = self.grabber.remote.get("OffsetY.Inc")
+            type(self).offset_y_px.step = self.step_offset_y_px
             self.log.debug(f"step offset y is: {self.step_offset_y_px} px")
         except Exception:
             self.log.debug(f"step offset y not available for camera {self.id}")
@@ -775,6 +781,7 @@ class VieworksCamera(BaseCamera):
             else:
                 line_interval_us = (1 / max_frame_rate) / self.height_px * 1e6
             self.min_line_interval_us = line_interval_us
+            type(self).line_interval_us.minimum = self.min_line_interval_us
             self.log.debug(f"min line interval is: {self.min_line_interval_us} [us]")
         except Exception:
             self.log.debug(f"min line interval is not available for camera {self.id}")
@@ -788,6 +795,7 @@ class VieworksCamera(BaseCamera):
             else:
                 line_interval_us = (1 / min_frame_rate) / self.height_px * 1e6
             self.max_line_interval_us = line_interval_us
+            type(self).line_interval_us.maximum = self.max_line_interval_us
             self.log.debug(f"max line interval is: {self.max_line_interval_us} [us]")
         except Exception:
             self.log.debug(f"max line interval is not available for camera {self.id}")
