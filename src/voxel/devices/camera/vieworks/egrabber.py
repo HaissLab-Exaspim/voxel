@@ -45,14 +45,6 @@ BINNINGS = dict()
 # }
 PIXEL_TYPES = dict()
 
-# generate line intervals by querying egrabber
-# should be of the form
-# {"mono8": 15.0,
-#  "mono12": 25.5,
-#  "mono16": 45.44 ...
-# }
-LINE_INTERVALS_US = dict()
-
 # generate bit packing modes by querying egrabber
 # should be of the form
 # {"msb": "Msb",
@@ -301,8 +293,49 @@ class VieworksCamera(BaseCamera):
         :return: Line interval in microseconds
         :rtype: float
         """
-        pixel_type = self.pixel_type
-        return LINE_INTERVALS_US[pixel_type]
+        # line interval is indirectly set via DeviceLinkThroughputLimit
+        # we can check the line interval indirectly by querying the max frame rate
+        # line rate = (width * height)/(data rate * height)
+        data_rate_mb_s = self.grabber.remote.get("DeviceLinkThroughputLimit")
+        # determine bits to bytes
+        if self.pixel_type == "mono8":
+            bit_to_byte = 1
+        else:
+            bit_to_byte = 2
+        # calculate line interval in us
+        # egrabber uses 1000 instead of 1024 for byte calculation
+        line_interval_us = (
+            (self.width_px * self.height_px * bit_to_byte) / 1000**2 / (data_rate_mb_s / 1e6 * self.height_px)
+        )
+        # data rate calculation is not perfect, so we need to check the min and max values
+        if line_interval_us < self.min_line_interval_us:
+            line_interval_us = self.min_line_interval_us
+        elif line_interval_us > self.max_line_interval_us:
+            line_interval_us = self.max_line_interval_us
+        return line_interval_us
+
+    @line_interval_us.setter
+    def line_interval_us(self, line_interval_us: float) -> None:
+        """Set the line rate in us.
+
+        :param line_interval_us: Line rate in us
+        :type line_interval_us: float
+        """
+        # line interval is indirectly set via DeviceLinkThroughputLimit
+        # data rate = (width * height)/(line rate * height)
+        # determine bits to bytes
+        if self.pixel_type == "mono8":
+            bit_to_byte = 1
+        else:
+            bit_to_byte = 2
+        # calculate data rate in MB/s
+        # egrabber uses 1000 instead of 1024 for byte calculation
+        data_rate_mb_s = (
+            (self.width_px * self.height_px * bit_to_byte) / 1000**2 / (line_interval_us / 1e6 * self.height_px)
+        )
+        self.grabber.remote.set("DeviceLinkThroughputLimit", data_rate_mb_s)
+        self._get_min_max_step_values()
+        self.log.info(f"line interval set to: {line_interval_us} [us]")
 
     @property
     def frame_time_ms(self) -> float:
@@ -445,14 +478,15 @@ class VieworksCamera(BaseCamera):
 
     def prepare(self) -> None:
         """Prepare the camera for acquisition."""
-        self.log.info(f"preparing camera")
+        self.log.info("preparing camera")
         # determine bits to bytes
         if self.pixel_type == "mono8":
             bit_to_byte = 1
         else:
             bit_to_byte = 2
         # software binning, so frame size is independent of binning factor
-        frame_size_mb = self.width_px * self.height_px * bit_to_byte / 1024**2
+        # egrabber uses 1000 instead of 1024 for byte calculation
+        frame_size_mb = self.width_px * self.height_px * bit_to_byte / 1000**2
         self.buffer_size_frames = round(BUFFER_SIZE_MB / frame_size_mb)
         # realloc buffers appears to be allocating ram on the pc side, not camera side.
         self.grabber.realloc_buffers(self.buffer_size_frames)  # allocate RAM buffer N frames
@@ -464,14 +498,14 @@ class VieworksCamera(BaseCamera):
         :param frame_count: Number of frames to acquire, defaults to GENTL_INFINITE
         :type frame_count: int, optional
         """
-        self.log.info(f"starting camera")
+        self.log.info("starting camera")
         if frame_count == float("inf"):
             frame_count = GENTL_INFINITE
         self.grabber.start(frame_count=frame_count)
 
     def stop(self) -> None:
         """Stop the camera acquisition."""
-        self.log.info(f"stopping camera")
+        self.log.info("stopping camera")
         self.grabber.stop()
         self.grabber.stream.execute("StreamReset")
 
@@ -485,7 +519,7 @@ class VieworksCamera(BaseCamera):
 
     def reset(self) -> None:
         """Reset the camera instance."""
-        self.log.info(f"resetting camera")
+        self.log.info("resetting camera")
         del self.grabber
         self.grabber = EGrabber(
             self.gentl,
@@ -731,6 +765,34 @@ class VieworksCamera(BaseCamera):
             self.log.debug(f"step offset y is: {self.step_offset_y_px} px")
         except Exception:
             self.log.debug(f"step offset y not available for camera {self.id}")
+        # minimum line interval
+        try:
+            max_frame_rate = self.grabber.remote.get("AcquisitionFrameRate.Max")
+            # vp-151mx camera uses the sony imx411 camera which has 10640 active rows
+            # but 10802 total rows. from the manual 10760 are used during readout
+            if self.grabber.remote.get("DeviceModelName") == "VP-151MX-M6H0":
+                line_interval_us = (1 / max_frame_rate) / (self.height_px + 120) * 1e6
+            else:
+                line_interval_us = (1 / max_frame_rate) / self.height_px * 1e6
+            self.min_line_interval_us = line_interval_us
+            self.log.debug(f"min line interval is: {self.min_line_interval_us} [us]")
+        except Exception:
+            self.log.debug(f"min line interval is not available for camera {self.id}")
+        # maximum line interval
+        try:
+            min_frame_rate = self.grabber.remote.get("AcquisitionFrameRate.Min")
+            # vp-151mx camera uses the sony imx411 camera which has 10640 active rows
+            # but 10802 total rows. from the manual 10760 are used during readout
+            if self.grabber.remote.get("DeviceModelName") == "VP-151MX-M6H0":
+                line_interval_us = (1 / min_frame_rate) / (self.height_px + 120) * 1e6
+            else:
+                line_interval_us = (1 / min_frame_rate) / self.height_px * 1e6
+            self.max_line_interval_us = line_interval_us
+            self.log.debug(f"max line interval is: {self.max_line_interval_us} [us]")
+        except Exception:
+            self.log.debug(f"max line interval is not available for camera {self.id}")
+        # step line interval
+        # not implemented in egrabber
 
     def _query_binning(self) -> None:
         """Query the available binning options."""
@@ -768,8 +830,6 @@ class VieworksCamera(BaseCamera):
             except Exception:
                 self.log.debug(f"{pixel_type} not avaiable on this camera")
 
-        # once the pixel types are found, determine line intervals
-        self._query_line_intervals()
         # reset to initial value
         self.grabber.remote.set("PixelFormat", init_pixel_type)
 
@@ -788,23 +848,6 @@ class VieworksCamera(BaseCamera):
                 self.log.debug(f"{bit_packing} not avaiable on this camera")
         # reset to initial value
         self.grabber.stream.set("UnpackingMode", init_bit_packing)
-
-    def _query_line_intervals(self) -> None:
-        """Query the line intervals for each pixel type."""
-        # based on framerate and number of sensor rows
-        for key in PIXEL_TYPES:
-            # set pixel type
-            self.grabber.remote.set("PixelFormat", PIXEL_TYPES[key])
-            # check max acquisition rate, used to determine line interval
-            max_frame_rate = self.grabber.remote.get("AcquisitionFrameRate.Max")
-            # vp-151mx camera uses the sony imx411 camera which has 10640 active rows
-            # but 10802 total rows. from the manual 10760 are used during readout
-            if self.grabber.remote.get("DeviceModelName") == "VP-151MX-M6H0":
-                line_interval_s = (1 / max_frame_rate) / (self.sensor_height_px + 120)
-            else:
-                line_interval_s = (1 / max_frame_rate) / self.sensor_height_px
-            # conver from s to us and store
-            LINE_INTERVALS_US[key] = line_interval_s * 1e6
 
     def _query_trigger_modes(self) -> None:
         """Query the available trigger modes."""
