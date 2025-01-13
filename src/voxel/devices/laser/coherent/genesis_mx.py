@@ -26,16 +26,23 @@ class GenesisMXLaser(BaseLaser):
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         super().__init__(id)
         self._conn = id
-        try:
-            self._inst = GenesisMX(serial=id)
-            assert self._inst.head.serial == id
-            self._inst.mode = OperationModes.PHOTO
-        except AssertionError:
-            raise ValueError(f"Error initializing laser {self._conn}, serial number mismatch")
+        self._instance
         self.enable()
         self.power_setpoint_mw = INIT_POWER_MW
         type(self).power_setpoint_mw.maximum = maximum_power_mw
         self._wavelength = wavelength
+
+    @property
+    def _instance(self):
+        _inst = getattr(self, "_inst", None)
+        if _inst is None :
+            try:
+                self._inst = GenesisMX(serial=id)
+                assert self._inst.head.serial == id
+                self._inst.mode = OperationModes.PHOTO
+            except AssertionError:
+                raise ValueError(f"Error initializing laser {self._conn}, serial number mismatch")
+        return self._inst
 
     @property
     def wavelength(self) -> int:
@@ -48,13 +55,11 @@ class GenesisMXLaser(BaseLaser):
 
     def enable(self) -> None:
         """Enable the laser."""
-        if self._inst is None:
-            self._inst = GenesisMX(serial=self._conn)
-        self._inst.enable()
+        self._instance.enable()
 
     def disable(self) -> None:
         """Disable the laser."""
-        self._inst.disable()
+        self._instance.disable()
 
     def close(self) -> None:
         """Close the connection to the laser."""
@@ -67,7 +72,7 @@ class GenesisMXLaser(BaseLaser):
         :return: The current power of the laser in milliwatts.
         :rtype: float
         """
-        return self._inst.power_mw
+        return self._instance.power_mw
 
     @DeliminatedProperty(minimum=0, maximum=float("inf"))
     def power_setpoint_mw(self) -> float:
@@ -76,7 +81,7 @@ class GenesisMXLaser(BaseLaser):
         :return: The power setpoint of the laser in milliwatts.
         :rtype: float
         """
-        return self._inst.power_setpoint_mw
+        return self._instance.power_setpoint_mw
 
     @power_setpoint_mw.setter
     def power_setpoint_mw(self, value: float) -> None:
@@ -86,7 +91,7 @@ class GenesisMXLaser(BaseLaser):
         :type value: float
         """
         self.log.info(f"setting power to {value} mW")
-        self._inst.power_mw = value
+        self._instance.power_mw = value
 
     @property
     def temperature_c(self) -> float:
@@ -95,4 +100,4 @@ class GenesisMXLaser(BaseLaser):
         :return: The temperature of the laser in degrees Celsius.
         :rtype: float
         """
-        return self._inst.temperature_c
+        return self._instance.temperature_c

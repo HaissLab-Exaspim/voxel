@@ -121,11 +121,16 @@ class VieworksCamera(BaseCamera):
                 )
                 # note the framegrabber serial number is also available through:
                 # grabber.interface.get('DeviceSerialNumber)
-                if grabber.remote.get("DeviceSerialNumber") == self.id:
+                remote_device_id = grabber.remote.get("DeviceSerialNumber")
+                if remote_device_id == self.id:
                     self.log.info(f"grabber found for S/N: {self.id}")
                     self.grabber = grabber
                     self.egrabber = egrabber
                     break
+                self.log.info(f"Grabber for S/N {remote_device_id} was skipped as device ID didn't matched the instrument one ({self.id})")
+            else :
+                # if the for loop finished without breaking (without a grabber being found)
+                raise ValueError() # We raise here to trigger the error message of the except Exception below.
         except Exception:
             self.log.error(f"no grabber found for S/N: {self.id}")
             raise ValueError(f"no grabber found for S/N: {self.id}")
