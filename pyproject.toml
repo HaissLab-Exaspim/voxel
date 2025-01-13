@@ -44,7 +44,7 @@ dependencies = [
     # processing and utils dependencies
     "pyclesperanto>=0.8.2",
     "scikit-image>=0.20.0",
-    "gputools>0.2.14",
+    "gputools>=0.2.16",
     "scikit-tensor-py3",
     "tensorstore>=0.1.56",
     "matplotlib>=3.8.2",

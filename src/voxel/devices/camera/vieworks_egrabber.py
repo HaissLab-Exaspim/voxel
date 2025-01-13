@@ -104,6 +104,8 @@ class Camera(BaseCamera):
                     self.grabber = grabber
                     self.egrabber = egrabber
                     break
+            else :
+                raise ValueError()
         except:
             self.log.error(f"no grabber found for S/N: {self.id}")
             raise ValueError(f"no grabber found for S/N: {self.id}")
