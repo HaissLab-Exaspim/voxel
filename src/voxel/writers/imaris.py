@@ -1,5 +1,7 @@
 import logging
 import multiprocessing
+import os
+import re
 import sys
 from ctypes import c_wchar
 from datetime import datetime
@@ -8,19 +10,18 @@ from multiprocessing import Array, Process
 from multiprocessing.shared_memory import SharedMemory
 from pathlib import Path
 from time import perf_counter, sleep
+from typing import Dict, List, Tuple
 
 import numpy as np
-import os
 from matplotlib.colors import hex2color
 from PyImarisWriter import PyImarisWriter as pw
 
-from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.writers.base import BaseWriter
 
 CHUNK_COUNT_PX = 64
 DIVISIBLE_FRAME_COUNT_PX = 64
 
-COMPRESSION_TYPES = {
+COMPRESSIONS = {
     "lz4shuffle": pw.eCompressionAlgorithmShuffleLZ4,
     "none": pw.eCompressionAlgorithmNone,
 }
@@ -31,10 +32,21 @@ class ImarisProgressChecker(pw.CallbackClass):
     Class for tracking progress of an active Imaris writer.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """
+        Initialize the ImarisProgressChecker class.
+        """
         self.progress = 0  # a float representing the progress (0 to 1.0)
 
-    def RecordProgress(self, progress, total_bytes_written):
+    def RecordProgress(self, progress: float, total_bytes_written: int) -> None:
+        """
+        Record the progress of the Imaris writer.
+
+        :param progress: The current progress as a float between 0 and 1.0.
+        :type progress: float
+        :param total_bytes_written: The total bytes written so far.
+        :type total_bytes_written: int
+        """
         self.progress = progress
 
 
@@ -45,70 +57,63 @@ class ImarisWriter(BaseWriter):
     Writer will save data to the following location
 
     path\\acquisition_name\\filename.ims
-
-    :param path: Path for the data writer
-    :type path: str
     """
 
-    def __init__(self, path: str):
+    def __init__(self, path: str) -> None:
+        """
+        Initialize the ImarisWriter class.
+
+        :param path: The path for the data writer.
+        :type path: str
+        """
         super().__init__(path)
+        self._compression = pw.eCompressionAlgorithmNone  # initialize as no compression
         self._color = "#ffffff"  # initialize as white
         # Internal flow control attributes to monitor compression progress
         self.callback_class = ImarisProgressChecker()
 
     @property
-    def frame_count_px(self):
+    def frame_count_px(self) -> int:
         """Get the number of frames in the writer.
 
         :return: Frame number in pixels
         :rtype: int
         """
-
         return self._frame_count_px
 
     @frame_count_px.setter
-    def frame_count_px(self, frame_count_px: int):
+    def frame_count_px(self, frame_count_px: int) -> None:
         """Set the number of frames in the writer.
 
         :param value: Frame number in pixels
         :type value: int
         """
-
         self.log.info(f"setting frame count to: {frame_count_px} [px]")
         if frame_count_px % DIVISIBLE_FRAME_COUNT_PX != 0:
-            frame_count_px = (
-                    ceil(frame_count_px / DIVISIBLE_FRAME_COUNT_PX)
-                    * DIVISIBLE_FRAME_COUNT_PX
-            )
+            frame_count_px = ceil(frame_count_px / DIVISIBLE_FRAME_COUNT_PX) * DIVISIBLE_FRAME_COUNT_PX
             self.log.info(f"adjusting frame count to: {frame_count_px} [px]")
         self._frame_count_px = frame_count_px
 
     @property
-    def chunk_count_px(self):
+    def chunk_count_px(self) -> int:
         """Get the chunk count in pixels
 
         :return: Chunk count in pixels
         :rtype: int
         """
-
         return CHUNK_COUNT_PX
 
     @property
-    def compression(self):
+    def compression(self) -> str:
         """Get the compression codec of the writer.
 
         :return: Compression codec
         :rtype: str
         """
-
-        return next(
-            key
-            for key, value in COMPRESSION_TYPES.items()
-            if value == self._compression
-        )
+        return next(key for key, value in COMPRESSIONS.items() if value == self._compression)
 
     @compression.setter
-    def compression(self, compression: str):
+    def compression(self, compression: str) -> None:
         """Set the compression codec of the writer.
 
         :param value: Compression codec
@@ -116,74 +121,66 @@ class ImarisWriter(BaseWriter):
         * **none**
         :type value: str
         """
-
-        valid = list(COMPRESSION_TYPES.keys())
+        valid = list(COMPRESSIONS.keys())
         if compression not in valid:
             raise ValueError("compression type must be one of %r." % valid)
         self.log.info(f"setting compression mode to: {compression}")
-        self._compression = COMPRESSION_TYPES[compression]
+        self._compression = COMPRESSIONS[compression]
 
     @property
-    def filename(self):
+    def filename(self) -> str:
         """
         The base filename of file writer.
 
         :return: The base filename
         :rtype: str
         """
-
         return self._filename
 
     @filename.setter
-    def filename(self, filename: str):
+    def filename(self, filename: str) -> None:
         """
         The base filename of file writer.
 
         :param value: The base filename
         :type value: str
         """
-
         self._filename = filename if filename.endswith(".ims") else f"{filename}.ims"
         self.log.info(f"setting filename to: {filename}")
 
     @property
-    def color(self):
+    def color(self) -> str:
         """
         The color of the writer.
 
         :return: Color
         :rtype: str
         """
-
         return self._color
 
     @color.setter
-    def color(self, color: str):
+    def color(self, color: str) -> None:
         """
         The color of the writer.
 
         :param value: Color
         :type value: str
         """
-
         if re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", color):
             self._color = color
         else:
             raise ValueError("%r is not a valid hex color code." % color)
         self.log.info(f"setting color to: {color}")
 
-    def delete_files(self):
+    def delete_files(self) -> None:
         """
         Delete all files generated by the writer.
         """
         filepath = Path(self._path, self._acquisition_name, self._filename).absolute()
         os.remove(filepath)
 
-    def prepare(self):
-        """
-        Prepare the writer.
-        """
-
+    def prepare(self) -> None:
+        """Prepare the writer."""
         self.log.info(f"{self._filename}: intializing writer.")
         # Specs for reconstructing the shared memory object.
         self._shm_name = Array(c_wchar, 32)  # hidden and exposed via property.
@@ -196,31 +193,21 @@ class ImarisWriter(BaseWriter):
             "z": CHUNK_COUNT_PX,
         }
         shm_shape = [chunk_shape_map[x] for x in chunk_dim_order]
-        shm_nbytes = int(
-            np.prod(shm_shape, dtype=np.int64) * np.dtype(self._data_type).itemsize
-        )
+        shm_nbytes = int(np.prod(shm_shape, dtype=np.int64) * np.dtype(self._data_type).itemsize)
         # voxel size metadata to create the converter
         image_size_z = int(ceil(self._frame_count_px / CHUNK_COUNT_PX) * CHUNK_COUNT_PX)
-        image_size = pw.ImageSize(
-            x=self._column_count_px, y=self._row_count_px, z=image_size_z, c=1, t=1
-        )
-        block_size = pw.ImageSize(
-            x=self._column_count_px, y=self._row_count_px, z=CHUNK_COUNT_PX, c=1, t=1
-        )
+        image_size = pw.ImageSize(x=self._column_count_px, y=self._row_count_px, z=image_size_z, c=1, t=1)
+        block_size = pw.ImageSize(x=self._column_count_px, y=self._row_count_px, z=CHUNK_COUNT_PX, c=1, t=1)
         sample_size = pw.ImageSize(x=1, y=1, z=1, c=1, t=1)
         # compute the start/end extremes of the enclosed rectangular solid.
         # (x0, y0, z0) position (in [um]) of the beginning of the first voxel,
         # (xf, yf, zf) position (in [um]) of the end of the last voxel.
-        x0 = self._x_position_mm - (
-                self._x_voxel_size_um * 0.5 * self._column_count_px
-        )
-        y0 = self._y_position_mm - (self._y_voxel_size_um * 0.5 * self._row_count_px)
-        z0 = self._z_position_mm
-        xf = self._x_position_mm + (
-                self._x_voxel_size_um * 0.5 * self._column_count_px
-        )
-        yf = self._y_position_mm + (self._y_voxel_size_um * 0.5 * self._row_count_px)
-        zf = self._z_position_mm + self._frame_count_px * self._z_voxel_size_um
+        x0 = self._x_position_mm * 1000 - (self._x_voxel_size_um * 0.5 * self._column_count_px)
+        y0 = self._y_position_mm * 1000 - (self._y_voxel_size_um * 0.5 * self._row_count_px)
+        z0 = self._z_position_mm * 1000
+        xf = self._x_position_mm * 1000 + (self._x_voxel_size_um * 0.5 * self._column_count_px)
+        yf = self._y_position_mm * 1000 + (self._y_voxel_size_um * 0.5 * self._row_count_px)
+        zf = self._z_position_mm * 1000 + self._frame_count_px * self._z_voxel_size_um
         image_extents = pw.ImageExtents(-x0, -y0, -z0, -xf, -yf, -zf)
         # c = channel, t = time. These fields are unused for now.
         # Note: ImarisWriter performs MUCH faster when the dimension sequence
@@ -272,24 +259,24 @@ class ImarisWriter(BaseWriter):
         )
 
     def _run(
-            self,
-            chunk_dim_order: tuple,
-            shm_shape: list,
-            shm_nbytes: int,
-            image_size: pw.ImageSize,
-            block_size: pw.ImageSize,
-            sample_size: pw.ImageSize,
-            image_extents: pw.ImageExtents,
-            dimension_sequence: pw.DimensionSequence,
-            dim_map: dict,
-            parameters: pw.Parameters,
-            opts: pw.Options,
-            color_infos: pw.ColorInfo,
-            adjust_color_range: bool,
-            time_infos: datetime,
-            shared_progress: multiprocessing.Value,
-            shared_log_queue: multiprocessing.Queue,
-    ):
+        self,
+        chunk_dim_order: Tuple[str, str, str],
+        shm_shape: List[int],
+        shm_nbytes: int,
+        image_size: pw.ImageSize,
+        block_size: pw.ImageSize,
+        sample_size: pw.ImageSize,
+        image_extents: pw.ImageExtents,
+        dimension_sequence: pw.DimensionSequence,
+        dim_map: Dict[str, int],
+        parameters: pw.Parameters,
+        opts: pw.Options,
+        color_infos: List[pw.ColorInfo],
+        adjust_color_range: bool,
+        time_infos: List[datetime],
+        shared_progress: multiprocessing.Value,
+        shared_log_queue: multiprocessing.Queue,
+    ) -> None:
         """
         Main run function of the Imaris writer.
 
@@ -326,7 +313,6 @@ class ImarisWriter(BaseWriter):
         :param shared_log_queue: Shared queue for passing log statements
         :type shared_log_queue: multiprocessing.Queue
         """
-
         # internal logger for process
         logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         fmt = "%(asctime)s.%(msecs)03d %(levelname)s %(name)s: %(message)s"
@@ -362,26 +348,20 @@ class ImarisWriter(BaseWriter):
             shm = SharedMemory(self.shm_name, create=False, size=shm_nbytes)
             frames = np.ndarray(shm_shape, self._data_type, buffer=shm.buf)
             shared_log_queue.put(
-                f"{self._filename}: writing chunk "
-                f"{chunk_num + 1}/{chunk_total} of size {frames.shape}."
+                f"{self._filename}: writing chunk " f"{chunk_num + 1}/{chunk_total} of size {frames.shape}."
             )
             start_time = perf_counter()
             dim_order = [dim_map[x] for x in chunk_dim_order]
             # Put the frames back into x, y, z, c, t order.
             converter.CopyBlock(frames.transpose(dim_order), block_index)
             frames = None
-            shared_log_queue.put(
-                f"{self._filename}: writing chunk took "
-                f"{perf_counter() - start_time:.2f} [s]"
-            )
+            shared_log_queue.put(f"{self._filename}: writing chunk took " f"{perf_counter() - start_time:.2f} [s]")
             shm.close()
             self.done_reading.set()
             # update shared value progress range 0-1
             shared_progress.value = self.callback_class.progress
 
-            shared_log_queue.put(
-                f"{self._filename}: {self._progress.value * 100:.2f} [%] complete."
-            )
+            shared_log_queue.put(f"{self._filename}: {self._progress.value * 100:.2f} [%] complete.")
 
         # wait for file writing to finish
         while self.callback_class.progress < 1.0:
@@ -390,9 +370,9 @@ class ImarisWriter(BaseWriter):
             shared_log_queue.put(
                 f"waiting for data writing to complete for "
                 f"{self._filename}: "
-                f"{self.progress.value * 100:.2f}% [%] complete."
+                f"{self._progress.value * 100:.2f}% [%] complete."
             )
-        f"{self.progress.value * 100:.2f}% [%] complete."
+        f"{self._progress.value * 100:.2f}% [%] complete."
 
         # check and empty queue to avoid code hanging in process
         if not shared_log_queue.empty:

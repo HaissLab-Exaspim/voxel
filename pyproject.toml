@@ -1,8 +1,8 @@
 [project]
 name = "voxel"
-description = "A python package for controlling Light Sheet Microscopes"
+description = "A python package for generalized microscope control"
 license = { file = "LICENSE" }
-requires-python = ">=3.10, <3.12"
+requires-python = ">=3.10, <=3.12"
 authors = [
     { name = "Micah Woodard", email = "micah.woodard@alleninstitute.org" },
     { name = "Adam Glaser", email = "adam.glaser@alleninstitute.org" },
@@ -18,9 +18,8 @@ classifiers = [
 readme = "README.md"
 keywords = [
     "microscopy",
-    "light-sheet",
-    "lightsheet",
     "microscope",
+    "acquisition",
     "imaging",
 ]
 dynamic = ["version"]
@@ -38,7 +37,6 @@ dependencies = [
     "PyVISA-py>=0.7.2",
     "pylablib>=1.4.2",
     "nidaqmx>=0.9.0",
-    "tigerasi>=0.0.26",
     # data handling dependencies
     "h5py>=3.0.0",
     # processing and utils dependencies
@@ -52,6 +50,7 @@ dependencies = [
     "fast_histogram>=0.14",
     "sympy>=1.12.1",
     "numpy>2.0.0",
+    "siphash24>=1.7",
 ]
 
 
@@ -59,6 +58,7 @@ dependencies = [
 "imaris" = ["PyImarisWriter>=0.7.0"]
 "tifffile" = ["tifffile>=2024.1.30"]
 "pycobolt" = ["pycobolt @ git+https://github.com/cobolt-lasers/pycobolt.git"]
+"acquire-zarr" = ["acquire-zarr>=0.0.5"]
 "dev" = [
     "pytest>=8.2.1",
     "black",
@@ -73,6 +73,7 @@ dependencies = [
     "voxel[imaris]",
     "voxel[tifffile]",
     "voxel[pycobolt]",
+    "voxel[acquire-zarr]",
     "voxel[dev]",
 ]
 
