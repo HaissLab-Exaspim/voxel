@@ -87,7 +87,7 @@ class Acquisition:
             if hasattr(device, key):
                 setattr(device, key, value)
             else:
-                raise ValueError(f"{device} property {key} has no setter")
+                raise ValueError(f"{device} property {key} has no setter. Properties of {type(device)} are : {dir(device)}")
 
     def _construct_operations(self, device_name: str, operation_dictionary: Dict) -> None:
         """

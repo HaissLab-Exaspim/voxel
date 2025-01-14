@@ -37,11 +37,12 @@ class GenesisMXLaser(BaseLaser):
         _inst = getattr(self, "_inst", None)
         if _inst is None :
             try:
-                self._inst = GenesisMX(serial=id)
-                assert self._inst.head.serial == id
+                self._inst = GenesisMX(serial=self._conn)
+                assert self._inst.head.serial == self._conn
+                assert self._inst.head.serial in self._inst.hops._manager._handles.values() # serial is in existing serial handles
                 self._inst.mode = OperationModes.PHOTO
             except AssertionError:
-                raise ValueError(f"Error initializing laser {self._conn}, serial number mismatch")
+                raise ValueError(f"Error initializing laser {self._conn}, serial number mismatch. Available ids are : {self._inst.hops._manager._handles.values()}")
         return self._inst
 
     @property

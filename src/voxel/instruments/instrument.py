@@ -161,7 +161,7 @@ class Instrument:
         thread_safe_device_class = for_all_methods(lock, device_class)
         return thread_safe_device_class(**kwds)
 
-    def _setup_device(self, device: Any, properties: Dict[str, Any]) -> None:
+    def _setup_device(self, device: object, properties: Dict[str, Any]) -> None:
         """
         Set up a device with its properties.
 
@@ -173,10 +173,11 @@ class Instrument:
         self.log.info(f"setting up {device}")
         # successively iterate through properties keys and if there is setter, set
         for key, value in properties.items():
-            if hasattr(device, key):
+            current_attr = getattr(device.__class__, key, None)
+            if isinstance(current_attr, property) and current_attr.fset is not None:
                 setattr(device, key, value)
             else:
-                raise ValueError(f"{device} property {key} has no setter")
+                raise ValueError(f"{device} property {key} has no setter. Properties of {type(device)} are : {dir(device)}")
 
     def update_current_state_config(self) -> None:
         """
