@@ -57,7 +57,7 @@ class XIAPICamera(BaseCamera):
         # initialize parameter values
         self._update_parameters()
         # disable BW limit so that it does not influence the sensor line period
-        self.camera.set_param("XI_PRM_LIMIT_BANDWIDTH_MODE", XI_SWITCH["XI_OFF"])
+        # self.camera.set_limit_bandwidth_mode(XI_SWITCH["XI_OFF"])
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
     def exposure_time_ms(self) -> float:
@@ -416,14 +416,14 @@ class XIAPICamera(BaseCamera):
         :param frame_count: Number of frames to acquire, defaults to None
         :type frame_count: int, optional
         """
-        self.log.info("starting camera")
+        self.log.info(f"starting camera")
         self.camera.start_acquisition()
 
     def stop(self) -> None:
         """
         Stop the camera acquisition.
         """
-        self.log.info("stopping camera")
+        self.log.info(f"stopping camera")
         self.camera.stop_acquisition()
 
     def abort(self) -> None:
@@ -436,14 +436,14 @@ class XIAPICamera(BaseCamera):
         """
         Close the camera connection.
         """
-        self.log.info("closing camera")
+        self.log.info(f"closing camera")
         self.camera.close_device()
 
     def reset(self) -> None:
         """
         Reset the camera.
         """
-        self.log.info("resetting camera")
+        self.log.info(f"resetting camera")
         self.camera.set_device_reset()
 
     def grab_frame(self) -> np.ndarray:
@@ -703,9 +703,6 @@ class XIAPICamera(BaseCamera):
                 PIXEL_TYPES.append(pixel_type)
             except Exception:
                 self.log.debug(f"{pixel_type} not avaiable on this camera")
-
-        # once the pixel types are found, determine line intervals
-        self._query_line_intervals()
         # reset to initial value
         self.camera.set_sensor_bit_depth(init_pixel_type)
 
