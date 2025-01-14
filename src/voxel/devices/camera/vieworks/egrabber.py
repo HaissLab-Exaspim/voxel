@@ -541,14 +541,18 @@ class VieworksCamera(BaseCamera):
         column_count = self.grabber.remote.get("Width")
         row_count = self.grabber.remote.get("Height")
         timeout_ms = 2000
-        with Buffer(self.grabber, timeout=timeout_ms) as buffer:
-            ptr = buffer.get_info(BUFFER_INFO_BASE, INFO_DATATYPE_PTR)  # grab pointer to new frame
-            # grab frame data
-            data = ct.cast(ptr, ct.POINTER(ct.c_ubyte * column_count * row_count * 2)).contents
-            # cast data to numpy array of correct size/datatype:
-            image = numpy.frombuffer(data, count=int(column_count * row_count), dtype=numpy.uint16).reshape(
-                (row_count, column_count)
-            )
+        try:
+            with Buffer(self.grabber, timeout=timeout_ms) as buffer:
+                ptr = buffer.get_info(BUFFER_INFO_BASE, INFO_DATATYPE_PTR)  # grab pointer to new frame
+                # grab frame data
+                data = ct.cast(ptr, ct.POINTER(ct.c_ubyte * column_count * row_count * 2)).contents
+                # cast data to numpy array of correct size/datatype:
+                image = numpy.frombuffer(data, count=int(column_count * row_count), dtype=numpy.uint16).reshape(
+                    (row_count, column_count)
+                )
+        except Exception:
+            self.log.error("frame grab failed")
+            image = np.zeros((row_count, column_count), dtype=np.uint16)
         # do software binning if != 1 and not a string for setting in egrabber
         if self._binning > 1 and isinstance(self._binning, int):
             image = np.copy(self.gpu_binning.run(image))
