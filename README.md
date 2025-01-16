@@ -36,7 +36,7 @@ modular composable components. Voxel is built on the following principles:
 
 ### Devices
 
-Voxel currently supports a number of different types of devices. Contributions for more devices is welcomed and only requires that new device drivers adhere to the corresponding device types base class. See the [full list of devices](#devices).
+Voxel currently supports a number of different types of devices. Contributions for more devices is welcomed and only requires that new device drivers adhere to the corresponding device types base class. See the [full list of devices](#device_list).
 
 > [!NOTE]
 > Please see associated README files for cameras with additional [installation instructions](./src/voxel/devices/camera/README.md) for camera specific SDKs.
