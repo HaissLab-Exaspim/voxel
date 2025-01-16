@@ -452,8 +452,15 @@ class XIAPICamera(BaseCamera):
         :return: Frame as a numpy array
         :rtype: numpy.ndarray
         """
-        self.camera.get_image(self.image)
-        image = self.image.get_image_data_numpy()
+        try:
+            self.camera.get_image(self.image)
+            image = self.image.get_image_data_numpy()
+        except Exception:
+            self.log.error('grab frame failed')
+            if self.pixel_type == 'XI_MONO8':
+                image = np.zeros(shape=(self.image_height_px, self.image_width_px), dtype=np.uint8)
+            else:
+                image = np.zeros(shape=(self.image_height_px, self.image_width_px), dtype=np.uint16)
         # do software binning if != 1 and not a string for setting in egrabber
         if self._binning > 1 and isinstance(self._binning, int):
             image = np.copy(self.gpu_binning.run(image))
