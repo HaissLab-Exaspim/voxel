@@ -6,7 +6,7 @@
 </h1>
 
 - [Overview](#overview)
-  - [Devices](#devices)
+  - [Devices](#device_list)
   - [Instrument](#instrument)
   - [Acquisition](#acquisition)
   - [Utilities](#utilities)
@@ -16,7 +16,7 @@
   - [Documentation](#documentation)
   - [Usage](#usage)
 - [Appendix](#appendix)
-  - [Devices](#devices)
+  - [Device List](#device_list)
   - [Writers](#writers)
   - [File Transfers](#file-transfers)
   - [Processes](#processes)
