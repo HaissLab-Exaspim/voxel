@@ -6,6 +6,7 @@
 </h1>
 
 - [Overview](#overview)
+  - [Devices](#devices)
   - [Instrument](#instrument)
   - [Acquisition](#acquisition)
   - [Utilities](#utilities)
@@ -33,9 +34,16 @@ modular composable components. Voxel is built on the following principles:
 3. **Extensible**: New devices and components can be easily added by implementing the appropriate interface.
 4. **Pythonic**: Written in Python and designed to be easily understood and modified.
 
-Voxel provides two key Classes: `Instrument` and `Acquisition`.
+### Devices
+
+Voxel currently supports a number of different types of devices. Contributions for more devices is welcomed and only requires that new device drivers adhere to the corresponding device types base class. See the [full list of devices](#devices).
+
+> [!NOTE]
+> Please see associated README files for cameras with additional [installation instructions](./src/voxel/devices/camera/README.md) for camera specific SDKs.
 
 ### Instrument
+
+Voxel provides two key Classes: `Instrument` and `Acquisition`.
 
 The `Instrument` class focuses on the composition and structure of the microscope setup. At its core, an instrument is a collection of devices that implement the `VoxelDevice` interface. An `instrument.yaml` file defines the devices and their respective settings. Devices are defined by providing their python package, module, and class name as well as any initialization arguments and settings.
 

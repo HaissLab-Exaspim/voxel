@@ -32,7 +32,7 @@ To control Ximea cameras you will need to install the **ximea** python package.
 The official python SDK is not published on PyPI but is available for download
 on the Ximea website.
 
-For Windows, install the Beta Release of the Ximea API SP[https://www.ximea.com/support/wiki/apis/XIMEA_Windows_Software_Package] - Select xiApiPython checkbox in the API list.
+For Windows, install the Beta Release of the [Ximea API SP](https://www.ximea.com/support/wiki/apis/XIMEA_Windows_Software_Package) - Select xiApiPython checkbox in the API list.
 
 Install the Ximea module by copying the whole folder \XIMEA\API\Python\v{x}\ximea (depending on the Python version) to site-packages of your Python environment.
 
@@ -40,7 +40,7 @@ Install the Ximea module by copying the whole folder \XIMEA\API\Python\v{x}\xime
 > For Python 2.x copy ximea folder placed in \XIMEA\API\Python\v2\
 > For Python 3.x copy ximea folder placed in \XIMEA\API\Python\v3
 
-For Linux, for the instructions[https://www.ximea.com/support/wiki/apis/XIMEA_Linux_Software_Package#Installation] appropriately for your architecture.
+For Linux, for the [instructions](https://www.ximea.com/support/wiki/apis/XIMEA_Linux_Software_Package#Installation) appropriately for your architecture.
 
 ## Hamamatsu Cameras
 
