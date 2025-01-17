@@ -8,6 +8,8 @@ However, you will first need to have the [eGrabber for CoaxLink and GigELink](ht
 
 The official python SDK is not published on PyPI but comes bundled with the eGrabber SDK as a wheel file.
 
+If you plan to use the provided [Memento](./vieworks/memento.py) class for logging statistics from the camera, you will need to also install [Memento](https://www.euresys.com/en/Support/Download-area?Series=105d06c5-6ad9-42ff-b7ce-622585ce607f)
+
 > [!NOTE]
 > To download the eGrabber SDK, you will first need to make an account.
 
