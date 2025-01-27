@@ -367,7 +367,7 @@ class BaseCamera(VoxelDevice):
         :return: The field of view height in mm.
         :rtype: float
         """
-        return self.sampling_um_px * self.image_height_px
+        return self.sampling_um_px * self.image_height_px / 1000.0
 
     @property
     def fov_width_mm(self) -> float:
@@ -377,7 +377,7 @@ class BaseCamera(VoxelDevice):
         :return: The field of view width in mm.
         :rtype: float
         """
-        return self.sampling_um_px * self.image_width_px
+        return self.sampling_um_px * self.image_width_px / 1000.0
 
     @abstractmethod
     def reset(self) -> None:
