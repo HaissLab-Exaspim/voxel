@@ -29,6 +29,7 @@ dependencies = [
     "inflection>=0.5.1",
     "pydantic>=2.7.3",
     "imohash>=1.0.5",
+    "numpy>=2.1",
     # device driver dependencies
     "pyserial>=3.5",
     "pyusb>=1.2.1",
@@ -43,7 +44,6 @@ dependencies = [
     "pyclesperanto>=0.8.2",
     "scikit-image>=0.20.0",
     "gputools>0.2.14",
-    "scikit-tensor-py3",
     "tensorstore>=0.1.56",
     "matplotlib>=3.8.2",
     "scipy>=1.12.0",
@@ -51,16 +51,18 @@ dependencies = [
     "sympy>=1.12.1",
     "numpy>2.0.0",
     "siphash24>=1.7",
-    "tigerasi",
 ]
 
 
 [project.optional-dependencies]
-"imaris" = ["PyImarisWriter>=0.7.0"]
-"tifffile" = ["tifffile>=2024.1.30"]
-"pycobolt" = ["pycobolt @ git+https://github.com/cobolt-lasers/pycobolt.git"]
-"acquire-zarr" = ["acquire-zarr>=0.0.5"]
-"dev" = [
+imaris = ["PyImarisWriter>=0.7.0"]
+tifffile = ["tifffile>=2024.1.30"]
+pycobolt = ["pycobolt @ git+https://github.com/cobolt-lasers/pycobolt.git"]
+coherent-lasers = ["coherent-lasers @ https://github.com/AllenNeuralDynamics/coherent-lasers/releases/download/v0.1.0/coherent_lasers-0.1.0-py3-none-any.whl"]
+tigerasi = ["tigerasi"]
+scikit-tensor = ["scikit-tensor-py3 @ https://github.com/adamkglaser/scikit-tensor-py3/releases/download/v0.1.0/scikit_tensor_py3-0.4.1-py3-none-any.whl"]
+acquire-zarr = ["acquire-zarr>=0.0.5"]
+dev = [
     "pytest>=8.2.1",
     "black",
     "coverage",
@@ -70,10 +72,13 @@ dependencies = [
     "Sphinx",
     "furo",
 ]
-"all" = [
+all = [
     "voxel[imaris]",
     "voxel[tifffile]",
     "voxel[pycobolt]",
+    "voxel[coherent-lasers]",
+    "voxel[tigerasi]",
+    "voxel[scikit-tensor]",
     "voxel[acquire-zarr]",
     "voxel[dev]",
 ]
