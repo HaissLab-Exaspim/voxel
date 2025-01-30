@@ -168,3 +168,6 @@ class AAOptoAOTF(BaseAOTF):
 
         for key, mode in modes.items():
             self.aotf.set_channel_input_mode(channel=key, mode=INPUT_MODES[mode])
+
+    def close(self):
+        pass
