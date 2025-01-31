@@ -298,11 +298,19 @@ class ZarrWriter(BaseWriter):
         x_array_size = x_shards * self._chunk_size_x_px
         y_array_size = y_shards * self._chunk_size_y_px
 
+        compression_settings = aqz.CompressionSettings(
+            codec=self._compression,  # compression codec
+            compressor=aqz.Compressor.BLOSC1,  # compressor
+            clevel=0,  # compression level
+            shuffle=1,  # shuffle filter
+        )
+
         settings = aqz.StreamSettings(
             store_path=str(filepath),
             data_type=DATA_TYPES[self._data_type],
             version=VERSIONS[self._version],
             multiscale=self._multiscale,
+            compression=compression_settings,
         )
 
         settings.dimensions.extend(
@@ -311,7 +319,7 @@ class ZarrWriter(BaseWriter):
                     name="z",
                     type=aqz.DimensionType.SPACE,
                     array_size_px=self.frame_count_px,
-                    chunk_size_px=self.chunk_count_px,
+                    chunk_size_px=self._chunk_size_z_px,
                     shard_size_chunks=1,  # hardcode shard to 1 in z
                 ),
                 aqz.Dimension(
