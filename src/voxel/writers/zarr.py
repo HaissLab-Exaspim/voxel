@@ -28,7 +28,7 @@ DATA_TYPES = {"unit8": aqz.DataType.UINT16, "uint16": aqz.DataType.UINT16}
 
 VERSIONS = {"v2": aqz.ZarrVersion.V2, "v3": aqz.ZarrVersion.V3}
 
-SHUFFLES = {"on": 1, "off": 0}
+SHUFFLES = {True: 1, False: 0}
 
 
 class ZarrWriter(BaseWriter):
@@ -55,6 +55,7 @@ class ZarrWriter(BaseWriter):
         self._version = None
         self._multiscale = None
         self._shuffle = None
+        self._clevel = None
 
     @property
     def chunk_size_x_px(self) -> int:
@@ -367,14 +368,14 @@ class ZarrWriter(BaseWriter):
                     type=aqz.DimensionType.SPACE,
                     array_size_px=self.row_count_px,
                     chunk_size_px=self._chunk_size_y_px,
-                    shard_size_chunks=y_shards,
+                    shard_size_chunks=ceil(self.row_count_px / self._chunk_size_y_px),
                 ),
                 aqz.Dimension(
                     name="x",
                     type=aqz.DimensionType.SPACE,
                     array_size_px=self.column_count_px,
                     chunk_size_px=self._chunk_size_x_px,
-                    shard_size_chunks=x_shards,
+                    shard_size_chunks=ceil(self.column_count_px / self._chunk_size_x_px),
                 ),
             ]
         )
