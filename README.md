@@ -6,6 +6,7 @@
 </h1>
 
 - [Overview](#overview)
+  - [Devices](#device-list)
   - [Instrument](#instrument)
   - [Acquisition](#acquisition)
   - [Utilities](#utilities)
@@ -15,7 +16,7 @@
   - [Documentation](#documentation)
   - [Usage](#usage)
 - [Appendix](#appendix)
-  - [Devices](#devices)
+  - [Device List](#device-list)
   - [Writers](#writers)
   - [File Transfers](#file-transfers)
   - [Processes](#processes)
@@ -33,13 +34,20 @@ modular composable components. Voxel is built on the following principles:
 3. **Extensible**: New devices and components can be easily added by implementing the appropriate interface.
 4. **Pythonic**: Written in Python and designed to be easily understood and modified.
 
-Voxel provides two key Classes: `Instrument` and `Acquisition`.
+### Devices
+
+Voxel currently supports a number of different types of devices. Contributions for more devices is welcomed and only requires that new device drivers adhere to the corresponding device types base class. See the [full list of devices](#device-list).
+
+> [!NOTE]
+> Please see associated README files for cameras with additional [installation instructions](./src/voxel/devices/camera/README.md) for camera specific SDKs.
 
 ### Instrument
 
+Voxel provides two key Classes: `Instrument` and `Acquisition`.
+
 The `Instrument` class focuses on the composition and structure of the microscope setup. At its core, an instrument is a collection of devices that implement the `VoxelDevice` interface. An `instrument.yaml` file defines the devices and their respective settings. Devices are defined by providing their python package, module, and class name as well as any initialization arguments and settings.
 
-Checkout an example [instrument configuration yaml](#2-instrument-yaml-configuration) and the [Devices](#devices) section for a list of supported devices and their respective drivers.
+Checkout an example [instrument configuration yaml](#2-instrument-yaml-configuration) and the [Devices](#device-list) section for a list of supported devices and their respective drivers.
 
 ### Acquisition
 
@@ -118,7 +126,7 @@ Checkout the [Writers](#writers) and [File Transfers](#file-transfers) for a lis
     pip install -e .[imaris tiff]
     ```
 
-Check out the [list of supported devices](#devices) for more information on device drivers.
+Check out the [list of supported devices](#device-list) for more information on device drivers.
 
 ### Documentation
 
@@ -219,7 +227,7 @@ instrument.scanning_stages['x axis stage']
 
 ## Appendix
 
-### Devices
+### Device List
 
 Currently supported device types and models are listed below.
 

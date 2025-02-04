@@ -65,10 +65,22 @@ class RsyncFileTransfer(BaseFileTransfer):
             # path is the entire experiment path
             # subdirs is any tile specific subdir i.e. zarr store
             # files are any tile specific files
-            file_list: Dict[str, float] = {}
-            for path, subdirs, files in os.walk(local_directory.absolute()):
+            file_list = dict()
+            # check if subdir for valid zarr store
+            for item in os.listdir(local_directory.absolute()):
+                if os.path.isdir(os.path.join(local_directory, item)):
+                    print(os.path.join(local_directory, item))
+                    if ".zarr" in item:
+                        for path, _, files in os.walk(Path(local_directory, item).absolute()):
+                            print(files)
+                            # not a zarr store so check entire local diretory for files
+                            for name in files:
+                                file_list[os.path.join(path, name)] = (
+                                    os.path.getsize(os.path.join(path, name)) / 1024**2
+                                )
+            # otherwise not a zarr store
+            for path, _, files in os.walk(local_directory.absolute()):
                 for name in files:
-                    # check and only add if filename matches tranfer's filename
                     if self.filename in name and name != log_path:
                         file_list[os.path.join(path, name)] = os.path.getsize(os.path.join(path, name)) / 1024**2
             total_size_mb = sum(file_list.values())
