@@ -102,6 +102,9 @@ class TigerStage(BaseStage):
         self.log.debug(f"New hardware to instrument axis mapping: " f"{self.hardware_to_instrument_axis_map}")
         self.tiger_joystick_mapping = self.tigerbox.get_joystick_axis_mapping()
 
+        # clear ring buffer incase there are persistent values
+        self.tigerbox.reset_ring_buffer(axis=self.hardware_axis.upper())
+
         # set parameter values
         # (!!) these are hardcoded here and cannot
         # be queiried from the tigerbox

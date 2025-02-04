@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 
 from sdks import pco
 
@@ -426,10 +427,17 @@ class PCOCamera(BaseCamera):
         """
         # pco api call is blocking on its own
         timeout_s = 1
-        self.pco.wait_for_new_image(delay=True, timeout=timeout_s)
-        # always use 0 index for ring buffer buffer
-        image, metadata = self.pco.image(image_index=0)
-        self._latest_frame = image
+        try:
+            self.pco.wait_for_new_image(delay=True, timeout=timeout_s)
+            # always use 0 index for ring buffer buffer
+            image, metadata = self.pco.image(image_index=0)
+        except Exception:
+            self.log.error('grab frame failed')
+            image = np.zeros(shape=(self.image_height_px, self.image_width_px), dtype=np.uint16)
+        # do software binning if != 1 and not a string for setting in egrabber
+        if self._binning > 1 and isinstance(self._binning, int):
+            image = np.copy(self.gpu_binning.run(image))
+        self._latest_frame = np.copy(image)
         return image
 
     @property

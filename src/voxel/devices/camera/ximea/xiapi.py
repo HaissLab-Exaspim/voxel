@@ -9,7 +9,6 @@ from ximea.xidefs import (
     XI_OUTPUT_DATA_PACKING_TYPE,
     XI_TRG_SELECTOR,
     XI_TRG_SOURCE,
-    XI_SWITCH,
 )
 
 from voxel.descriptors.deliminated_property import DeliminatedProperty
@@ -45,6 +44,7 @@ class XIAPICamera(BaseCamera):
         :param id: Camera ID
         :type id: str
         """
+        super().__init__()
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.id = str(id)  # convert to string in case serial # is entered as int
         self._latest_frame = None
@@ -57,7 +57,7 @@ class XIAPICamera(BaseCamera):
         # initialize parameter values
         self._update_parameters()
         # disable BW limit so that it does not influence the sensor line period
-        # self.camera.set_limit_bandwidth_mode(XI_SWITCH["XI_OFF"])
+        self.camera.set_limit_bandwidth_mode("XI_OFF")
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
     def exposure_time_ms(self) -> float:
@@ -188,9 +188,9 @@ class XIAPICamera(BaseCamera):
         self.camera.set_sensor_bit_depth(pixel_type_bits.upper())
         # change ximea output image format
         if pixel_type_bits.upper() == "XI_BPP_8":
-            self.camera.set_imgdataformat("MONO8")
+            self.camera.set_imgdataformat("XI_MONO8")
         else:
-            self.camera.set_imgdataformat("MONO16")
+            self.camera.set_imgdataformat("XI_MONO16")
         self.log.info(f"pixel type set to: {pixel_type_bits}")
         # refresh parameter values
         self._update_parameters()
@@ -338,8 +338,7 @@ class XIAPICamera(BaseCamera):
         self._binning = binning
         # if binning is not an integer, do it in hardware
         if not isinstance(BINNINGS[binning], int):
-            self.camera.set_binning_vertical(BINNINGS[binning])
-            self.camera.set_binning_horizontal(BINNINGS[binning])
+            self.camera.set_downsampling(BINNINGS[binning])
         # initialize the opencl binning program
         else:
             self.gpu_binning = GPUToolsDownSample2D(binning=int(self._binning))
@@ -396,7 +395,7 @@ class XIAPICamera(BaseCamera):
         :return: Sensor temperature in Celsius
         :rtype: float
         """
-        self.camera.set_temp_selector("XI_TEMP_IMAGE_SENSOR_DIE")
+        self.camera.set_temp_selector("XI_TEMP_SENSOR_BOARD")
         temperature = self.camera.get_temp()
         return temperature
 
@@ -453,8 +452,15 @@ class XIAPICamera(BaseCamera):
         :return: Frame as a numpy array
         :rtype: numpy.ndarray
         """
-        self.camera.get_image(self.image)
-        image = self.image.get_image_data_numpy()
+        try:
+            self.camera.get_image(self.image)
+            image = self.image.get_image_data_numpy()
+        except Exception:
+            self.log.error('grab frame failed')
+            if self.pixel_type == 'XI_MONO8':
+                image = np.zeros(shape=(self.image_height_px, self.image_width_px), dtype=np.uint8)
+            else:
+                image = np.zeros(shape=(self.image_height_px, self.image_width_px), dtype=np.uint16)
         # do software binning if != 1 and not a string for setting in egrabber
         if self._binning > 1 and isinstance(self._binning, int):
             image = np.copy(self.gpu_binning.run(image))
