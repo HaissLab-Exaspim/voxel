@@ -55,18 +55,22 @@ dependencies = [
 
 
 [project.optional-dependencies]
-imaris = ["PyImarisWriter>=0.7.0"]
-tifffile = ["tifffile>=2024.1.30"]
-pycobolt = ["pycobolt @ git+https://github.com/cobolt-lasers/pycobolt.git"]
-coherent-lasers = ["coherent-lasers @ https://github.com/AllenNeuralDynamics/coherent-lasers/releases/download/v0.1.0/coherent_lasers-0.1.0-py3-none-any.whl"]
-tigerasi = ["tigerasi"]
-egrabber = ["egrabber @ https://github.com/adamkglaser/egrabber-python/releases/download/v24.09.0.5/egrabber-24.09.0.5-py2.py3-none-any.whl"]
-pco = ["pco"]
-optokummenberg = ["optokummenberg @https://github.com/adamkglaser/optotune-icc4c/releases/download/v2.0.4922/optoKummenberg-1.0.4894-py3-none-any.whl"]
-optoicc = ["optoicc @https://github.com/adamkglaser/optotune-icc4c/releases/download/v2.0.4922/optoICC-2.0.4922-py3-none-any.whl"]
+imaris-writer = ["PyImarisWriter>=0.7.0"]
+tifffile-writer = ["tifffile>=2024.1.30"]
+acquire-zarr-writer = ["acquire-zarr>=0.0.5"]
+pycobolt-laser = ["pycobolt @ git+https://github.com/cobolt-lasers/pycobolt.git"]
+coherent-laser = ["coherent-lasers @ https://github.com/AllenNeuralDynamics/coherent-lasers/releases/download/v0.1.0/coherent_lasers-0.1.0-py3-none-any.whl"]
+vortran-laser = ["vortran_laser @ git+https://github.com/AllenNeuralDynamics/vortran_laser.git"]
+oxxius-laser = ["oxxius_laser @ git+https://github.com/AllenNeuralDynamics/oxxius_laser.git"]
+obis-laser = ["obis_laser @ git+https://github.com/AllenNeuralDynamics/obis-laser.git"]
+egrabber-camera = ["egrabber @ https://github.com/adamkglaser/egrabber-python/releases/download/v24.09.0.5/egrabber-24.09.0.5-py2.py3-none-any.whl"]
+pco-camera = ["pco"]
+ximea-camera = ["ximea-python @ https://github.com/adamkglaser/ximea-python/releases/download/v4.29.10/ximea_python-4.29.10-py3-none-any.whl"]
+optokummenberg-etl = ["optokummenberg @https://github.com/adamkglaser/optotune-icc4c/releases/download/v2.0.4922/optoKummenberg-1.0.4894-py3-none-any.whl"]
+optoicc-etl = ["optoicc @https://github.com/adamkglaser/optotune-icc4c/releases/download/v2.0.4922/optoICC-2.0.4922-py3-none-any.whl"]
+tigerasi-controller = ["tigerasi"]
 scikit-tensor = ["scikit-tensor-py3 @ https://github.com/adamkglaser/scikit-tensor-py3/releases/download/v0.1.0/scikit_tensor_py3-0.4.1-py3-none-any.whl"]
-acquire-zarr = ["acquire-zarr>=0.0.5"]
-ximea = ["ximea-python @ https://github.com/adamkglaser/ximea-python/releases/download/v4.29.10/ximea_python-4.29.10-py3-none-any.whl"]
+
 dev = [
     "pytest>=8.2.1",
     "black",
@@ -78,18 +82,21 @@ dev = [
     "furo",
 ]
 all = [
-    "voxel[imaris]",
-    "voxel[tifffile]",
-    "voxel[pycobolt]",
-    "voxel[coherent-lasers]",
-    "voxel[tigerasi]",
-    "voxel[egrabber]",
-    "voxel[pco]",
-    "voxel[optokummenberg]",
-    "voxel[optoicc]",
+    "voxel[imaris-writer]",
+    "voxel[tifffile-writer]",
+    "voxel[acquire-zarr-writer]",
+    "voxel[pycobolt-laser]",
+    "voxel[coherent-laser]",
+    "voxel[vortran-laser]",
+    "voxel[oxxius-laser]",
+    "voxel[obis-laser]",
+    "voxel[egrabber-camera]",
+    "voxel[pco-camera]",
+    "voxel[ximea-camera]",
+    "voxel[optokummenberg-etl]",
+    "voxel[optoicc-etl]",
+    "voxel[tigerasi-controller]",
     "voxel[scikit-tensor]",
-    "voxel[acquire-zarr]",
-    "voxel[ximea]",
     "voxel[dev]",
 ]
 
