@@ -6,8 +6,6 @@ from coherent_lasers.genesis_mx.driver import GenesisMX
 from voxel.descriptors.deliminated_property import DeliminatedProperty
 from voxel.devices.laser.base import BaseLaser
 
-INIT_POWER_MW = 10.0
-
 
 class GenesisMXLaser(BaseLaser):
     """Genesis MX Laser device class."""
@@ -28,7 +26,6 @@ class GenesisMXLaser(BaseLaser):
         self._conn = id
         self._instance
         self.enable()
-        self.power_setpoint_mw = INIT_POWER_MW
         type(self).power_setpoint_mw.maximum = maximum_power_mw
         self._wavelength = wavelength
 

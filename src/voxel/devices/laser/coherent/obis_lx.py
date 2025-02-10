@@ -1,4 +1,4 @@
-from obis_laser import ObisLX, OperationalCmd, OperationalQuery
+from obis_laser import ObisLX, OperationalCmd, OperationalQuery, SysInfoQuery
 from serial import Serial
 from typing import Union, Dict, Optional
 import logging
@@ -53,13 +53,12 @@ def obis_modulation_setter(instance: ObisLX, value: str, modes: Optional[Dict[st
     else:
         instance.set_operational_setting(OperationalCmd.MODE_EXTERNAL, modes[value])
 
-
 class ObisLXLaser(BaseLaser):
     """
     ObisLXLaser class for handling Coherent Obis LX laser devices.
     """
 
-    def __init__(self, id: str, wavelength: int, port: Union[Serial, str], prefix: Optional[str] = None) -> None:
+    def __init__(self, id: str, wavelength: int, port: Union[Serial, str], maximum_power_mw: int, prefix: Optional[str] = None) -> None:
         """
         Initialize the ObisLXLaser object.
 
@@ -74,8 +73,22 @@ class ObisLXLaser(BaseLaser):
         """
         super().__init__(id)
         self.prefix = prefix
+        self._conn = id
+        self.port = port
         self._wavelength = wavelength
-        self._inst = ObisLX(port, self.prefix)
+        self._instance
+        type(self).power_setpoint_mw.maximum = maximum_power_mw
+
+    @property
+    def _instance(self):
+        _inst = getattr(self, "_inst", None)
+        if _inst is None :
+            try:
+                _inst = ObisLX(self.port, self.prefix)
+                assert _inst.get_sys_info_setting(SysInfoQuery.SERIAL_NUMBER) == self._conn
+            except AssertionError:
+                raise ValueError(f"Error initializing laser {self._conn}, serial number mismatch. Current id is : {_inst.get_sys_info_setting(SysInfoQuery.SERIAL_NUMBER)}")
+        return _inst
 
     @property
     def wavelength(self) -> int:
@@ -91,21 +104,22 @@ class ObisLXLaser(BaseLaser):
         """
         Enable the laser.
         """
-        self._inst.enable()
+        self._instance.enable()
 
     def disable(self) -> None:
         """
         Disable the laser.
         """
-        self._inst.disable()
+        self._instance.disable()
 
     def close(self) -> None:
         """
         Close the laser connection.
         """
-        self._inst.close()
+        self.disable()
+        self._instance.ser.close()
 
-    @DeliminatedProperty(minimum=0, maximum=lambda self: self._inst.max_power)
+    @DeliminatedProperty(minimum=100, maximum= float("inf"))#lambda self: self._instance.max_power)
     def power_setpoint_mw(self) -> float:
         """
         Get the power setpoint in milliwatts.
@@ -113,17 +127,20 @@ class ObisLXLaser(BaseLaser):
         :return: Power setpoint in milliwatts
         :rtype: float
         """
-        return self._inst.power_setpoint
+        return self._instance.power_setpoint
 
     @power_setpoint_mw.setter
-    def power_setpoint_mw(self, value: Union[float, int]) -> None:
+    def power_setpoint_mw(self, value: float) -> None:
         """
         Set the power setpoint in milliwatts.
 
         :param value: Power setpoint in milliwatts
         :type value: float | int
         """
-        self._inst.power_setpoint = value
+        if value <= 1 :
+            self._instance.disable()
+        else :
+            self._instance.power_setpoint = float(value)
 
     @property
     def modulation_mode(self) -> str:
@@ -133,7 +150,7 @@ class ObisLXLaser(BaseLaser):
         :return: Modulation mode
         :rtype: str
         """
-        return obis_modulation_getter(self._inst, self.log, modes=MODULATION_MODES)
+        return obis_modulation_getter(self._instance, self.log, modes=MODULATION_MODES)
 
     @modulation_mode.setter
     def modulation_mode(self, mode: str) -> None:
@@ -143,7 +160,7 @@ class ObisLXLaser(BaseLaser):
         :param mode: Modulation mode
         :type mode: str
         """
-        obis_modulation_setter(self._inst, mode, modes=MODULATION_MODES)
+        obis_modulation_setter(self._instance, mode, modes=MODULATION_MODES)
 
     @property
     def power_mw(self) -> float:
@@ -153,7 +170,7 @@ class ObisLXLaser(BaseLaser):
         :return: Current power in milliwatts
         :rtype: float
         """
-        return self._inst.power_setpoint
+        return self._instance.power_setpoint
 
     @property
     def temperature_c(self) -> float:
@@ -163,7 +180,7 @@ class ObisLXLaser(BaseLaser):
         :return: Temperature in Celsius
         :rtype: float
         """
-        return self._inst.temperature
+        return self._instance.temperature
 
     def status(self) -> Dict[str, Union[str, float]]:
         """
@@ -172,4 +189,4 @@ class ObisLXLaser(BaseLaser):
         :return: Status of the laser
         :rtype: dict
         """
-        return self._inst.get_system_status()
+        return self._instance.get_system_status()
