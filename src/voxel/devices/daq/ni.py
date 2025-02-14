@@ -125,13 +125,19 @@ class NIDAQ(BaseDAQ):
 
             trigger_port = timing["trigger_port"]
 
-            for port, specs in task["ports"].items():
+            for name, specs in task["ports"].items():
                 # add channel to task
                 channel_port = specs["port"]
                 if f"{self.id}/{channel_port}" not in channel_options[task_type]:
                     raise ValueError(f"{task_type} number must be one of {channel_options[task_type]}")
                 physical_name = f"/{self.id}/{channel_port}"
                 channel = add_task_options[task_type](physical_name)
+                # store all port values as attributes for access later
+                for parameter in specs["parameters"]:
+                    for channel, value in specs["parameters"][parameter]["channels"].items():
+                        parameter_name = f"daq_{name}_{parameter}_{channel}".replace(" ", "_")
+                        eval(f"setattr(NIDAQ, '{parameter_name}', property(fget=lambda NIDAQ: {value}, \
+                            fset=lambda NIDAQ, value: {value}, fdel=lambda NIDAQ: None))")
                 # maintain last voltage value
                 if task_type == "ao":
                     try:
