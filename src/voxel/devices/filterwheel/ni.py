@@ -63,7 +63,7 @@ class DAQFilterWheel(BaseFilterWheel):
             samps_per_chan=1000,  # hardcode 100 ms waveform
         )
         ao_voltages = numpy.zeros(1000)
-        ao_voltages[0:500] = 0.0  # harcode 5 V TTL pulse for 50 ms
+        ao_voltages[0:500] = 5.0  # harcode 5 V TTL pulse for 50 ms
         daq_task.out_stream.output_buf_size = len(ao_voltages)
         daq_task.control(TaskMode.TASK_COMMIT)
         daq_task.write(ao_voltages)
