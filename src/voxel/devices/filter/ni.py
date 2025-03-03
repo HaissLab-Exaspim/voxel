@@ -1,7 +1,7 @@
 import logging
 
 from voxel.devices.filter.base import BaseFilter
-from voxel.devices.filterwheel.asi import FilterWheel
+from voxel.devices.filterwheel.ni import DAQFilterWheel
 
 
 class Filter(BaseFilter):
@@ -9,7 +9,7 @@ class Filter(BaseFilter):
     Filter class for handling ASI filter devices.
     """
 
-    def __init__(self, wheel: FilterWheel, id: str) -> None:
+    def __init__(self, wheel: DAQFilterWheel, id: str) -> None:
         """
         Initialize the Filter object.
 
