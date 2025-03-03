@@ -420,7 +420,7 @@ class VieworksCamera(BaseCamera):
             self.grabber.remote.set("BinningVertical", BINNINGS[binning])
         # initialize the opencl binning program
         else:
-            self.gpu_binning = GPUToolsDownSample2D(binning=int(self._binning))
+            self.gpu_binning = GPUToolsDownSample2D(binning=int(self._binning), mode="sum")
         # refresh parameter values
         self._get_min_max_step_values()
 
