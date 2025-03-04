@@ -50,3 +50,6 @@ class SimulatedFilterWheel(BaseFilterWheel):
         self.log.info(f"setting filter to {filter_name}")
         self._filter = self.filters[filter_name]
         time.sleep(SWITCH_TIME_S)
+    
+    def close(self):
+        pass

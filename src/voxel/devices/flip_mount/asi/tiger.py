@@ -53,7 +53,7 @@ class TigerFlipMount(BaseFlipMount):
         """
         if position_name not in POSITIONS:
             raise ValueError(f"Invalid position {position_name}. Valid positions are {list(POSITIONS.keys())}")
-        print(POSITIONS[position_name])
+        self._position = POSITIONS[position_name]
         self.tigerbox.move_absolute(**{self.axis: POSITIONS[position_name]}, wait=True)
         self.log.info(f"Flip mount {self.id} moved to position {position_name}")
 
