@@ -4,6 +4,8 @@ from tigerasi.tiger_controller import TigerController
 
 from voxel.devices.flip_mount.base import BaseFlipMount
 
+STEPS_PER_UM = 1000
+
 POSITIONS = dict()
 
 
@@ -56,6 +58,23 @@ class TigerFlipMount(BaseFlipMount):
         self._position = POSITIONS[position_name]
         self.tigerbox.move_absolute(**{self.axis: POSITIONS[position_name]}, wait=True)
         self.log.info(f"Flip mount {self.id} moved to position {position_name}")
+
+    @property
+    def flip_time_ms(self) -> int:
+        """
+        Get the time it takes to flip the mount in milliseconds.
+
+        :raises ValueError: If the flip mount is not connected or if the flip time cannot be retrieved
+        :return: Flip time in milliseconds
+        :rtype: int
+        """
+        speed_mm_s = self.tigerbox.get_speed(self.axis)
+        flip_time_ms = int(
+            abs(POSITIONS[list(POSITIONS.keys())[1]] - POSITIONS[list(POSITIONS.keys())[0]])
+            / STEPS_PER_UM
+            / speed_mm_s[self.axis.upper()]
+        )
+        return flip_time_ms
 
     def close(self) -> None:
         """
