@@ -545,7 +545,7 @@ class VieworksCamera(BaseCamera):
         #   pool back to the input pool, so it can be reused.
         column_count = self.grabber.remote.get("Width")
         row_count = self.grabber.remote.get("Height")
-        timeout_ms = 2000
+        timeout_ms = 3000
         try:
             with Buffer(self.grabber, timeout=timeout_ms) as buffer:
                 ptr = buffer.get_info(BUFFER_INFO_BASE, INFO_DATATYPE_PTR)  # grab pointer to new frame
@@ -555,8 +555,8 @@ class VieworksCamera(BaseCamera):
                 image = numpy.frombuffer(data, count=int(column_count * row_count), dtype=numpy.uint16).reshape(
                     (row_count, column_count)
                 )
-        except Exception:
-            self.log.error("frame grab failed")
+        except Exception as e:
+            self.log.error(f"frame grab failed with error {type(e)}:{e}")
             image = np.zeros((row_count, column_count), dtype=np.uint16)
         # do software binning if != 1 and not a string for setting in egrabber
         if self._binning > 1 and isinstance(self._binning, int):

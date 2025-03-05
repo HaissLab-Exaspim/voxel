@@ -114,7 +114,11 @@ class TSP01BTemperatureSensor(BaseTemperatureSensor):
         :rtype: float
         """
         temperature = C.c_double()
-        self.dll.get_temperture(self.device_handle, CHANNELS[self.channel], temperature)
+        try :
+            self.dll.get_temperture(self.device_handle, CHANNELS[self.channel], temperature)
+        except UserWarning as e:
+            print(f"Error getting the temperature from TSP0B1 (Thorlabs) : {e}")
+            return 0.0
         return temperature.value
 
     def close(self) -> None:

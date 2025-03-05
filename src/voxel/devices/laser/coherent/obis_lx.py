@@ -1,5 +1,5 @@
 from obis_laser import ObisLX, OperationalCmd, OperationalQuery, SysInfoQuery
-from serial import Serial
+from serial import Serial, SerialException
 from typing import Union, Dict, Optional
 import logging
 
@@ -76,7 +76,6 @@ class ObisLXLaser(BaseLaser):
         self._conn = id
         self.port = port
         self._wavelength = wavelength
-        self._instance
         type(self).power_setpoint_mw.maximum = maximum_power_mw
 
     @property
@@ -117,7 +116,7 @@ class ObisLXLaser(BaseLaser):
         Close the laser connection.
         """
         self.disable()
-        self._instance.ser.close()
+        # self._instance.ser.close()
 
     @DeliminatedProperty(minimum=100, maximum= float("inf"))#lambda self: self._instance.max_power)
     def power_setpoint_mw(self) -> float:
@@ -180,7 +179,11 @@ class ObisLXLaser(BaseLaser):
         :return: Temperature in Celsius
         :rtype: float
         """
-        return self._instance.temperature
+        try : 
+            return self._instance.temperature
+        except SerialException :
+            return 0.0
+
 
     def status(self) -> Dict[str, Union[str, float]]:
         """

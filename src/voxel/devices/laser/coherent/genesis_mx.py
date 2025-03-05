@@ -24,10 +24,9 @@ class GenesisMXLaser(BaseLaser):
         self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         super().__init__(id)
         self._conn = id
-        self._instance
-        self.enable()
-        type(self).power_setpoint_mw.maximum = maximum_power_mw
         self._wavelength = wavelength
+        type(self).power_setpoint_mw.maximum = maximum_power_mw
+        self.enable()
 
     @property
     def _instance(self):

@@ -57,6 +57,7 @@ class TigerStage(BaseStage):
         tigerbox: TigerController = None,
         port: str = None,
         log_level: str = "INFO",
+        
     ) -> None:
         """
         Initialize the Stage object.

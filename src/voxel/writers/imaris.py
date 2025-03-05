@@ -385,4 +385,7 @@ class ImarisWriter(BaseWriter):
             color_infos,
             adjust_color_range,
         )
-        converter.Destroy()
+        try :
+            converter.Destroy()
+        except OSError as e :
+            logger.error(f"Error while closing the pyimariswriter ImageConverter. Original error : {e}")

@@ -149,3 +149,4 @@ class RobocopyFileTransfer(BaseFileTransfer):
                 self.log.info(f"{self.filename} transfer complete, total time: {total_time:.2f} [s]")
                 subprocess.kill()
                 retry_num += 1
+        self.log.info(f"Robocopy transfer complete !")
