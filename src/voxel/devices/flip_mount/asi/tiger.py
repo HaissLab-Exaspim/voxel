@@ -1,10 +1,12 @@
+import time
+import logging
 from typing import Dict, Optional
 
 from tigerasi.tiger_controller import TigerController
 
 from voxel.devices.flip_mount.base import BaseFlipMount
 
-STEPS_PER_UM = 1000
+STEPS_PER_UM = 10
 
 POSITIONS = dict()
 
@@ -29,6 +31,7 @@ class TigerFlipMount(BaseFlipMount):
         self.id = f"tiger flip mount: axis = {axis}"
         self.axis = axis
         super().__init__(id)
+        self.log = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
         self.tigerbox = tigerbox
         for key, value in positions.items():
             POSITIONS[key] = value
@@ -57,6 +60,12 @@ class TigerFlipMount(BaseFlipMount):
             raise ValueError(f"Invalid position {position_name}. Valid positions are {list(POSITIONS.keys())}")
         self._position = POSITIONS[position_name]
         self.tigerbox.move_absolute(**{self.axis: POSITIONS[position_name]}, wait=True)
+        while self.tigerbox.is_axis_moving(self.axis):
+            self.log.info(
+                f"waiting for flip mount: {self.axis} = "
+                f"{self.tigerbox.get_position(*self.axis)[self.axis.upper()] / 10000} -> {POSITIONS[position_name] / 10000} mm"
+            )
+            time.sleep(1.0)
         self.log.info(f"Flip mount {self.id} moved to position {position_name}")
 
     @property
