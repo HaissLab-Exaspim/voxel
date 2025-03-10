@@ -9,6 +9,8 @@ class BaseStage(VoxelDevice):
     Base class for stage devices.
     """
 
+    instrument_axis : str
+
     @abstractmethod
     def move_relative_mm(self, position: float, wait: bool = True) -> None:
         """
