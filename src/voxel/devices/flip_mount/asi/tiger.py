@@ -36,7 +36,7 @@ class TigerFlipMount(BaseFlipMount):
         for key, value in positions.items():
             POSITIONS[key] = value
         # default to starting in first position
-        self.position = list(positions.keys())[0]
+        # self.position = list(positions.keys())[0]
 
     @property
     def position(self) -> Optional[str]:
