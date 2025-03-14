@@ -24,6 +24,8 @@ COMPRESSIONS = {
     "none": aqz.CompressionCodec.NONE,
 }
 
+MODES = ["local", "s3"]
+
 DATA_TYPES = {"unit8": aqz.DataType.UINT16, "uint16": aqz.DataType.UINT16}
 
 VERSIONS = {"v2": aqz.ZarrVersion.V2, "v3": aqz.ZarrVersion.V3}
@@ -56,6 +58,12 @@ class ZarrWriter(BaseWriter):
         self._multiscale = None
         self._shuffle = None
         self._clevel = None
+        self._access_key_id = None
+        self._secret_access_key = None
+        self._bucket_name = None
+        self._endpoint_url = None
+        self._region = None
+        self._mode = "local"
 
     @property
     def chunk_size_x_px(self) -> int:
@@ -144,6 +152,125 @@ class ZarrWriter(BaseWriter):
         :rtype: int
         """
         return CHUNK_COUNT_PX
+
+    @property
+    def mode(self) -> str:
+        """Get the mode of the zarr writer.
+
+        :return: Mode
+        :rtype: str
+        """
+        return self._mode
+
+    @mode.setter
+    def mode(self, mode: str) -> None:
+        """Set the mode.
+
+        :param mode: Mode
+        * **local**
+        * **s3**
+        :type mode: str
+        """
+        valid = MODES
+        if mode not in MODES:
+            raise ValueError("mode must be one of %r." % valid)
+        self.log.info(f"setting mode to: {mode}")
+        self._mode = mode
+
+    @property
+    def access_key_id(self) -> str:
+        """Get the access key ID setting of the zarr writer.
+
+        :return: Access key ID setting
+        :rtype: str
+        """
+        return self._multiscale
+
+    @access_key_id.setter
+    def access_key_id(self, access_key_id: str) -> None:
+        """Set the access key ID setting of the zarr writer.
+
+        :param value: Access key ID setting
+        :type value: str
+        """
+        self.log.info(f"setting access key id setting to: {access_key_id}")
+        self._access_key_id = access_key_id
+
+    @property
+    def secret_access_key(self) -> str:
+        """Get the secret access key setting of the zarr writer.
+
+        :return: Secret access key setting
+        :rtype: str
+        """
+        return self._multiscale
+
+    @secret_access_key.setter
+    def secret_access_key(self, secret_access_key: str) -> None:
+        """Set the secret access key setting of the zarr writer.
+
+        :param value: Secret access key setting
+        :type value: str
+        """
+        self.log.info(f"setting secret access key setting to: {secret_access_key}")
+        self._secret_access_key = secret_access_key
+
+    @property
+    def bucket_name(self) -> str:
+        """Get the bucket name setting of the zarr writer.
+
+        :return: Bucket name setting
+        :rtype: str
+        """
+        return self._multiscale
+
+    @bucket_name.setter
+    def bucket_name(self, bucket_name: str) -> None:
+        """Set the bucket name setting of the zarr writer.
+
+        :param value: Bucket name setting
+        :type value: str
+        """
+        self.log.info(f"setting bucket name setting to: {bucket_name}")
+        self._bucket_name = bucket_name
+
+    @property
+    def endpoint_url(self) -> str:
+        """Get the endpoint URL setting of the zarr writer.
+
+        :return: Endpoint URL setting
+        :rtype: str
+        """
+        return self._multiscale
+
+    @endpoint_url.setter
+    def endpoint_url(self, endpoint_url: str) -> None:
+        """Set the endpoint URL setting of the zarr writer.
+
+        :param value: Endpoint URL setting
+        :type value: str
+        """
+        self.log.info(f"setting endpoint url setting to: {endpoint_url}")
+        self._endpoint_url = endpoint_url
+
+    @property
+    def region(self) -> str:
+        """Get the region setting of the zarr writer.
+
+        :return: Region setting
+        :rtype: str
+        """
+        return self._multiscale
+
+    @region.setter
+    def region(self, region: str) -> None:
+        """Set the region setting of the zarr writer.
+
+        :param value: Region setting
+        :type value: str
+        """
+        self.log.info(f"setting region setting to: {region}")
+        self._region = region
 
     @property
     def multiscale(self) -> bool:
@@ -342,17 +469,34 @@ class ZarrWriter(BaseWriter):
         compression_settings = aqz.CompressionSettings(
             codec=self._compression,  # compression codec
             compressor=aqz.Compressor.BLOSC1,  # compressor
-            clevel=self._clevel,  # compression level
+            level=self._clevel,  # compression level
             shuffle=self._shuffle,  # shuffle filter
         )
 
-        settings = aqz.StreamSettings(
-            store_path=str(filepath),
-            data_type=DATA_TYPES[self._data_type],
-            version=VERSIONS[self._version],
-            multiscale=self._multiscale,
-            compression=compression_settings,
-        )
+        if self._mode == "local":
+            settings = aqz.StreamSettings(
+                store_path=str(filepath),
+                data_type=DATA_TYPES[self._data_type],
+                version=VERSIONS[self._version],
+                multiscale=self._multiscale,
+                compression=compression_settings,
+            )
+        else:
+            s3_settings = aqz.S3Settings(
+                access_key_id=self._access_key_id,
+                bucket_name=self._bucket_name,
+                endpoint=self._endpoint_url,
+                secret_access_key=self._secret_access_key,
+                region=self._region
+            )
+            settings = aqz.StreamSettings(
+                store_path=str(filepath),
+                data_type=DATA_TYPES[self._data_type],
+                version=VERSIONS[self._version],
+                multiscale=self._multiscale,
+                compression=compression_settings,
+                s3=s3_settings
+            )
 
         settings.dimensions.extend(
             [
