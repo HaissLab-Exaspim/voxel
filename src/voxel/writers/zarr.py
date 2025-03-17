@@ -6,7 +6,7 @@ from ctypes import c_wchar
 from math import ceil
 from multiprocessing import Array, Process
 from multiprocessing.shared_memory import SharedMemory
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 from time import perf_counter, sleep
 from typing import List
 
@@ -184,7 +184,7 @@ class ZarrWriter(BaseWriter):
         :return: Access key ID setting
         :rtype: str
         """
-        return self._multiscale
+        return self._access_key_id
 
     @access_key_id.setter
     def access_key_id(self, access_key_id: str) -> None:
@@ -203,7 +203,7 @@ class ZarrWriter(BaseWriter):
         :return: Secret access key setting
         :rtype: str
         """
-        return self._multiscale
+        return self._secret_access_key
 
     @secret_access_key.setter
     def secret_access_key(self, secret_access_key: str) -> None:
@@ -222,7 +222,7 @@ class ZarrWriter(BaseWriter):
         :return: Bucket name setting
         :rtype: str
         """
-        return self._multiscale
+        return self._bucket_name
 
     @bucket_name.setter
     def bucket_name(self, bucket_name: str) -> None:
@@ -241,7 +241,7 @@ class ZarrWriter(BaseWriter):
         :return: Endpoint URL setting
         :rtype: str
         """
-        return self._multiscale
+        return self._endpoint_url
 
     @endpoint_url.setter
     def endpoint_url(self, endpoint_url: str) -> None:
@@ -260,7 +260,7 @@ class ZarrWriter(BaseWriter):
         :return: Region setting
         :rtype: str
         """
-        return self._multiscale
+        return self._region
 
     @region.setter
     def region(self, region: str) -> None:
@@ -464,7 +464,10 @@ class ZarrWriter(BaseWriter):
         log_handler = logging.StreamHandler(sys.stdout)
         log_handler.setFormatter(log_formatter)
         logger.addHandler(log_handler)
-        filepath = Path(self._path, self._acquisition_name, self._filename).absolute()
+        if self._mode == "local":
+            filepath = Path(self._path, self._acquisition_name, self._filename).absolute()
+        else:
+            filepath = str(PureWindowsPath(self._acquisition_name, self._filename))
 
         compression_settings = aqz.CompressionSettings(
             codec=self._compression,  # compression codec
