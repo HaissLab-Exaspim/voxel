@@ -40,39 +40,3 @@ class BaseFlipMount(VoxelDevice):
         :type wait: bool, optional
         """
         pass
-
-    @abstractmethod
-    def toggle(self) -> None:
-        """
-        Toggle the flip mount position.
-        """
-        pass
-
-    @abstractmethod
-    def wait(self) -> None:
-        """
-        Wait for the flip mount to finish flipping.
-        """
-        pass
-
-    @property
-    @abstractmethod
-    def flip_time_ms(self) -> int:
-        """
-        Get the time it takes to flip the mount in milliseconds.
-
-        :return: Flip time in milliseconds
-        :rtype: int
-        """
-        pass
-
-    @flip_time_ms.setter
-    @abstractmethod
-    def flip_time_ms(self, time_ms: int) -> None:
-        """
-        Set the time it takes to flip the mount in milliseconds.
-
-        :param time_ms: Flip time in milliseconds
-        :type time_ms: int
-        """
-        pass

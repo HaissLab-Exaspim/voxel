@@ -246,7 +246,7 @@ class SimulatedCamera(BaseCamera):
         else:
             self._binning = BINNINGS[binning]
             # initialize the downsampling in 2d
-            self.gpu_binning = GPUToolsDownSample2D(binning=self._binning)
+            self.gpu_binning = GPUToolsDownSample2D(binning=self._binning, mode="average")
 
     @property
     def pixel_type(self) -> str:
