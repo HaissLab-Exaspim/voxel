@@ -114,7 +114,9 @@ class TigerStage(BaseStage):
         self.hardware_to_instrument_axis_map = self._sanitize_axis_map(r_axis_map)
         self.log.debug(f"New instrument to hardware axis mapping: " f"{self.instrument_to_hardware_axis_map}")
         self.log.debug(f"New hardware to instrument axis mapping: " f"{self.hardware_to_instrument_axis_map}")
-        self._joystick_mapping = self.tigerbox.get_joystick_axis_mapping(self.hardware_axis)
+        self._joystick_mapping = next(joystick_input for joystick_input in self.tigerbox.get_joystick_axis_mapping(self.hardware_axis).values())
+        self.log.warning(f"New hardware to jostick association : {self._joystick_mapping}")
+
 
         # clear ring buffer incase there are persistent values
         self.tigerbox.reset_ring_buffer(axis=self.hardware_axis.upper())
@@ -350,7 +352,7 @@ class TigerStage(BaseStage):
         :return: Joystick axis
         :rtype: str
         """
-        return next(key for key, enum in JOYSTICK_AXES.items() if enum.value == self._joystick_mapping)
+        return next(key for key, enum in JOYSTICK_AXES.items() if enum == self._joystick_mapping)
 
     @joystick_axis.setter
     def joystick_axis(self, axis: str) -> None:

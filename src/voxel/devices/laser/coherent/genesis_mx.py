@@ -26,7 +26,7 @@ class GenesisMXLaser(BaseLaser):
         self._conn = id
         self._wavelength = wavelength
         type(self).power_setpoint_mw.maximum = maximum_power_mw
-        self.enable()
+        # self.enable()
 
     @property
     def _instance(self):
@@ -34,11 +34,11 @@ class GenesisMXLaser(BaseLaser):
         if _inst is None :
             try:
                 self._inst = GenesisMX(serial=self._conn)
-                assert self._inst.head.serial == self._conn
-                assert self._inst.head.serial in self._inst.hops._manager._handles.values() # serial is in existing serial handles
+                assert self._inst.head["serial"] == self._conn
+                # assert self._inst.headserial in self._inst.hops._manager._handles.values() # serial is in existing serial handles
                 self._inst.mode = OperationModes.PHOTO
             except AssertionError:
-                raise ValueError(f"Error initializing laser {self._conn}, serial number mismatch. Available ids are : {self._inst.hops._manager._handles.values()}")
+                raise ValueError(f"Error initializing laser {self._conn} with {self._inst.head['serial']}, serial number mismatch. Available ids are : {self._inst._manager.devices.keys()}")
         return self._inst
 
     @property
