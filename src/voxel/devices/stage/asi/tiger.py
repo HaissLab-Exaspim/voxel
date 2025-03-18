@@ -23,6 +23,19 @@ SCAN_PATTERN = {
     "serpentine": ScanPattern.SERPENTINE,
 }
 
+JOYSTICK_AXES = {
+    "x joystick": JoystickInput.JOYSTICK_X,
+    "y joystick": JoystickInput.JOYSTICK_Y,
+    "z wheel": JoystickInput.Z_WHEEL,
+    "f wheel": JoystickInput.F_WHEEL,
+    "none": JoystickInput.NONE,
+}
+
+POLARITIES = {
+    "inverted": JoystickPolarity.INVERTED,
+    "default": JoystickPolarity.DEFAULT,
+}
+
 
 # singleton wrapper around TigerController
 class TigerControllerSingleton(TigerController, metaclass=Singleton):
@@ -101,7 +114,7 @@ class TigerStage(BaseStage):
         self.hardware_to_instrument_axis_map = self._sanitize_axis_map(r_axis_map)
         self.log.debug(f"New instrument to hardware axis mapping: " f"{self.instrument_to_hardware_axis_map}")
         self.log.debug(f"New hardware to instrument axis mapping: " f"{self.hardware_to_instrument_axis_map}")
-        self.tiger_joystick_mapping = self.tigerbox.get_joystick_axis_mapping()
+        self._joystick_mapping = self.tigerbox.get_joystick_axis_mapping(self.hardware_axis)
 
         # clear ring buffer incase there are persistent values
         self.tigerbox.reset_ring_buffer(axis=self.hardware_axis.upper())
@@ -328,6 +341,31 @@ class TigerStage(BaseStage):
         Close the stage.
         """
         self.tigerbox.ser.close()
+
+    @property
+    def joystick_axis(self) -> str:
+        """
+        Get the joystick axis.
+
+        :return: Joystick axis
+        :rtype: str
+        """
+        return next(key for key, enum in JOYSTICK_AXES.items() if enum.value == self._joystick_mapping)
+
+    @joystick_axis.setter
+    def joystick_axis(self, axis: str) -> None:
+        """
+        Set the joystick axis.
+
+        :param axis: Joystick axis
+        :type axis: str
+        :raises ValueError: If axis is not valid
+        """
+        valid = list(JOYSTICK_AXES.keys())
+        if axis not in valid:
+            raise ValueError("joystick axis must be one of %r." % valid)
+        self.tigerbox.bind_axis_to_joystick_input(**{self.hardware_axis: JOYSTICK_AXES[axis]})
+        self._joystick_mapping = JOYSTICK_AXES[axis]
 
     @property
     def position_mm(self) -> Optional[float]:

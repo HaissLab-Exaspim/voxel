@@ -9,7 +9,7 @@ class GPUToolsDownSample2D(BaseDownSample):
     Voxel 2D downsampling with gputools.
     """
 
-    def __init__(self, binning: int) -> None:
+    def __init__(self, binning: int, mode: str) -> None:
         """
         Module for handling 2D downsampling processes.
 
@@ -19,21 +19,40 @@ class GPUToolsDownSample2D(BaseDownSample):
         """
         super().__init__(binning)
         # opencl kernel
-        self._kernel = """
-        __kernel void downsample2d(__global short * input,
-                                   __global short * output){
-          int i = get_global_id(0);
-          int j = get_global_id(1);
-          int Nx = get_global_size(0);
-          int Ny = get_global_size(1);
-          int res = 0; 
+        if mode == "average":
+            self._kernel = """
+            __kernel void downsample2d(__global short * input,
+                                    __global short * output){
+            int i = get_global_id(0);
+            int j = get_global_id(1);
+            int Nx = get_global_size(0);
+            int Ny = get_global_size(1);
+            int res = 0;
 
-          for (int m = 0; m < BLOCK; ++m) 
-             for (int n = 0; n < BLOCK; ++n) 
-                  res+=input[BLOCK*Nx*(BLOCK*j+m)+BLOCK*i+n];
-          output[Nx*j+i] = (short)(res/BLOCK/BLOCK);
-        }
-        """
+            for (int m = 0; m < BLOCK; ++m)
+                for (int n = 0; n < BLOCK; ++n)
+                    res+=input[BLOCK*Nx*(BLOCK*j+m)+BLOCK*i+n];
+            output[Nx*j+i] = (short)(res/BLOCK/BLOCK);
+            }
+            """
+        elif mode == "sum":
+            self._kernel = """
+            __kernel void downsample2d(__global short * input,
+                                    __global short * output){
+            int i = get_global_id(0);
+            int j = get_global_id(1);
+            int Nx = get_global_size(0);
+            int Ny = get_global_size(1);
+            int res = 0;
+
+            for (int m = 0; m < BLOCK; ++m)
+                for (int n = 0; n < BLOCK; ++n)
+                    res+=input[BLOCK*Nx*(BLOCK*j+m)+BLOCK*i+n];
+            output[Nx*j+i] = (short)(res);
+            }
+            """
+        else:
+            raise ValueError(f"invalid mode: {mode}, mode must be 'average' or 'sum'")
 
         self._prog = OCLProgram(src_str=self._kernel, build_options=["-D", f"BLOCK={self._binning}"])
 

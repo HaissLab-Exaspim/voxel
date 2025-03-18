@@ -88,6 +88,18 @@ class NIDAQ(BaseDAQ):
         :type tasks_dict: dict
         """
         self._tasks = tasks_dict
+        # store properties
+        # store all port values as attributes for access later
+        # for name, task in tasks_dict.items():
+        #     if name == "ao_task":
+        #         for name, specs in task["ports"].items():
+        #             for parameter in specs["parameters"]:
+        #                 for channel, value in specs["parameters"][parameter]["channels"].items():
+        #                     parameter_name = f"daq_{name}_{parameter}_{channel}".replace(" ", "_")
+        #                     eval(
+        #                         f"setattr(NIDAQ, '{parameter_name}', property(fget=lambda NIDAQ: {value}, \
+        #                         fset=lambda NIDAQ, value: {value}, fdel=lambda NIDAQ: None))"
+        #                     )
 
     def add_task(self, task_type: str, pulse_count: Optional[int] = None) -> None:
         """
@@ -125,7 +137,7 @@ class NIDAQ(BaseDAQ):
 
             trigger_port = timing["trigger_port"]
 
-            for port, specs in task["ports"].items():
+            for name, specs in task["ports"].items():
                 # add channel to task
                 channel_port = specs["port"]
                 if f"{self.id}/{channel_port}" not in channel_options[task_type]:
