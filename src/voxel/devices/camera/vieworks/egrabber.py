@@ -134,10 +134,10 @@ class VieworksCamera(BaseCamera):
         # IMPORTANT: call stop here in the event that the camera previously crashed
         # if not called, the camera may not respond via the SDK
         self.grabber.remote.execute("AcquisitionStop")
-        # initialize binning as 1
-        self._binning = 1
         # initialize parameter values
         self._update_parameters()
+        # initialize binning as 1
+        self.binning = 1
 
     @DeliminatedProperty(minimum=float("-inf"), maximum=float("inf"))
     def exposure_time_ms(self) -> float:
